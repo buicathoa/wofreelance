@@ -1,4 +1,3 @@
-const db = require("../models")
 const userService = require("../services/user.service")
 const { handleSuccess, handleError } = require("../utils/handleResponse")
 
@@ -42,6 +41,15 @@ const userController = {
         }
     },
 
+    getAllUser: async(req, res) => {
+        try {
+            const result = await userService.getAllUser(req, res)
+            return handleSuccess(res, result)
+        } catch (err) {
+            return handleError(res, err)
+        }
+    },
+
     updateUser: async(req, res) => {
         try {
             const result = await userService.updateUser(req, res)
@@ -50,6 +58,15 @@ const userController = {
             return handleError(res, err)
         }
     },
+
+    createServiceProfile: async(req, res) => {
+        try{
+            const result = await userService.createServiceProfile(req, res)
+            return handleSuccess(res, result)
+        } catch(err) {
+            return handleError(res, err)
+        }
+    }
 }
 
 module.exports = userController

@@ -8,6 +8,8 @@ const sql = require("mssql");
 const app = express();
 const bodyParser = require('body-parser');
 const userRoute = require("./routes/user.route")
+const jobCategoriesRoute = require("./routes/job-categories.route")
+
 // import userRoute from "./routes/userRoute"
 dotenv.config();
 
@@ -37,6 +39,7 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json()); // for parsing application/json
 
 app.use("/v1/user", userRoute)
+app.use("/v1/job-categories", jobCategoriesRoute)
 
 
 app.listen(port, () => {

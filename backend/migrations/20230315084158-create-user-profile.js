@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('GeneralProfiles', {
+    await queryInterface.createTable('UserProfiles', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,10 +10,6 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       email: {
-        type: Sequelize.STRING,
-        isEmail: true
-      },
-      referer_code: {
         type: Sequelize.STRING
       },
       skype_username: {
@@ -58,6 +54,39 @@ module.exports = {
       other_certifications: {
         type: Sequelize.STRING
       },
+      account_status: {
+        type: Sequelize.STRING
+      },
+      latest_online_time: {
+        type: Sequelize.STRING
+      },
+      joined: {
+        type: Sequelize.STRING
+      },
+      areas_of_expertise: {
+        type: Sequelize.STRING
+      },
+      yoe: {
+        type: Sequelize.INTEGER
+      },
+      majority: {
+        type: Sequelize.STRING
+      },
+      service_role: {
+        type: Sequelize.STRING
+      },
+      list_service: {
+        type: Sequelize.STRING
+      },
+      is_open: {
+        type: Sequelize.BOOLEAN
+      },
+      working_time: {
+        type: Sequelize.STRING
+      },
+      products_link: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -69,6 +98,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('GeneralProfiles');
+    await queryInterface.dropTable('UserProfiles');
   }
 };

@@ -44,10 +44,19 @@ db.sequelize.sync({ force: false })
     console.log('yes re-sync done!')
 })
 
-db.generalprofiles = require("./userModel/generalprofile.js")(sequelize, DataTypes)
-db.serviceprofiles = require("./userModel/serviceprofile")(sequelize, DataTypes)
+db.userprofile = require("./userModel/userprofile.js")(sequelize, DataTypes)
+db.jobcategories = require("./JobCategory/jobcategories.js")(sequelize, DataTypes)
+db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelize, DataTypes)
 
-db.serviceprofiles.belongsTo(db.generalprofiles, {foreignKey: 'user_id'})
-db.generalprofiles.hasOne(db.serviceprofiles, {foreignKey: 'user_id'})
+//relations
+db.jobcategories.hasMany(db.jobsubcategories, {foreignKey: 'category_id'})
+db.jobsubcategories.belongsTo(db.jobcategories, {foreignKey: 'category_id'})
+
+
+
+// db.serviceprofiles = require("./userModel/serviceprofile")(sequelize, DataTypes)
+
+// db.serviceprofiles.belongsTo(db.generalprofiles, {foreignKey: 'user_id'})
+// db.generalprofiles.hasOne(db.serviceprofiles, {foreignKey: 'user_id'})
 
 module.exports = db;

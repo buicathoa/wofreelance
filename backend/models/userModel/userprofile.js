@@ -1,13 +1,9 @@
 'use strict';
 const {
-  Model
+  Model, BOOLEAN
 } = require('sequelize');
-const ServiceProfile = require('./serviceprofile');
-const db = require("./../index");
 module.exports = (sequelize, DataTypes) => {
-  const ServiceProfile = db.generalprofiles;
-
-  class GeneralProfile extends Model {
+  class UserProfile extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -17,13 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  GeneralProfile.init({
+  UserProfile.init({
     email: DataTypes.STRING,
-    fullname: DataTypes.STRING,
-    account_status: DataTypes.STRING,
-    is_active: DataTypes.BOOLEAN,
     password: DataTypes.STRING,
-    referer_code: DataTypes.STRING, 
+    is_verified_account: DataTypes.BOOLEAN,
     skype_username: DataTypes.STRING,
     linkedin_username: DataTypes.STRING,
     avatar: DataTypes.STRING,
@@ -37,11 +30,21 @@ module.exports = (sequelize, DataTypes) => {
     yoe: DataTypes.INTEGER,
     majority: DataTypes.STRING,
     cv_uploaded: DataTypes.STRING,
-    other_certifications: DataTypes.STRING
+    other_certifications: DataTypes.STRING,
+    account_status: DataTypes.STRING,
+    latest_online_time: DataTypes.STRING,
+    joined: DataTypes.STRING,
+    areas_of_expertise: DataTypes.STRING,
+    yoe: DataTypes.INTEGER,
+    majority: DataTypes.STRING,
+    service_role: DataTypes.STRING,
+    list_service: DataTypes.STRING,
+    is_open: DataTypes.BOOLEAN,
+    working_time: DataTypes.STRING,
+    products_link: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'GeneralProfile',
+    modelName: 'UserProfile',
   });
-
-  return GeneralProfile;
+  return UserProfile;
 };

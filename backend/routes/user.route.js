@@ -8,7 +8,10 @@ const { uploadImage } = require('../utils/helper');
 
 router.post("/register", userController.registerAccount)
 router.post("/login", userController.loginUser)
-router.post("/get-info", userController.getUserInfo)
-router.post("/update", authorize('personal') ,uploadImage('avatar').single('image') ,userController.updateUser)
+router.post("/get-info", authorize(['super_admin', 'admin', 'user'], 'user') ,userController.getUserInfo)
+router.post("/get-all", authorize(['super_admin', 'admin'], 'user') , userController.getAllUser)
+router.post("/update", authorize(['super_admin', 'admin', 'user'], 'user') ,uploadImage('avatar').single('image') ,userController.updateUser)
+
+// router.post("/service/create", authorize('create') , userController.createServiceProfile)
 
 module.exports = router
