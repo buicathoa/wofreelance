@@ -1,8 +1,8 @@
 // import userController from "../controllers/userController"
 const router = require('express').Router()
-const jobCategoriesController = require("../controllers/job-categories.controller");
-const authorize = require('../middlewares/authorize');
-const { uploadImage } = require('../utils/helper');
+const jobCategoriesController = require("../../controllers/JobCategoryController/job-categories.controller");
+const authorize = require('../../middlewares/authorize');
+const { uploadImage } = require('../../utils/helper');
 
 
 router.post("/create", authorize(['super_admin'], 'others') , jobCategoriesController.createCategory)
@@ -15,6 +15,12 @@ router.post('/sub/update', authorize(['super_admin'], 'others'), jobCategoriesCo
 router.post('/sub/delete', authorize(['super_admin'], 'others'), jobCategoriesController.deleteSubCategory)
 router.post('/sub/get-all', authorize(['super_admin'], 'others'), jobCategoriesController.getAllSubCategory)
 
+//child-categories
+router.post("/skillset/create", authorize(['super_admin'], 'others') , jobCategoriesController.createSkillsetcategory)
+router.post("/skillset/get-all", authorize(['super_admin'], 'others') , jobCategoriesController.getAllSkillset)
+
+//Sub-child categories
+// router.post("/sub-child/create", authorize(['super_admin'], 'others') , jobCategoriesController.createSubChildCategory)
 
 // router.post("/service/create", authorize('create') , userController.createServiceProfile)
 

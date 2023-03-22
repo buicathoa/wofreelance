@@ -1,5 +1,5 @@
-const JobCategoryService = require("../services/job-categories.service")
-const { handleSuccess, handleError } = require("../utils/handleResponse")
+const JobCategoryService = require("../../services/JobCategoryService/job-categories.service");
+const { handleSuccess, handleError } = require("../../utils/handleResponse")
 
 const jobCategoriesController = {
     createCategory: async (req, res) => {
@@ -68,6 +68,34 @@ const jobCategoriesController = {
             return handleError(res, err)
         }
     },
+
+    //Skillset category
+    createSkillsetcategory: async (req, res) => {
+        try{
+            const result = await JobCategoryService.createSkillsetcategory(req, res)
+            return handleSuccess(res, result)
+        } catch (err) {
+            return handleError(res, err)
+        }
+    },
+
+    getAllSkillset: async (req, res) => {
+        try{
+            const result = await JobCategoryService.getAllSkillset(req, res)
+            return handleSuccess(res, result)
+        } catch (err) {
+            return handleError(res, err)
+        }
+    },
+    //Sub-child category
+    // createSubChildCategory: async (req, res) => {
+    //     try{
+    //         const result = await JobCategoryService.createSubChildcategory(req, res)
+    //         return handleSuccess(res, result)
+    //     } catch (err) {
+    //         return handleError(res, err)
+    //     }
+    // },
 }
 
 module.exports = jobCategoriesController

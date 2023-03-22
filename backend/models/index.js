@@ -39,18 +39,82 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-db.sequelize.sync({ force: false })
-.then(() => {
-    console.log('yes re-sync done!')
-})
 
+//user profile
 db.userprofile = require("./userModel/userprofile.js")(sequelize, DataTypes)
+
+//category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories.js")(sequelize, DataTypes)
+
+//subcategory: website development...
 db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelize, DataTypes)
 
-//relations
+//skillset: javascript, react,...
+db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
+
+//Junction table many to many (skillset - posts): skillset_id and post_id
+db.skillsetandposts = require("./JunctionTable/skillsetandpost")(sequelize, DataTypes)
+
+//Junction table many to many (subcategory - skillset): subcategory_id, skillset_id
+db.subcateandskill = require("./JunctionTable/subcateandskill")(sequelize, DataTypes)
+
+//reviews table
+db.reviews = require("./Reviews/review")(sequelize, DataTypes)
+
+//Post table
+db.posts = require("./Posts/post")(sequelize, DataTypes)
+
+
+// =============================================================================== One to Many Relationship =============================================================================== // 
+
+//Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
 db.jobcategories.hasMany(db.jobsubcategories, {foreignKey: 'category_id'})
 db.jobsubcategories.belongsTo(db.jobcategories, {foreignKey: 'category_id'})
+
+//Making relations one to many, 1 user can have multiple posts
+db.userprofile.hasMany(db.posts, {foreignKey: 'user_id'})
+db.posts.belongsTo(db.userprofile, {foreignKey: 'user_id'})
+
+
+// ========================================================================================== End ==========================================================================================//
+
+
+
+
+// =============================================================================== Many to Many Relationship =============================================================================== // 
+
+//Making relations many to many, 1 posts can have multiple skillset, such as: 1 post Frontend jobs can have various skills(Javascript, React) and 1 skillset can be stored in various posts
+db.posts.belongsToMany(db.jobskillset, {through: {
+  model:  db.skillsetandposts,
+  unique: true
+}})
+db.jobskillset.belongsToMany(db.posts, {through: {
+  model:  db.skillsetandposts,
+  unique: true
+}})
+
+
+//Making relations many to many => 1 website development can have multiple skillset and 1 skillset can be stored in frontend and backend,...
+db.jobsubcategories.belongsToMany(db.jobskillset, {through: {
+  model:  db.subcateandskill,
+  unique: true
+}})
+db.jobskillset.belongsToMany(db.jobsubcategories, {through: {
+  model:  db.subcateandskill,
+  unique: true
+}})
+
+
+// ========================================================================================== End ==========================================================================================//
+
+
+
+
+//reviews
+db.userprofile.hasMany(db.reviews, {foreignKey: 'user_id'}),
+db.userprofile.hasMany(db.reviews, {foreignKey: 'user_was_reviewed_id'})
+
+
 
 
 
@@ -58,5 +122,8 @@ db.jobsubcategories.belongsTo(db.jobcategories, {foreignKey: 'category_id'})
 
 // db.serviceprofiles.belongsTo(db.generalprofiles, {foreignKey: 'user_id'})
 // db.generalprofiles.hasOne(db.serviceprofiles, {foreignKey: 'user_id'})
-
+db.sequelize.sync({ force: false })
+.then(() => {
+    console.log('yes re-sync done!')
+})
 module.exports = db;

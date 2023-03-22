@@ -84,14 +84,11 @@ const userService = {
                 expiresIn: "24h",
               }
             );
+            const {password, ...others} = user
 
-            const userResponse = { ...user };
-            delete userResponse["password"];
-
-            delete user.password
             return {
               message: "Login success.",
-              data: userResponse.dataValues ? userResponse.dataValues : user,
+              data: others,
               token: accesstoken,
             };
           } else {
