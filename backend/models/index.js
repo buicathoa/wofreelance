@@ -10,10 +10,14 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
+let sequelizeCategories;
+let sequelizeJunctionTable;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelizeCategories = new Sequelize({...config, database: 'wofreelance_categories'});
+  sequelizeJunctionTable = new Sequelize({...config, database: 'wofreelance_junction_table'})
 }
 
 fs
@@ -38,28 +42,30 @@ Object.keys(db).forEach(modelName => {
 });
 
 db.sequelize = sequelize;
+db.sequelizeCategories = sequelizeCategories;
+db.sequelizeJunctionTable = sequelizeJunctionTable;
 db.Sequelize = Sequelize;
 
 //user profile
-db.userprofile = require("./userModel/userprofile.js")(sequelize, DataTypes)
+db.userprofile = require("./userModel/userprofile")(sequelize, DataTypes)
 
 //category: IT-Sofware, BA, Marketing...
-db.jobcategories = require("./JobCategory/jobcategories.js")(sequelize, DataTypes)
+db.jobcategories = require("./JobCategory/jobcategories")(sequelizeCategories, DataTypes)
 
 //subcategory: website development...
-db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelize, DataTypes)
+db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelizeCategories, DataTypes)
 
 //skillset: javascript, react,...
-db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
+db.jobskillset = require("./JobCategory/jobskillset")(sequelizeCategories, DataTypes)
 
 //Junction table many to many (skillset - posts): skillset_id and post_id
-db.skillsetandposts = require("./JunctionTable/skillsetandpost")(sequelize, DataTypes)
+db.skillsetandposts = require("./JobCategory/skillsetandposts")(sequelize, DataTypes)
 
 //Junction table many to many (subcategory - skillset): subcategory_id, skillset_id
-db.subcateandskill = require("./JunctionTable/subcateandskill")(sequelize, DataTypes)
+db.subcategoryandskillset = require("./JobCategory/subcategoryandskillset")(sequelizeJunctionTable, DataTypes)
 
 //reviews table
-db.reviews = require("./Reviews/review")(sequelize, DataTypes)
+// db.reviews = require("./Reviews/review")(sequelize, DataTypes)
 
 //Post table
 db.posts = require("./Posts/post")(sequelize, DataTypes)
@@ -84,35 +90,31 @@ db.posts.belongsTo(db.userprofile, {foreignKey: 'user_id'})
 // =============================================================================== Many to Many Relationship =============================================================================== // 
 
 //Making relations many to many, 1 posts can have multiple skillset, such as: 1 post Frontend jobs can have various skills(Javascript, React) and 1 skillset can be stored in various posts
-db.posts.belongsToMany(db.jobskillset, {through: {
-  model:  db.skillsetandposts,
-  unique: true
-}})
-db.jobskillset.belongsToMany(db.posts, {through: {
-  model:  db.skillsetandposts,
-  unique: true
-}})
+db.posts.associate = (models) => {
+  db.posts.belongsToMany(models.jobskillset, {through: db.skillsetandposts})
+}
+db.jobskillset.associate = (models) => {
+  db.jobskillset.belongsToMany(models.posts, {through: db.skillsetandposts})
+}
 
 
 //Making relations many to many => 1 website development can have multiple skillset and 1 skillset can be stored in frontend and backend,...
-db.jobsubcategories.belongsToMany(db.jobskillset, {through: {
-  model:  db.subcateandskill,
-  unique: true
-}})
-db.jobskillset.belongsToMany(db.jobsubcategories, {through: {
-  model:  db.subcateandskill,
-  unique: true
-}})
-
-
+// db.jobsubcategories.belongsToMany(db.jobskillset, {through: db.subcategoryandskillset})
+// db.jobskillset.belongsToMany(db.jobsubcategories, {through: db.subcategoryandskillset})
+db.jobsubcategories.associate = (models) => {
+  db.jobsubcategories.belongsToMany(models.jobskillset, {through: db.subcategoryandskillset})
+}
+db.jobskillset.associate = (models) => {
+  db.jobskillset.belongsToMany(models.jobsubcategories, {through: db.subcategoryandskillset})
+}
 // ========================================================================================== End ==========================================================================================//
 
 
 
 
 //reviews
-db.userprofile.hasMany(db.reviews, {foreignKey: 'user_id'}),
-db.userprofile.hasMany(db.reviews, {foreignKey: 'user_was_reviewed_id'})
+// db.userprofile.hasMany(db.reviews, {foreignKey: 'user_id'}),
+// db.userprofile.hasMany(db.reviews, {foreignKey: 'user_was_reviewed_id'})
 
 
 
@@ -122,8 +124,5 @@ db.userprofile.hasMany(db.reviews, {foreignKey: 'user_was_reviewed_id'})
 
 // db.serviceprofiles.belongsTo(db.generalprofiles, {foreignKey: 'user_id'})
 // db.generalprofiles.hasOne(db.serviceprofiles, {foreignKey: 'user_id'})
-db.sequelize.sync({ force: false })
-.then(() => {
-    console.log('yes re-sync done!')
-})
+
 module.exports = db;

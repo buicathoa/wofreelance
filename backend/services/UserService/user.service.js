@@ -1,12 +1,12 @@
-const db = require("../models");
+const db = require("../../models");
 const bcrypt = require("bcrypt");
 const jwt_decode = require("jwt-decode");
 const jwt = require("jsonwebtoken");
 
-const { handleError } = require("../utils/handleResponse");
+const { handleError } = require("../../utils/handleResponse");
 const { Op } = require("sequelize");
-const { ClientError } = require("../errors");
-const RestApiMethods = require("../utils/QueryInsertPattern");
+const { ClientError } = require("../../errors");
+const RestApiMethods = require("../../utils/QueryInsertPattern");
 const UserProfile = db.userprofile;
 // const ServiceProfiles = db.serviceprofiles
 const sequelize = db.sequelize;

@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('SKILLSETandPOSTs', {
+    await queryInterface.createTable('subcategoryandskillsets', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,7 +12,7 @@ module.exports = {
       skillset_id: {
         type: Sequelize.INTEGER
       },
-      post_id: {
+      subcategory_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -26,6 +26,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('SKILLSETandPOSTs');
+    await queryInterface.dropTable('subcategoryandskillsets');
   }
 };

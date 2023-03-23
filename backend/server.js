@@ -7,10 +7,11 @@ const mysql = require('mysql2');
 const sql = require("mssql");
 const app = express();
 const bodyParser = require('body-parser');
-const userRoute = require("./routes/user.route")
+const userRoute = require("./routes/UserRoute/user.route")
 const jobCategoriesRoute = require("./routes/JobCategoryRoute/job-categories.route")
 const postsRoute = require("./routes/PostsRoute/posts.route")
-
+// const JunctionRoute = require("./routes/JunctionRoute/junction.route");
+const { sequelize } = require("./models");
 // import userRoute from "./routes/userRoute"
 dotenv.config();
 
@@ -43,8 +44,13 @@ app.use("/v1/user", userRoute)
 app.use("/v1/job-categories", jobCategoriesRoute)
 app.use("/v1/posts", postsRoute)
 
-app.listen(port, () => {
-    console.log(`server is running at ${port}`)
+//Junction routes
+// app.use("/v1", JunctionRoute)
+
+sequelize.sync().then(() => {
+    app.listen(port, () => {
+        console.log(`server is running at ${port}`)
+    })
 })
 
 module.exports = dbConnection

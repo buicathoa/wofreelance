@@ -10,9 +10,12 @@ const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const JobCategories = db.jobcategories;
 const JobSubCategories = db.jobsubcategories;
-const JobSkillsetCategories = db.jobskillsetcategories;
+const jobskillset = db.jobskillset;
+const SkillsetandPosts = db.skillsetandposts
 
 const sequelize = db.sequelize;
+const sequelizeCategories = db.sequelizeCategories
+const sequelizeJunctionTable = db.sequelizeJunctionTable
 
 const JobCategoryService = {
   createCategory: async (req, res) => {
@@ -27,34 +30,40 @@ const JobCategoryService = {
 
     try {
       //solution 1
-      // const result = await JobCategories.create(req.body)
-
-      //solution 2
-      const table = "wofreelance.jobcategories";
-      const column = Object.keys(req.body);
-      const query = RestApiMethods.insert(table, column);
-      const promises = [];
-      for (let record of listRecords) {
-        const result = await sequelize.query(query, { replacements: record }); // The first query
-        const getMethodPattern = RestApiMethods.get(
-          "wofreelance.jobcategories",
-          "all",
-          ["id"]
-        );
-        const promise = await sequelize.query(
-          `select * from wofreelance.jobcategories where id = "${result[0]}"`
-        );
-        promises.push(promise);
+      let promises = []
+      for(x of listRecords) {
+        promises.push(await JobCategories.create(x))
       }
-      const listInserted = [];
-      await Promise.all(promises).then((res) => {
-        if (res?.length > 0) {
-          res?.map((x) => {
-            listInserted.push(x[0][0]);
-          });
-        }
-      });
-      return listInserted;
+
+      await Promise.all(promises).then(res => {
+        console.log(res)
+      })
+      //solution 2
+      // const table = "wofreelance.jobcategories";
+      // const column = Object.keys(req.body);
+      // const query = RestApiMethods.insert(table, column);
+      // const promises = [];
+      // for (let record of listRecords) {
+      //   const result = await sequelize.query(query, { replacements: record }); // The first query
+      //   const getMethodPattern = RestApiMethods.get(
+      //     "wofreelance.jobcategories",
+      //     "all",
+      //     ["id"]
+      //   );
+      //   const promise = await sequelize.query(
+      //     `select * from wofreelance.jobcategories where id = "${result[0]}"`
+      //   );
+      //   promises.push(promise);
+      // }
+      // const listInserted = [];
+      // await Promise.all(promises).then((res) => {
+      //   if (res?.length > 0) {
+      //     res?.map((x) => {
+      //       listInserted.push(x[0][0]);
+      //     });
+      //   }
+      // });
+      // return listInserted;
     } catch (err) {
       throw err;
     }
@@ -135,19 +144,19 @@ const JobCategoryService = {
   getAllCategory: async (req, res) => {
     try {
       //first solution
-      // const result = await JobCategories.findAll({
-      //     include: JobSubCategories
-      // })
-
+      const result = await JobCategories.findAll({
+          include: JobSubCategories
+      })
+      return result
       //const solution
-      const result =
-        await sequelize.query(`SELECT wofreelance.jobcategories.id, wofreelance.jobcategories.name,
-        json_arrayagg(json_object('name', wofreelance.jobsubcategories.name, 'category_id', wofreelance.jobsubcategories.category_id,
-        'id', wofreelance.jobsubcategories.id)) as list_sub
-        FROM wofreelance.jobcategories
-        LEFT JOIN wofreelance.jobsubcategories ON wofreelance.jobcategories.id = wofreelance.jobsubcategories.category_id
-        GROUP BY  wofreelance.jobcategories.id;`);
-      return result[0];
+      // const result =
+      //   await sequelize.query(`SELECT wofreelance_categories.jobcategories.id, wofreelance_categories.jobcategories.name,
+      //   json_arrayagg(json_object('name', wofreelance_categories.jobsubcategories.name, 'category_id', wofreelance_categories.jobsubcategories.category_id,
+      //   'id', wofreelance_categories.jobsubcategories.id)) as list_sub
+      //   FROM wofreelance_categories.jobcategories
+      //   LEFT JOIN wofreelance_categories.jobsubcategories ON wofreelance_categories.jobcategories.id = wofreelance_categories.jobsubcategories.category_id
+      //   GROUP BY  wofreelance_categories.jobcategories.id;`);
+      // return result[0];
     } catch (err) {
       throw err;
     }
@@ -271,19 +280,19 @@ const JobCategoryService = {
   getAllSubCategory: async (req, res) => {
     try {
       //first solution
-      // const result = await JobSubCategories.findAll();
-      // return result;
+      const result = await JobSubCategories.findAll();
+      return result;
 
       //second solution
-      let query = '';
-      if(req.body.getType === 'onlySub'){
-        query = `Select * from wofreelance.jobsubcategories`
-      } else {
-        query = `Select wofreelance.jobsubcategories.id, wofreelance.jobsubcategories.name, IF(json_arrayagg(json_object('name', wofreelance.jobskillsets.name)) IS NULL, JSON_ARRAY(), json_arrayagg(json_object('name', wofreelance.jobskillsets.name))) as list_skillsets
-        FROM wofreelance.jobsubcategories LEFT JOIN wofreelance.jobskillsets ON wofreelance.jobsubcategories.id = wofreelance.jobskillsets.subcategory_id
-        GROUP BY wofreelance.jobsubcategories.id`
-      }
-      const result = await sequelize.query(query);
+      // let query = '';
+      // if(req.body.getType === 'onlySub'){
+      //   query = `Select * from wofreelance.jobsubcategories`
+      // } else {
+      //   query = `Select wofreelance.jobsubcategories.id, wofreelance.jobsubcategories.name, IF(json_arrayagg(json_object('name', wofreelance.jobskillsets.name)) IS NULL, JSON_ARRAY(), json_arrayagg(json_object('name', wofreelance.jobskillsets.name))) as list_skillsets
+      //   FROM wofreelance.jobsubcategories LEFT JOIN wofreelance.jobskillsets ON wofreelance.jobsubcategories.id = wofreelance.jobskillsets.subcategory_id
+      //   GROUP BY wofreelance.jobsubcategories.id`
+      // }
+      // const result = await sequelize.query(query);
       return result[0];
     } catch (err) {
       throw err;
@@ -334,17 +343,32 @@ const JobCategoryService = {
   getAllSkillset: async (req, res) => {
     try {
       //first solution
-      // const result = await JobSkillsetCategories.findAll();
-      // return result;
+      const result = await jobskillset.findAll();
+      return result;
 
       //second solution
-      const query = `Select * from wofreelance.jobskillsets`;
-      const result = await sequelize.query(query);
-      return result[0];
+      // const query = `Select * from wofreelance.jobskillsets`;
+      // const result = await sequelize.query(query);
+      // return result[0];
     } catch (err) {
       throw err;
     }
   },
+
+  getAllSubcategoryandSkillset: async (req, res) => {
+    try {
+        //first solution
+        const result = await sequelizeJunctionTable.query(`call wofreelance_junction_table.SP_getallSubcateandSkillset()`)
+        if(result){
+          const list_array = result.map((res) => {
+            return {...res, list_skills: res.list_skills.filter(x => x !== null)}
+          })
+          return list_array
+        }
+    } catch (err) {
+      throw err
+    }
+  }
 
 };
 

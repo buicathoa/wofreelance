@@ -1,5 +1,5 @@
-const userService = require("../services/user.service")
-const { handleSuccess, handleError } = require("../utils/handleResponse")
+const userService = require("../../services/UserService/user.service")
+const { handleSuccess, handleError } = require("../../utils/handleResponse")
 
 const userController = {
     registerAccount: async(req, res) => {

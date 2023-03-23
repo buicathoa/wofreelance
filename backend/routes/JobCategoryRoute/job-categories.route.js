@@ -19,6 +19,7 @@ router.post('/sub/get-all', authorize(['super_admin'], 'others'), jobCategoriesC
 router.post("/skillset/create", authorize(['super_admin'], 'others') , jobCategoriesController.createSkillsetcategory)
 router.post("/skillset/get-all", authorize(['super_admin'], 'others') , jobCategoriesController.getAllSkillset)
 
+router.post("/subcate/get-all", authorize(['super_admin'], 'others') , jobCategoriesController.getAllSubcategoryandSkillset)
 //Sub-child categories
 // router.post("/sub-child/create", authorize(['super_admin'], 'others') , jobCategoriesController.createSubChildCategory)
 
