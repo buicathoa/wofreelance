@@ -59,7 +59,7 @@ db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelizeCategor
 db.jobskillset = require("./JobCategory/jobskillset")(sequelizeCategories, DataTypes)
 
 //Junction table many to many (skillset - posts): skillset_id and post_id
-db.skillsetandposts = require("./JobCategory/skillsetandposts")(sequelize, DataTypes)
+db.skillsetandposts = require("./Posts/posts_skillsets")(sequelizeJunctionTable, DataTypes)
 
 //Junction table many to many (subcategory - skillset): subcategory_id, skillset_id
 db.subcategoryandskillset = require("./JobCategory/subcategoryandskillset")(sequelizeJunctionTable, DataTypes)
@@ -90,12 +90,24 @@ db.posts.belongsTo(db.userprofile, {foreignKey: 'user_id'})
 // =============================================================================== Many to Many Relationship =============================================================================== // 
 
 //Making relations many to many, 1 posts can have multiple skillset, such as: 1 post Frontend jobs can have various skills(Javascript, React) and 1 skillset can be stored in various posts
-db.posts.associate = (models) => {
-  db.posts.belongsToMany(models.jobskillset, {through: db.skillsetandposts})
-}
-db.jobskillset.associate = (models) => {
-  db.jobskillset.belongsToMany(models.posts, {through: db.skillsetandposts})
-}
+// db.posts.associate = (models) => {
+//   db.posts.belongsToMany(models.jobskillset, {through: db.skillsetandposts})
+// }
+// db.jobskillset.associate = (models) => {
+//   db.jobskillset.belongsToMany(models.posts, {through: db.skillsetandposts})
+// }
+
+db.posts.belongsToMany(db.jobskillset, {
+  through: db.skillsetandposts,
+  foreignKey: 'post_id',
+  otherKey: 'skillset_id'
+})
+db.jobskillset.belongsToMany(db.posts, {
+  through: db.skillsetandposts,
+  foreignKey: 'skillset_id',
+  otherKey: 'post_id'
+})
+
 
 
 //Making relations many to many => 1 website development can have multiple skillset and 1 skillset can be stored in frontend and backend,...

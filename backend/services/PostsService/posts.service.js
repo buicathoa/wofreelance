@@ -8,232 +8,116 @@ const { Op } = require("sequelize");
 const { ClientError } = require("../../errors");
 
 const RestApiMethods = require("../../utils/QueryInsertPattern");
-const Posts = db.posts;
+const dbConnection = require("../../server");
+const Post = db.posts;
 const JobSubCategories = db.jobsubcategories;
+const Posts_skillsets = db.skillsetandposts;
+const UserProfiles = db.userprofile;
+const JobSkillset = db.jobskillset;
 
 const sequelize = db.sequelize;
+const sequelizeJunctionTable = db.sequelizeJunctionTable;
 
 const PostService = {
-  create: async (req, res) => {
+  createPosts: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
-    const obj = {...req.body, post_status: 'pending', user_id: decoded.id}
+    const {
+      title,
+      project_detail,
+      project_paid_unit,
+      project_budget,
+      avg_bid_unit,
+      bidding_time_start,
+      bidding_time_end,
+      project_paid_type,
+    } = req.body;
+    const obj = { ...req.body, post_status: "pending", user_id: decoded.id };
+    const columnPosts = Object.keys(obj);
+    // const transaction = await sequelize.transaction();
     try {
-      //solution 1
-      //   const result = await Posts.create(req.body)
-      //     return result
-      //solution 2
-      const table = "wofreelance.posts";
-      const column = Object.keys(obj);
-      const query = RestApiMethods.insert(table, column);
-      const itemInserted = await sequelize.query(query, {
-        replacements: {...obj},
-      }); // The first query
-      const itemGot = await sequelize.query(
-        `select * from ${table} where id = "${itemInserted[0]}"`
-      );
-      return itemGot[0][0];
+      await sequelize.transaction(async (t) => {
+        const newPost = await Posts.create(
+          {
+            title: title,
+            project_detail: project_detail,
+            project_paid_unit: project_paid_unit,
+            project_budget: project_budget,
+            avg_bid_unit: avg_bid_unit,
+            bidding_time_start: bidding_time_start,
+            bidding_time_end: bidding_time_end,
+            project_paid_type: project_paid_type,
+            post_status: "pending",
+            user_id: decoded.id,
+          },
+          { transaction: t }
+        );
+        // const queryPatternPosts = RestApiMethods.insert('wofreelance.posts', columnPosts)
+        // const result = await sequelize.query(queryPatternPosts,{
+        //  replacements: {...obj}, transaction: t
+        // })
+        // const recordAdded = await sequelize.query(
+        //   `SELECT * FROM wofreelance.posts WHERE id = ${result[0]}`, {transaction: t}
+        // )
+        let promises = [];
+        const list_skills = req.body.skills.split(",");
+        for (skill of list_skills) {
+          const columnsSkillsandPosts = ["skillset_id", "post_id", "user_id"];
+          const querySkillsAndPosts = RestApiMethods.insert(
+            "wofreelance_junction_table.posts_skillsets",
+            columnsSkillsandPosts
+          );
+          promises.push(
+            await sequelizeJunctionTable.query(querySkillsAndPosts, {
+              replacements: {
+                skillset_id: parseInt(skill),
+                post_id: newPost.id,
+                user_id: decoded.id,
+              },
+              transaction: t,
+            })
+          );
+        }
+
+        await Promise.all(promises).then((res) => {
+          return newPost[0];
+        });
+      });
+      // return result
     } catch (err) {
       throw err;
     }
   },
 
-  //   updateCategory: async (req, res) => {
-  //     try {
-  //       let result;
-  //       //solution 1
-  //       // await sequelize.transaction(async (t) => {
-  //       //   await JobCategories.update(
-  //       //     {
-  //       //       name: req.body.name,
-  //       //     },
-  //       //     {
-  //       //       where: {
-  //       //         id: req.body.id,
-  //       //       },
-  //       //       returning: true,
-  //       //     }
-  //       //   );
+  getAllPersonalPosts: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    // const params = {
+    //   user_id: decoded.id,
+    //   list_skills: req.body.list_skills
+    //     ? req.body.list_skills?.split(",")?.map(Number)?.join(",")
+    //     : null,
+    // };
+    // const json_string = JSON.stringify(params);
+    try {
+      // const result = await sequelizeJunctionTable.query(`CALL wofreelance_junction_table.getAllPostsByPersonal('${json_string}')`)
+      // return result
 
-  //       //   result = await JobCategories.findOne({
-  //       //     where: {
-  //       //       id: req.body.id,
-  //       //     },
-  //       //   });
-  //       // });
+      const result = await db.posts.findAll({
+        include: [
+          {
+            model: db.jobskillset,
+            through: {
+              model: db.skillsetandposts,
+              attributes: []
+            }
+          }
+        ]
+      });
 
-  //       //solution 2
-  //       const columns = Object.keys(req.body)
-  //       const values = Object.values(req.body)
-  //       const query = RestApiMethods.update('wofreelance.jobcategories', columns, ['id'])
-  //       await sequelize.query(query,  {
-  //         replacements: [...values, req.body['id']]
-  //       })
-
-  //       result = await sequelize.query(`select * from wofreelance.jobcategories where id = ${req.body.id}`)
-  //       return result[0];
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-
-  //   deleteCategory: async (req, res) => {
-  //     try {
-  //       //first solution
-  //       // const result = await JobCategories.destroy({
-  //       //   where: {
-  //       //     id: req.body.id,
-  //       //   },
-  //       // });
-
-  //       //second solution
-  //       const columns = Object.keys(req.body)
-  //       let results = []
-  //       for(record of req.body.id.split('.')){
-  //         const query = RestApiMethods.delete('wofreelance.jobcategories', columns, ['id'])
-  //         const result = await sequelize.query(query, {replacements: [record]})
-  //         results.push(result)
-  //       }
-  //       return results
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-
-  //   getAllCategory: async (req, res) => {
-  //     try {
-  //       //first solution
-  //       // const result = await JobCategories.findAll({
-  //       //     include: JobSubCategories
-  //       // })
-
-  //       //const solution
-  //       const result =
-  //         await sequelize.query(`SELECT wofreelance.jobcategories.id, wofreelance.jobcategories.name,
-  //         json_arrayagg(json_object('name', wofreelance.jobsubcategories.name, 'category_id', wofreelance.jobsubcategories.category_id,
-  //         'id', wofreelance.jobsubcategories.id)) as list_sub
-  //         FROM wofreelance.jobcategories
-  //         LEFT JOIN wofreelance.jobsubcategories ON wofreelance.jobcategories.id = wofreelance.jobsubcategories.category_id
-  //         GROUP BY  wofreelance.jobcategories.id;`);
-  //       return result[0];
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-
-  //   //sub-categories
-
-  //   createSubCategory: async (req, res) => {
-  //     let listRecords = [];
-  //     let listInserted = []
-  //     if (req.body.name.split(".")?.length > 0) {
-  //       req?.body?.name?.split(".")?.forEach((item) => {
-  //         listRecords.push({
-  //           name: item.trim(),
-  //           category_id: req.body.category_id,
-  //           createdAt: req.body.createdAt,
-  //           updatedAt: req.body.updatedAt
-  //         });
-  //       });
-  //     }
-  //     try {
-  //       //first solution
-  //       // const result = await JobSubCategories.bulkCreate(listRecords);
-  //       // return result
-
-  //       //second solution
-  //       const columns = Object.keys(req.body)
-  //       const query = RestApiMethods.insert('wofreelance.jobsubcategories', columns)
-  //       const promises = []
-  //       for (const record of listRecords) {
-  //         const result = await sequelize.query(query, {replacements: record})
-  //         const getRecordUpdated = await sequelize.query(`SELECT * FROM wofreelance.jobsubcategories WHERE id = ${result[0]}`)
-  //         promises.push(getRecordUpdated)
-  //       }
-  //       await Promise.all(promises).then(res => {
-  //         if(res?.length > 0){
-  //           res?.map((x) => {
-  //             listInserted.push(x[0][0])
-  //           })
-  //         }
-  //       })
-  //        return listInserted
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-  //   updateSubCategory: async (req, res) => {
-  //     try {
-  //       //first solution
-  //       // let result;
-  //       // await sequelize.transaction(async (t) => {
-  //       //   await JobSubCategories.update(
-  //       //     {
-  //       //       name: req.body.name,
-  //       //     },
-  //       //     {
-  //       //       where: {
-  //       //         id: req.body.id,
-  //       //       },
-  //       //       returning: true,
-  //       //     }
-  //       //   );
-
-  //       //   result = await JobSubCategories.findOne({
-  //       //     where: {
-  //       //       id: req.body.id,
-  //       //     },
-  //       //   });
-  //       // });
-  //       // return result;
-
-  //       //second solution
-  //       const columns = Object.keys(req.body)
-  //       const values = Object.values(req.body)
-  //       const query = RestApiMethods.update('wofreelance.jobsubcategories', columns, ['id'])
-  //       await sequelize.query(query,  {
-  //         replacements: [...values, req.body['id']]
-  //       })
-
-  //       result = await sequelize.query(`select * from wofreelance.jobsubcategories where id = ${req.body.id}`)
-  //       return result[0];
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-
-  //   deleteSubCategory: async (req, res) => {
-  //     try {
-  //       //first solution
-  //       // const result = await JobSubCategories.destroy({
-  //       //   where: {
-  //       //     id: req.body.id,
-  //       //   },
-  //       // });
-  //       // return result;
-
-  //       //second solution
-  //       const query = RestApiMethods.delete('wofreelance.jobsubcategories', ['id'])
-  //       const result = await sequelize.query(query, {replacements: [req.body.id]})
-  //       return result
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
-
-  //   getAllSubCategory: async (req, res) => {
-  //     try {
-  //       //first solution
-  //       // const result = await JobSubCategories.findAll();
-  //       // return result;
-
-  //       //second solution
-  //       const query = `Select * from wofreelance.jobsubcategories`
-  //       const result = await sequelize.query(query)
-  //       return result[0]
-  //     } catch (err) {
-  //       throw err;
-  //     }
-  //   },
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = PostService;

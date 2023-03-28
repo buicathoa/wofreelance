@@ -208,6 +208,7 @@ const JobCategoryService = {
       throw err;
     }
   },
+  
   updateSubCategory: async (req, res) => {
     try {
       //first solution
@@ -280,8 +281,15 @@ const JobCategoryService = {
   getAllSubCategory: async (req, res) => {
     try {
       //first solution
-      const result = await JobSubCategories.findAll();
-      return result;
+      // const result = await JobSubCategories.findAll();
+
+      // const result = await sequelizeJunctionTable.query(`call wofreelance_junction_table.SP_getallSubcateandSkillset()`)
+      // return result;
+
+      const result = await JobSubCategories.findAll({
+          include: jobskillset
+      })
+      return result
 
       //second solution
       // let query = '';
@@ -358,13 +366,18 @@ const JobCategoryService = {
   getAllSubcategoryandSkillset: async (req, res) => {
     try {
         //first solution
-        const result = await sequelizeJunctionTable.query(`call wofreelance_junction_table.SP_getallSubcateandSkillset()`)
-        if(result){
-          const list_array = result.map((res) => {
-            return {...res, list_skills: res.list_skills.filter(x => x !== null)}
-          })
-          return list_array
-        }
+        // const result = await sequelizeJunctionTable.query(`call wofreelance_junction_table.SP_getallSubcateandSkillset()`)
+        // if(result){
+        //   const list_array = result.map((res) => {
+        //     return {...res, list_skills: res.list_skills.filter(x => x !== null)}
+        //   })
+        //   return list_array
+        // }
+
+        const result = await JobSubCategories.findAll({
+          include: jobskillset
+      })
+      return result
     } catch (err) {
       throw err
     }

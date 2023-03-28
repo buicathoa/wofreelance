@@ -16,13 +16,21 @@ module.exports = (sequelize, DataTypes) => {
   Post.init({
     title: DataTypes.STRING,
     project_detail: DataTypes.STRING,
-    skills: DataTypes.STRING,
     project_paid_unit: DataTypes.STRING,
     project_budget: DataTypes.INTEGER,
     avg_bid_unit: DataTypes.FLOAT,
     bidding_time_start: DataTypes.DATE,
     bidding_time_end: DataTypes.DATE,
-    project_paid_type: DataTypes.STRING
+    project_paid_type: DataTypes.STRING,
+    post_status: DataTypes.STRING,
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'userprofiles',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Post',

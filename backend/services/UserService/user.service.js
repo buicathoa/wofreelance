@@ -37,7 +37,7 @@ const userService = {
 
         //second solution
         const insertPattern = RestApiMethods.insert("wofreelance.userprofiles", Object.keys(req))
-        const inserted = await sequelize.query(insertPattern, {replacements: req})
+        const inserted = await sequelize.query(insertPattern, {replacements: {...req, password: hashed}})
         const user = await sequelize.query(`SELECT * FROM wofreelance.userprofiles WHERE id = "${inserted[0]}"`)
         const response = user[0][0]
         delete response['password']

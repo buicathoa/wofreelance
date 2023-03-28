@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class skillsetandposts extends Model {
+  class Posts_skillsets extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,12 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  skillsetandposts.init({
+  Posts_skillsets.init({
     skillset_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'skillsetandposts',
+        model: 'jobskillsets',
         key: 'id'
       }
     },
@@ -26,13 +26,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'skillsetandposts',
+        model: 'posts',
+        key: 'id'
+      }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'userprofiles',
         key: 'id'
       }
     }
   }, {
     sequelize,
-    modelName: 'skillsetandposts',
+    modelName: 'Posts_skillsets',
+    schema: 'wofreelance_junction_table'
   });
-  return skillsetandposts;
+  return Posts_skillsets;
 };
