@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model
+  Model, Sequelize, DataTypes
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class JobSkillset extends Model {
@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'JobSkillset',
+    // freezeTableName: true
+    // schema: 'wofreelance_categories'
   });
   return JobSkillset;
 };

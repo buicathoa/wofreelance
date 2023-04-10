@@ -59,10 +59,10 @@ const userController = {
         }
     },
 
-    createServiceProfile: async(req, res) => {
-        try{
-            const result = await userService.createServiceProfile(req, res)
-            return handleSuccess(res, result)
+    deleteUser: async(req, res) => {
+        try {
+            const result = await userService.deleteUser(req, res)
+            return handleSuccess(res, {message: 'Action successfully.'})
         } catch(err) {
             return handleError(res, err)
         }

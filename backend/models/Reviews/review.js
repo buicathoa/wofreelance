@@ -1,5 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
+const db = require('..');
+
 module.exports = (sequelize, DataTypes) => {
   class Review extends Model {
     /**
@@ -19,14 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "userprofiles",
+          model: db.userprofile,
           key: "id",
         },
       },
       user_was_reviewed_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "userprofiles",
+          model: db.userprofile,
           key: "id",
         },
       },

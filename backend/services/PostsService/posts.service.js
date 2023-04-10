@@ -4,19 +4,22 @@ const jwt_decode = require("jwt-decode");
 const jwt = require("jsonwebtoken");
 
 const { handleError } = require("../../utils/handleResponse");
-const { Op } = require("sequelize");
+const { Op, col, Sequelize } = require("sequelize");
 const { ClientError } = require("../../errors");
 
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const dbConnection = require("../../server");
+const { validateRole } = require("../../utils/validateRole");
+const QueryParameter = require("../../utils/QueryParameter");
 const Post = db.posts;
 const JobSubCategories = db.jobsubcategories;
-const Posts_skillsets = db.skillsetandposts;
+const Posts_skillsets = db.post_skillsets;
 const UserProfiles = db.userprofile;
 const JobSkillset = db.jobskillset;
 
 const sequelize = db.sequelize;
-const sequelizeJunctionTable = db.sequelizeJunctionTable;
+// const sequelizeCategories = db.sequelizeCategories;
+// const sequelizeJunctionTable = db.sequelizeJunctionTable;
 
 const PostService = {
   createPosts: async (req, res) => {
@@ -30,57 +33,52 @@ const PostService = {
       bidding_time_start,
       bidding_time_end,
       project_paid_type,
+      list_skills,
     } = req.body;
-    const obj = { ...req.body, post_status: "pending", user_id: decoded.id };
-    const columnPosts = Object.keys(obj);
     // const transaction = await sequelize.transaction();
     try {
+      const checkRole = await validateRole.create(decoded, req.body.user_id, UserProfiles);
       await sequelize.transaction(async (t) => {
-        const newPost = await Posts.create(
-          {
-            title: title,
-            project_detail: project_detail,
-            project_paid_unit: project_paid_unit,
-            project_budget: project_budget,
-            avg_bid_unit: avg_bid_unit,
-            bidding_time_start: bidding_time_start,
-            bidding_time_end: bidding_time_end,
-            project_paid_type: project_paid_type,
-            post_status: "pending",
-            user_id: decoded.id,
-          },
-          { transaction: t }
-        );
-        // const queryPatternPosts = RestApiMethods.insert('wofreelance.posts', columnPosts)
-        // const result = await sequelize.query(queryPatternPosts,{
-        //  replacements: {...obj}, transaction: t
-        // })
-        // const recordAdded = await sequelize.query(
-        //   `SELECT * FROM wofreelance.posts WHERE id = ${result[0]}`, {transaction: t}
-        // )
-        let promises = [];
-        const list_skills = req.body.skills.split(",");
-        for (skill of list_skills) {
-          const columnsSkillsandPosts = ["skillset_id", "post_id", "user_id"];
-          const querySkillsAndPosts = RestApiMethods.insert(
-            "wofreelance_junction_table.posts_skillsets",
-            columnsSkillsandPosts
+        if (checkRole === 1) {
+          const newPost = await Post.create(
+            {
+              title: title,
+              project_detail: project_detail,
+              project_paid_unit: project_paid_unit,
+              project_budget: project_budget,
+              avg_bid_unit: avg_bid_unit,
+              bidding_time_start: bidding_time_start,
+              bidding_time_end: bidding_time_end,
+              project_paid_type: project_paid_type,
+              post_status: "pending",
+              user_id: req.body.user_id ? req.body.user_id : decoded.id,
+            },
+            { transaction: t }
           );
-          promises.push(
-            await sequelizeJunctionTable.query(querySkillsAndPosts, {
-              replacements: {
-                skillset_id: parseInt(skill),
-                post_id: newPost.id,
-                user_id: decoded.id,
-              },
-              transaction: t,
-            })
-          );
+          if (newPost) {
+            let promises = [];
+            for (let skill of list_skills) {
+              promises.push(
+                Posts_skillsets.create(
+                  {
+                    skillset_id: skill,
+                    post_id: newPost.id,
+                  },
+                  { transaction: t }
+                )
+              );
+            }
+            await Promise.all(promises).then((res) => {
+              if (res) {
+                return true;
+              }
+            });
+          }
+        } else if(checkRole === 0){
+          throw new ClientError("You're not allowed to do this action.", 403)
+        } else if(checkRole === 2){
+          throw new ClientError("Bad request.")
         }
-
-        await Promise.all(promises).then((res) => {
-          return newPost[0];
-        });
       });
       // return result
     } catch (err) {
@@ -88,36 +86,155 @@ const PostService = {
     }
   },
 
-  getAllPersonalPosts: async (req, res) => {
-    const decoded = jwt_decode(req.headers.authorization);
-    // const params = {
-    //   user_id: decoded.id,
-    //   list_skills: req.body.list_skills
-    //     ? req.body.list_skills?.split(",")?.map(Number)?.join(",")
-    //     : null,
-    // };
-    // const json_string = JSON.stringify(params);
+  getAllPosts: async (req, res) => {
     try {
-      // const result = await sequelizeJunctionTable.query(`CALL wofreelance_junction_table.getAllPostsByPersonal('${json_string}')`)
-      // return result
-
-      const result = await db.posts.findAll({
+      const { search_list, sort, list_skills } = req.body;
+      const wherePost = QueryParameter.querySearch(search_list)
+      const sortPost = QueryParameter.querySort(sort)
+      const result = await Post.findAll({
+        where: { ...wherePost, post_status: 'success' },
         include: [
           {
-            model: db.jobskillset,
+            model: JobSkillset,
+            attributes: ["name", "id"],
+            as: "list_skills",
             through: {
-              model: db.skillsetandposts,
-              attributes: []
-            }
-          }
-        ]
+              attributes: [],
+            },
+            where: list_skills.length > 0
+              ? {
+                  id: { [Op.in]: req.body.list_skills },
+                }
+              : {},
+          },
+        ],
+        limit: req.body.limit,
+        offset: (req.body.page - 1) * req.body.limit,
+        group: ["id"],
+        order: [[...sortPost]],
       });
-
       return result;
     } catch (err) {
       throw err;
     }
   },
+
+  getAllPersonalPost: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    try {
+      const { search_list, sort, list_skills } = req.body;
+      const wherePost = QueryParameter.querySearch(search_list)
+      const sortPost = QueryParameter.querySort(sort)
+      const result = await Post.findAll({
+        where: { ...wherePost, user_id: decoded.id },
+        include: [
+          {
+            model: JobSkillset,
+            attributes: ["name", "id"],
+            as: "list_skills",
+            through: {
+              attributes: [],
+            },
+            where: list_skills.length > 0
+              ? {
+                  id: { [Op.in]: req.body.list_skills },
+                }
+              : {},
+          },
+        ],
+        limit: req.body.limit,
+        offset: (req.body.page - 1) * req.body.limit,
+        group: ["id"],
+        order: [[...sortPost]],
+      });
+      return result
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  editPosts: async (req, res) => {
+    const { post_status, user_id, ...others } = req.body;
+    const decoded = jwt_decode(req.headers.authorization);
+    let updatedRecord;
+    try {
+      const checkRole = await validateRole.update_delete(decoded, req.body.id, Post);
+      if(checkRole === 1) {
+        await sequelize.transaction(async (t) => {
+          const postUpdated = await Post.update(
+            {
+              ...others,
+            },
+            {
+              where: !req.body.hasOwnProperty("user_id")
+                ? {
+                    id: req.body.id,
+                  }
+                : {
+                    [Op.and]: [
+                      { id: req.body.id },
+                      { user_id: req.body.user_id },
+                    ],
+                  },
+              transaction: t,
+            }
+          );
+          if (postUpdated[0] === 0) {
+            throw new ClientError("Bad request", 400);
+          }
+          updatedRecord = await Post.findOne({
+            where: { id: req.body.id },
+            transaction: t,
+          });
+        });
+      } else if(checkRole === 2) {
+        throw new ClientError("Bad request", 400);
+      } else if(checkRole === 0) {
+        throw new ClientError("You're not allowed to do this action.", 403)
+      }
+      return updatedRecord;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  changeStatusPost: async (req, res) => {
+    const {post_status, id} = req.body;
+    const decoded = jwt_decode(req.headers.authorization);
+    let updatedRecord;
+    try {
+      const checkRole = await validateRole.update_delete(decoded, req.body.id, Post)
+      if(checkRole === 1) {
+        await sequelize.transaction(async (t) => {
+          const postUpdated = await Post.update(
+            {
+              post_status: post_status,
+            },
+            {
+              where: {
+                id: id
+              },
+              transaction: t,
+            }
+          );
+          if (postUpdated[0] === 0) {
+            throw new ClientError("Bad request", 400);
+          }
+          updatedRecord = await Post.findOne({
+            where: { id: req.body.id },
+            transaction: t,
+          });
+        });
+      } else if(checkRole === 2) {
+        throw new ClientError("Bad request", 400);
+      } else if(checkRole === 0) {
+        throw new ClientError("You're not allowed to do this action.", 403)
+      }
+      return updatedRecord
+    } catch (err) {
+      throw err
+    }
+  }
 };
 
 module.exports = PostService;

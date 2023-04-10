@@ -10,14 +10,14 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
-let sequelizeCategories;
-let sequelizeJunctionTable;
+// let sequelizeCategories;
+// let sequelizeJunctionTable;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
-  sequelizeCategories = new Sequelize({...config, database: 'wofreelance_categories'});
-  sequelizeJunctionTable = new Sequelize({...config, database: 'wofreelance_junction_table'})
+  sequelize = new Sequelize({...config});
+  // sequelizeCategories = new Sequelize({...config, database: 'wofreelance_categories'});
+  // sequelizeJunctionTable = new Sequelize({...config, database: 'wofreelance_junction_table'});
 }
 
 fs
@@ -42,27 +42,28 @@ Object.keys(db).forEach(modelName => {
 });
 
 db.sequelize = sequelize;
-db.sequelizeCategories = sequelizeCategories;
-db.sequelizeJunctionTable = sequelizeJunctionTable;
+// db.sequelizeCategories = sequelizeCategories;
+// db.sequelizeJunctionTable = sequelizeJunctionTable;
 db.Sequelize = Sequelize;
 
 //user profile
 db.userprofile = require("./userModel/userprofile")(sequelize, DataTypes)
+db.userroles = require("./userModel/userroles")(sequelize,DataTypes)
 
 //category: IT-Sofware, BA, Marketing...
-db.jobcategories = require("./JobCategory/jobcategories")(sequelizeCategories, DataTypes)
+db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 
 //subcategory: website development...
-db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelizeCategories, DataTypes)
+db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelize, DataTypes)
 
 //skillset: javascript, react,...
-db.jobskillset = require("./JobCategory/jobskillset")(sequelizeCategories, DataTypes)
+db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
 
 //Junction table many to many (skillset - posts): skillset_id and post_id
-db.skillsetandposts = require("./Posts/posts_skillsets")(sequelizeJunctionTable, DataTypes)
+db.post_skillsets = require("./Posts/post_skillsets")(sequelize, DataTypes)
 
 //Junction table many to many (subcategory - skillset): subcategory_id, skillset_id
-db.subcategoryandskillset = require("./JobCategory/subcategoryandskillset")(sequelizeJunctionTable, DataTypes)
+db.subcategory_skillset = require("./JobCategory/subcategory_skillset")(sequelize, DataTypes)
 
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
@@ -71,15 +72,37 @@ db.subcategoryandskillset = require("./JobCategory/subcategoryandskillset")(sequ
 db.posts = require("./Posts/post")(sequelize, DataTypes)
 
 
+// =============================================================================== One to One Relationships =================================================================//
+
+db.userroles.hasOne(db.userprofile, {
+  foreignKey: 'role_id',
+  as: 'role'
+})
+db.userprofile.belongsTo(db.userroles, {
+  foreignKey: 'role_id',
+  as: 'role'
+})
+
+
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
 //Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
-db.jobcategories.hasMany(db.jobsubcategories, {foreignKey: 'category_id'})
-db.jobsubcategories.belongsTo(db.jobcategories, {foreignKey: 'category_id'})
+db.jobcategories.hasMany(db.jobsubcategories, {
+  foreignKey: 'category_id',
+  as: 'subcategories'
+})
+db.jobsubcategories.belongsTo(db.jobcategories, {
+  foreignKey: 'category_id',
+  as: 'subcategories'
+})
 
-//Making relations one to many, 1 user can have multiple posts
-db.userprofile.hasMany(db.posts, {foreignKey: 'user_id'})
-db.posts.belongsTo(db.userprofile, {foreignKey: 'user_id'})
+
+db.userprofile.hasMany(db.posts, {
+  foreignKey: 'user_id'
+})
+db.posts.belongsTo(db.userprofile, {
+  foreignKey: 'user_id'
+})
 
 
 // ========================================================================================== End ==========================================================================================//
@@ -88,37 +111,43 @@ db.posts.belongsTo(db.userprofile, {foreignKey: 'user_id'})
 
 
 // =============================================================================== Many to Many Relationship =============================================================================== // 
+db.userprofile.hasMany(db.posts, {
+  foreignKey: 'id'
+})
 
-//Making relations many to many, 1 posts can have multiple skillset, such as: 1 post Frontend jobs can have various skills(Javascript, React) and 1 skillset can be stored in various posts
-// db.posts.associate = (models) => {
-//   db.posts.belongsToMany(models.jobskillset, {through: db.skillsetandposts})
-// }
-// db.jobskillset.associate = (models) => {
-//   db.jobskillset.belongsToMany(models.posts, {through: db.skillsetandposts})
-// }
+db.posts.belongsTo(db.userprofile, {
+  foreignKey: 'user_id'
+})
+
+
+
 
 db.posts.belongsToMany(db.jobskillset, {
-  through: db.skillsetandposts,
+  through: db.post_skillsets,
   foreignKey: 'post_id',
+  otherKey: 'skillset_id',
+  as: 'list_skills'
+})
+
+db.jobskillset.belongsToMany(db.posts, {
+  through: db.post_skillsets,
+  foreignKey: 'skillset_id',
+  otherKey: 'post_id',
+})
+
+
+
+db.jobsubcategories.belongsToMany(db.jobskillset, {
+  through: db.subcategory_skillset,
+  foreignKey: 'subcategory_id',
   otherKey: 'skillset_id'
 })
-db.jobskillset.belongsToMany(db.posts, {
-  through: db.skillsetandposts,
+db.jobskillset.belongsToMany(db.jobsubcategories, {
+  through: db.subcategory_skillset,
   foreignKey: 'skillset_id',
-  otherKey: 'post_id'
+  otherKey: 'subcategory_id'
 })
 
-
-
-//Making relations many to many => 1 website development can have multiple skillset and 1 skillset can be stored in frontend and backend,...
-// db.jobsubcategories.belongsToMany(db.jobskillset, {through: db.subcategoryandskillset})
-// db.jobskillset.belongsToMany(db.jobsubcategories, {through: db.subcategoryandskillset})
-db.jobsubcategories.associate = (models) => {
-  db.jobsubcategories.belongsToMany(models.jobskillset, {through: db.subcategoryandskillset})
-}
-db.jobskillset.associate = (models) => {
-  db.jobskillset.belongsToMany(models.jobsubcategories, {through: db.subcategoryandskillset})
-}
 // ========================================================================================== End ==========================================================================================//
 
 

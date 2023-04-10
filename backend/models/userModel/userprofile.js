@@ -22,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
     avatar: DataTypes.STRING,
     education: DataTypes.STRING,
     birthdate: DataTypes.DATE,
-    role: DataTypes.STRING,
     title: DataTypes.STRING,
     describe: DataTypes.STRING,
     personal_website: DataTypes.STRING,
@@ -41,7 +40,15 @@ module.exports = (sequelize, DataTypes) => {
     list_service: DataTypes.STRING,
     is_open: DataTypes.BOOLEAN,
     working_time: DataTypes.STRING,
-    products_link: DataTypes.STRING
+    products_link: DataTypes.STRING,
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'userroles',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'UserProfile',

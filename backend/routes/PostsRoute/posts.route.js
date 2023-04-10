@@ -1,23 +1,16 @@
 // import userController from "../controllers/userController"
 const router = require('express').Router()
+const db = require("../../models");
 const postsController = require("../../controllers/PostsController/posts.controller");
 const authorize = require('../../middlewares/authorize');
+const checkSecretKey = require('../../middlewares/checkSecretKey');
 const { uploadImage } = require('../../utils/helper');
 
 
-router.post("/create", authorize(['super_admin', 'admin', 'user'], 'others') , postsController.createPosts)
-router.post("/get-all", authorize(['super_admin', 'admin', 'user'], 'others') , postsController.getAllPosts)
-
-// router.post("/update", authorize(['super_admin'], 'others') , jobCategoriesController.updateCategory)
-// router.post("/delete", authorize(['super_admin'], 'others') , jobCategoriesController.deleteCategory)
-// router.post("/get-all", authorize(['super_admin', 'admin', 'user'], 'others') , jobCategoriesController.getAllCategory)
-
-// router.post('/sub/create', authorize(['super_admin'], 'others'), jobCategoriesController.createSubCategory)
-// router.post('/sub/update', authorize(['super_admin'], 'others'), jobCategoriesController.updateSubCategory)
-// router.post('/sub/delete', authorize(['super_admin'], 'others'), jobCategoriesController.deleteSubCategory)
-// router.post('/sub/get-all', authorize(['super_admin'], 'others'), jobCategoriesController.getAllSubCategory)
-
-
-// router.post("/service/create", authorize('create') , userController.createServiceProfile)
+router.post("/create", authorize(['director', 'admin', 'user']), postsController.createPosts)
+router.post("/get-all", postsController.getAllPosts)
+router.post("/personal/get-all", authorize(['director', 'admin', 'user']), postsController.getAllPersonalPost)
+router.post("/update", authorize(['director', 'admin', 'user']), postsController.editPosts)
+router.post("/status/update", authorize(['director', 'admin']), postsController.changeStatusPost)
 
 module.exports = router

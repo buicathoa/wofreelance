@@ -7,12 +7,14 @@ const { handleError } = require("../../utils/handleResponse");
 const { Op } = require("sequelize");
 const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
+const { validateRole } = require("../../utils/validateRole");
 const UserProfile = db.userprofile;
+const UserRole = db.userroles;
 // const ServiceProfiles = db.serviceprofiles
 const sequelize = db.sequelize;
 const userService = {
   registerAccount: async (req, res) => {
-    const { email, password, referer_code, role, is_verified_account } = req;
+    const { email, password, referer_code, role_id, is_verified_account } = req;
     try {
       const salt = await bcrypt.genSalt(10);
       const hashed = await bcrypt.hash(password, salt);
@@ -25,27 +27,18 @@ const userService = {
         return 201;
       } else {
         //first solution
-        // newUser = await UserProfile.create({
-        //   email: email,
-        //   password: hashed,
-        //   referer_code: referer_code,
-        //   is_verified_account: is_verified_account,
-        //   role: role,
-        //   account_status: "offline",
-        // });
-        // return newUser;
-
-        //second solution
-        const insertPattern = RestApiMethods.insert("wofreelance.userprofiles", Object.keys(req))
-        const inserted = await sequelize.query(insertPattern, {replacements: {...req, password: hashed}})
-        const user = await sequelize.query(`SELECT * FROM wofreelance.userprofiles WHERE id = "${inserted[0]}"`)
-        const response = user[0][0]
-        delete response['password']
-        delete response['is_verified_account']
-        return response
+        newUser = await UserProfile.create({
+          email: email,
+          password: hashed,
+          referer_code: referer_code,
+          is_verified_account: is_verified_account,
+          role_id: role_id,
+          account_status: "offline",
+        });
+        return newUser;
       }
     } catch (err) {
-      throw err
+      throw err;
     }
   },
 
@@ -53,21 +46,22 @@ const userService = {
     const { email, password } = req;
 
     try {
-
-      //first solution
-      // const user = await UserProfile.findOne({
-      //   where: {
-      //     email: email,
-      //   },
-      //   attributes: {
-      //     exclude: ["referer_code"],
-      //   },
-      // });
-
       //second solution
-      const getPattern = `SELECT * FROM wofreelance.userprofiles WHERE email = "${req.email}"`
-      const users = await sequelize.query(getPattern)
-      const user = users[0][0]
+      const user = await UserProfile.findOne({
+        where: {
+          email: email,
+        },
+        attributes: {
+          exclude: ["referer_code"],
+        },
+        include: [
+          {
+            model: UserRole,
+            as: "role",
+          },
+        ],
+      });
+
       if (user) {
         if (!bcrypt.compareSync(password, user.password)) {
           return 1;
@@ -76,7 +70,10 @@ const userService = {
             const accesstoken = jwt.sign(
               {
                 id: user.id,
-                role: user.role,
+                role: user?.role,
+                email: user?.email,
+                // role_name: user.role.role_name,
+                // role_id: user.role.id,
                 fullname: user?.fullname,
               },
               process.env.MY_SECRET_ACCESS_KEY,
@@ -84,7 +81,7 @@ const userService = {
                 expiresIn: "24h",
               }
             );
-            const {password, ...others} = user
+            const { password, ...others } = user.dataValues;
 
             return {
               message: "Login success.",
@@ -104,25 +101,35 @@ const userService = {
   },
 
   getUserInfo: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    let user;
     try {
-      //first solution
-      // const result = await UserProfile.findOne({
-      //   where: {
-      //     id: req.body.id,
-      //   },
-      //   attributes: {
-      //     exclude: ["referer_code", "id", "password"],
-      //   },
-      // });
-      // return result;
+        user = await UserProfile.findOne({
+          where: {
+            id: req.body.id ? req.body.id : decoded.id,
+          },
+          attributes: {
+            exclude: ["referer_code"],
+          },
+          include: [
+            {
+              model: UserRole,
+              as: "role",
+            },
+          ],
+        });
 
-      //second solution
-      const getPattern = `SELECT * FROM wofreelance.userprofiles WHERE id = ${req.body.id}`
-      const users = await sequelize.query(getPattern)
-      const user = users[0][0]
-      delete user['is_verified_account']
-      delete user['password']
-      return user
+        const {password, is_verified_account, ...others} = user.dataValues
+
+        if(req.body.id) {
+          if(decoded.role.id <= user.role.id){
+            return others
+          } else {
+            throw new ClientError("You're not allowed to do this action", 404)
+          }
+        } else {
+          return others
+        }
     } catch (err) {
       throw err;
     }
@@ -130,40 +137,49 @@ const userService = {
 
   getAllUser: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
-    try{
-
-      //first solution
-      // const result = await UserProfile.findAll({
-      //   where: decoded.role === 'super_admin' ? {
-      //     id: {
-      //       [Op.ne]: decoded.id
-      //     }
-      //   } : {role: 'user', id: {
-      //     [Op.ne]: decoded.id
-      //   }}
-      // })
-      // return result
-
-      //second solution
-      const getPattern = `SELECT * FROM wofreelance.userprofiles WHERE ${decoded.role === "super_admin" ? `id NOT IN (${decoded.id})` : `role = "user" AND id NOT IN (${decoded.id})`}`
-      const users = await sequelize.query(getPattern)
-      const user = users[0].map(x => {
-        delete x['password']
-        return x
+    let where = {};
+    if(decoded.role.id === 1) {
+      where = {
+        id: {
+          [Op.ne]: decoded.role.id
+        }
+      }
+    } else {
+      where = {
+        id: {
+          [Op.gt]: decoded.role.id
+        },
+      }
+    }
+    let response = []
+    try {
+      const result = await UserProfile.findAll({
+        include: [
+          {
+            model: db.userroles,
+            as: "role",
+            where: {...where}
+          },
+        ],
       })
-      return user
-    }catch(error){
-      throw error
+
+      response = result.map((res) => {
+        const {password, is_verified_account, role, ...others} = res.dataValues 
+        return others
+      })
+
+      return response
+    } catch (error) {
+      throw error;
     }
   },
 
   updateUser: async (req, res) => {
     let result;
+    const decoded = jwt_decode(req.headers.authorization);
     try {
-      if(req?.body?.role === 'super_admin'){
-        throw new ClientError("You do not have permission to perform this action", 403)
-      } else {
-        //first solution
+      const checkRole = await validateRole.update_delete(decoded, req.body.id, UserProfile);
+      if(checkRole === 1){
         await sequelize.transaction(async (t) => {
           await UserProfile.update(
             req?.file?.path ? { avatar: req?.file?.path } : { ...req.body },
@@ -177,29 +193,45 @@ const userService = {
           );
           result = await UserProfile.findOne({
             where: {
-              id: req.body.id
+              id: req.body.id,
             },
-            transaction: t
-          })
+            transaction: t,
+          });
         });
-
-        //second solution
-        const columns = Object.keys(req.body)
-        const values = Object.values(req.body)
-        const queryUpdated = RestApiMethods.update("wofreelance.userprofiles", columns, ['id'])
-        await sequelize.query(queryUpdated, {replacements: [...values, req.body['id']]})
-        const getPattern = `SELECT * FROM wofreelance.userprofiles WHERE id = ${req.body.id}`
-        const user = await sequelize.query(getPattern)
-        const response = user[0][0]
-        delete response['password']
-        delete response['is_verified_account']
-        return response
+      } else if (checkRole === 0) {
+        throw new ClientError("You're not allowed to do this action")
+      } else if (checkRole === 2){
+        throw new ClientError("Bad request")
       }
-      return result
+      return result;
     } catch (err) {
       throw err;
     }
   },
+
+  deleteUser: async (req, res) => {
+    try{
+      let user = {}
+      const decoded = jwt_decode(req.headers.authorization);
+      const checkRole = await validateRole.update_delete(decoded, req.body.id, UserProfile);
+      if(checkRole === 1) {
+        user = await UserProfile.update({
+          account_status: 'deleted'
+        }, {
+          where: {
+            id: req.body.id
+          }
+        })
+      } else if (checkRole === 2) {
+        throw new ClientError("Bad request")
+      } else if (checkRole === 0) {
+        throw new ClientError("You  are not allowed to do this action.")
+      }
+      return user
+    } catch(err){
+      throw err
+    }
+  }
 };
 
 module.exports = userService;
