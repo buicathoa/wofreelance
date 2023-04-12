@@ -1,0 +1,134 @@
+@import "../../css/custom";
+
+.auth-wrapper {
+  background-color: $parentbgcolor;
+  padding-top: calc(16 / $fdf) * $rem;
+  font-family: $roboto;
+  height: 100vh;
+  .auth-component {
+    box-shadow: 0 0 6px #dedede;
+    border-radius: 5px;
+    max-width: calc(400 / $fdf) * $rem;
+    padding: calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem;
+    background-color: #ffffff;
+    margin: 0 auto;
+    .auth-logo {
+      padding: calc(24 / $fdf) * $rem 0 0;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      span{
+        position: absolute;
+        left:5%;
+        top:50%;
+        font-weight: 700;
+        cursor: pointer;
+      }
+    }
+    .auth-description {
+      color: $textcolor;
+      font-weight: 700;
+      font-size: calc(20 / $fdf) * $rem;
+      padding: calc(16 / $fdf) * $rem 0;
+      text-align: center;
+    }
+    .note-username{
+      font-size: calc(16 / $fdf) * $rem;
+      padding: calc(16 / $fdf) * $rem 0;
+    }
+    .auth-login-social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #4267b2;
+      border-color: #4267b2;
+      border-radius: 5px;
+      padding: calc(8 / $fdf) * $rem calc(22 / $fdf) * $rem;
+      margin-bottom: calc(24 / $fdf) * $rem;
+      img {
+        width: calc(36 / $fdf) * $rem;
+        height: calc(36 / $fdf) * $rem;
+        margin-right: calc(12 / $fdf) * $rem;
+        padding: calc(8 / $fdf) * $rem;
+        background-color: #ffffff;
+        border-radius: 50%;
+      }
+      span {
+        color: #ffffff;
+        font-weight: 700;
+      }
+    }
+    .auth-other-login {
+        text-align: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: calc(24 / $fdf) * $rem;
+      &::before {
+        position: absolute;
+        width:45%;
+        border-top: 1px solid #dedede;
+        content: "";
+        left:0;
+      }
+      &::after {
+        position: absolute;
+        width:45%;
+        border-top: 1px solid #dedede;
+        content: "";
+        right: 0;
+      }
+    }
+    .auth-form{
+        .ant-row{
+            &.forgot-password{
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: calc(16 / $fdf) * $rem;
+             .ant-col-12{
+                &:first-child{
+                    .custom-form-item{
+                        margin-bottom: unset !important;
+                    }
+                }
+                &:last-child{
+                    text-align: right;
+                }
+             }  
+            }
+            &.agree-policy{
+              font-size: calc(14 / $fdf) * $rem;
+              .important{
+                text-decoration: underline;
+              }
+            }
+        }
+        .form-buttons{
+            margin-bottom: calc(32 / $fdf) * $rem;
+            button{
+                background-color: #007fed;
+                color: #ffffff;
+                font-weight: 600;
+                width: 100%;
+                height: calc(40 / $fdf) * $rem;
+                font-size: calc(20 / $fdf) * $rem;
+            }
+        }
+    }
+    .divider{
+        border-bottom: 1px solid #dedede;
+        margin-bottom: calc(16 / $fdf) * $rem;
+    }
+    .sign-up{
+        font-size: calc(12 / $fdf) * $rem;
+        font-weight: 400;
+        color: $textcolor;
+        text-align: center;
+        .important{
+            font-weight: 600;
+            color: rgb(75, 178, 238);
+        }
+    }
+  }
+}

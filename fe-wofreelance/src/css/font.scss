@@ -1,0 +1,271 @@
+/**
+ * _font.scss
+ *
+ * This is where you declare all your fonts with @font-face syntax.
+ */
+
+/* roboto-regular - vietnamese_latin */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 400;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-italic.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-500 - vietnamese_latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-500italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 500;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-500italic.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-700 - vietnamese_latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  /* roboto-700italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Roboto';
+    font-style: italic;
+    font-weight: 700;
+    src: url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/roboto-v30-vietnamese_latin/roboto-v30-vietnamese_latin-700italic.svg#Roboto') format('svg'); /* Legacy iOS */
+  }
+  
+  // Font Library
+  /* open-sans-regular - vietnamese_latin */
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-regular.svg#OpenSans') format('svg'); /* Legacy iOS */
+  }
+  /* open-sans-700 - vietnamese_latin */
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700.svg#OpenSans') format('svg'); /* Legacy iOS */
+  }
+  /* open-sans-italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    src: url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-italic.svg#OpenSans') format('svg'); /* Legacy iOS */
+  }
+  /* open-sans-700italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 700;
+    src: url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/open-sans-v34-vietnamese_latin/open-sans-v34-vietnamese_latin-700italic.svg#OpenSans') format('svg'); /* Legacy iOS */
+  }
+  
+  /* dancing-script-regular - vietnamese_latin */
+  @font-face {
+    font-family: 'Dancing Script';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-regular.svg#DancingScript') format('svg'); /* Legacy iOS */
+  }
+  /* dancing-script-700 - vietnamese_latin */
+  @font-face {
+    font-family: 'Dancing Script';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/dancing-script-v24-vietnamese_latin/dancing-script-v24-vietnamese_latin-700.svg#DancingScript') format('svg'); /* Legacy iOS */
+  }
+  
+  /* montserrat-regular - vietnamese_latin */
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-regular.svg#Montserrat') format('svg'); /* Legacy iOS */
+  }
+  /* montserrat-700 - vietnamese_latin */
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700.svg#Montserrat') format('svg'); /* Legacy iOS */
+  }
+  /* montserrat-italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: italic;
+    font-weight: 400;
+    src: url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-italic.svg#Montserrat') format('svg'); /* Legacy iOS */
+  }
+  /* montserrat-700italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: italic;
+    font-weight: 700;
+    src: url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/montserrat-v25-vietnamese_latin/montserrat-v25-vietnamese_latin-700italic.svg#Montserrat') format('svg'); /* Legacy iOS */
+  }
+  
+  /* tourney-regular - vietnamese_latin */
+  @font-face {
+    font-family: 'Tourney';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-regular.svg#Tourney') format('svg'); /* Legacy iOS */
+  }
+  /* tourney-700 - vietnamese_latin */
+  @font-face {
+    font-family: 'Tourney';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700.svg#Tourney') format('svg'); /* Legacy iOS */
+  }
+  /* tourney-italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Tourney';
+    font-style: italic;
+    font-weight: 400;
+    src: url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-italic.svg#Tourney') format('svg'); /* Legacy iOS */
+  }
+  /* tourney-700italic - vietnamese_latin */
+  @font-face {
+    font-family: 'Tourney';
+    font-style: italic;
+    font-weight: 700;
+    src: url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.eot'); /* IE9 Compat Modes */
+    src: local(''),
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.woff') format('woff'), /* Modern Browsers */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../assets/fonts/tourney-v8-vietnamese_latin/tourney-v8-vietnamese_latin-700italic.svg#Tourney') format('svg'); /* Legacy iOS */
+  }

@@ -1,0 +1,72 @@
+// @import 'css/style.scss';
+@import './../../css/variable.scss';
+$width: calc(120 / $fdf) * $rem;
+$height: calc(40 / $fdf) * $rem;
+$bounce_height: calc(60 / $fdf) * $rem;
+
+@keyframes bounce {
+  0% {
+    top: $bounce_height;
+    height: calc(50 / $fdf) * $rem;
+    transform: scaleX(1.2);
+  }
+  35% {
+    height: $height;
+    transform: scaleX(1);
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  opacity: 0.85;
+  z-index: 99999;
+  width: calc(100vw + 6.25rem);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: calc(-100 / $fdf) * $rem;
+  &.hiden {
+    display: none;
+  }
+
+  .wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    .text {
+      display: inline-block;
+      margin-left: calc(30 / $fdf) * $rem;
+      font-family: $roboto;
+      font-weight: bold;
+      font-size: calc(17 / $fdf) * $rem;
+      line-height: calc(17 / $fdf) * $rem;
+      color: #0ab2a8;
+    }
+
+    .bounceball {
+      position: relative;
+      display: inline-block;
+      height: calc(100 / $fdf) * $rem;
+      width: $width;
+      &:before {
+        position: absolute;
+        content: '';
+        display: block;
+        // background: url(../../assets/icons/icFullLogo.svg) no-repeat;
+        background-size: 100% 100%;
+        top: 0;
+        width: $width;
+        height: $height;
+        transform-origin: 50%;
+        animation: bounce 500ms alternate infinite ease;
+      }
+    }
+  }
+}
