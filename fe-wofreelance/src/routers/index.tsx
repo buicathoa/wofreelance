@@ -1,9 +1,10 @@
 import Auth from '../containers/Auth'
 import Signup from '../containers/Auth/Signup'
 import HomePage from '../containers/HomePage'
+import NewFreelancer from '../containers/NewFreelancer'
 
 
-export const routerNotAuth = [
+export const routerNotSidebar = [
     {
         element: <Auth/>,
         path: '/signin'
@@ -17,12 +18,16 @@ export const routerNotAuth = [
         path: '/forgot-password'
     },
     {
-        element: <Auth/>,
-        path: '/change-password'
+        element: <NewFreelancer/>,
+        path: '/new-freelancer/:id'
+    },
+    {
+        element: <NewFreelancer/>,
+        path: '/new-freelancer'
     }
 ]
 
-export const routerAuth = [
+export const routerSidebar = [
     {
         exact: true,
         element: <HomePage/>,

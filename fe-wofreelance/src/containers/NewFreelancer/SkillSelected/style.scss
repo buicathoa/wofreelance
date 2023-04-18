@@ -1,0 +1,89 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.new-freelancer-content {
+  padding: calc(64 / $fdf) * $rem calc(48 / $fdf) * $rem;
+  padding-bottom: calc(24 / $fdf) * $rem;
+  max-width: calc(1200 / $fdf) * $rem;
+  margin: 0 auto;
+  .new-freelancer-content-header {
+    .title {
+      color: $textcolor;
+      font-weight: 700;
+      font-size: calc(20 / $fdf) * $rem;
+      line-height: 1.4;
+    }
+    .description {
+      color: $textcolor;
+      font-size: calc(14 / $fdf) * $rem;
+      line-height: 1.43;
+      margin-bottom: calc(12 / $fdf) * $rem;
+    }
+    .form-input {
+      margin-bottom: calc(16 / $fdf) * $rem;
+    }
+  }
+  .content-divider {
+    margin-bottom: calc(16 / $fdf) * $rem;
+  }
+  .new-freelancer-main-content {
+    .ant-row {
+      .ant-col {
+        &.category-selection {
+          padding-right: calc(24 / $fdf) * $rem;
+          margin-bottom: calc(24 / $fdf) * $rem;
+          .ant-card {
+            box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+            width: calc(350 / $fdf) * $rem;
+            &.empty-list{
+              font-size: calc(16 / $fdf) * $rem;
+              color: $textcolor;
+              .ant-card-body{
+                padding: calc(16 / $fdf) * $rem !important;
+              }
+            }
+            .ant-card-body {
+              height: calc(180 / $fdf) * $rem;
+              overflow-y: scroll;
+              .category-item {
+                padding: calc(16 / $fdf) * $rem;
+                box-shadow: inset 0 -1px #dedede;
+                border-bottom: 1px solid #dedede;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                &:hover {
+                  background-color: #f0f0f0;
+                  transition: background-color 0.1s ease-in-out;
+                }
+              }
+              
+            }
+          }
+        }
+        &.skills-selected-result{
+          .skills-selected-header{
+            color: $textcolor;
+            font-weight: 700;
+            font-size: calc(14 / $fdf) * $rem;
+            padding: calc(16 / $fdf) * $rem;
+            border-bottom: 1px solid #dedede;
+          }
+          .skill-selected-body{
+            padding: calc(16 / $fdf) * $rem;
+            .ant-tag{
+              margin-bottom: calc(8 / $fdf) * $rem;
+            }
+            .lists-job-matching-quantity{
+              color: $textcolor;
+              font-weight: 400;
+              font-size: calc(14 / $fdf) * $rem;
+              margin-bottom: calc(16 / $fdf) * $rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

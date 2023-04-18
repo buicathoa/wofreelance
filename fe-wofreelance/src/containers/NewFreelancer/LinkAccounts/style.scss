@@ -1,0 +1,55 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.new-freelancer-content{
+    .link-account-container{
+        max-width: calc(540 / $fdf) * $rem;
+        margin: 0 auto;
+        .link-account-title{
+            color: $textcolor;
+            font-weight: 700;
+            font-size: calc(24 / $fdf) * $rem;
+            line-height: 1.33;
+            margin-bottom: calc(16 / $fdf) * $rem;
+        }
+        .link-account-description{
+            font-weight: 400;
+            color: $textcolor;
+            font-size: calc(16 / $fdf) * $rem;
+            margin-bottom: calc(16 / $fdf) * $rem;
+        }
+        .link-account-list{
+            .link-account-item{
+                padding: calc(24 / $fdf) * $rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+                background-color: #fff;
+                transition: background-color .1s ease-in-out;
+                cursor: pointer;
+                &:hover{
+                    background-color: #f0f0f0;
+                }
+                .link-account-item-left{
+                    display: flex;
+                    align-items: center;
+                    img{
+                        margin-right: calc(16 / $fdf) * $rem;
+                    }
+                    .link-account-item-content{
+                        .title{
+                            color: $textcolor;
+                            font-weight: 600;
+                            font-size: calc(16 / $fdf) * $rem;
+                            line-height: 1.5;
+                        }
+                    }
+                }
+                .anticon{
+                    color: #139ff0;
+                }
+            }
+        }
+    }
+}
