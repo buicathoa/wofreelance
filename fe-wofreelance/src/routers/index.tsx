@@ -1,7 +1,9 @@
 import Auth from '../containers/Auth'
 import Signup from '../containers/Auth/Signup'
 import HomePage from '../containers/HomePage'
-import NewFreelancer from '../containers/NewFreelancer'
+import LinkAccounts from '../containers/NewFreelancer/LinkAccounts'
+import ProfileDetail from '../containers/NewFreelancer/ProfileDetail'
+import SkillSelected from '../containers/NewFreelancer/SkillSelected'
 
 
 export const routerNotSidebar = [
@@ -18,13 +20,17 @@ export const routerNotSidebar = [
         path: '/forgot-password'
     },
     {
-        element: <NewFreelancer/>,
-        path: '/new-freelancer/:id'
+        element: <SkillSelected/>,
+        path: '/new-freelancer/skills'
     },
     {
-        element: <NewFreelancer/>,
-        path: '/new-freelancer'
-    }
+        element: <LinkAccounts/>,
+        path: '/new-freelancer/link-accounts'
+    },
+    // {
+    //     element: <ProfileDetail/>,
+    //     path: '/new-freelancer/profile-detail'
+    // },
 ]
 
 export const routerSidebar = [

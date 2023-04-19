@@ -2,7 +2,8 @@ const db = require("../../models");
 const bcrypt = require("bcrypt");
 const jwt_decode = require("jwt-decode");
 const jwt = require("jsonwebtoken");
-
+const passport = require("passport");
+const FacebookStrategy = require("passport-facebook").Strategy;
 const { handleError } = require("../../utils/handleResponse");
 const { Op } = require("sequelize");
 const { ClientError } = require("../../errors");
@@ -10,11 +11,14 @@ const RestApiMethods = require("../../utils/QueryInsertPattern");
 const { validateRole } = require("../../utils/validateRole");
 const UserProfile = db.userprofile;
 const UserRole = db.userroles;
+const Skillset = db.jobskillset;
+const User_Skillset = db.user_skillset;
+const Post = db.posts
 // const ServiceProfiles = db.serviceprofiles
 const sequelize = db.sequelize;
 const userService = {
   registerAccount: async (req, res) => {
-    const { email, password, referer_code, role_id, is_verified_account } = req;
+    const { email, password, role_id, is_verified_account } = req;
     try {
       const salt = await bcrypt.genSalt(10);
       const hashed = await bcrypt.hash(password, salt);
@@ -30,7 +34,7 @@ const userService = {
         newUser = await UserProfile.create({
           email: email,
           password: hashed,
-          referer_code: referer_code,
+          // referer_code: referer_code,
           is_verified_account: is_verified_account,
           role_id: role_id,
           account_status: "offline",
@@ -56,10 +60,18 @@ const userService = {
         },
         include: [
           {
+            model: Skillset,
+            as: "list_skills",
+          },
+          {
             model: UserRole,
             as: "role",
           },
+          {
+            model: Post
+          }
         ],
+        group: ["id"],
       });
 
       if (user) {
@@ -104,32 +116,39 @@ const userService = {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
-        user = await UserProfile.findOne({
-          where: {
-            id: req.body.id ? req.body.id : decoded.id,
+      user = await UserProfile.findOne({
+        where: {
+          id: req.body.id ? req.body.id : decoded.id,
+        },
+        attributes: {
+          exclude: ["referer_code"],
+        },
+        include: [
+          {
+            model: Skillset,
+            as: "list_skills",
           },
-          attributes: {
-            exclude: ["referer_code"],
+          {
+            model: UserRole,
+            as: "role",
           },
-          include: [
-            {
-              model: UserRole,
-              as: "role",
-            },
-          ],
-        });
-
-        const {password, is_verified_account, ...others} = user.dataValues
-
-        if(req.body.id) {
-          if(decoded.role.id <= user.role.id){
-            return others
-          } else {
-            throw new ClientError("You're not allowed to do this action", 404)
+          {
+            model: Post
           }
+        ],
+      });
+
+      const { password, is_verified_account, ...others } = user.dataValues;
+
+      if (req.body.id) {
+        if (decoded.role.id <= user.role.id) {
+          return others;
         } else {
-          return others
+          throw new ClientError("You're not allowed to do this action", 404);
         }
+      } else {
+        return others;
+      }
     } catch (err) {
       throw err;
     }
@@ -138,37 +157,38 @@ const userService = {
   getAllUser: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     let where = {};
-    if(decoded.role.id === 1) {
+    if (decoded.role.id === 1) {
       where = {
         id: {
-          [Op.ne]: decoded.role.id
-        }
-      }
+          [Op.ne]: decoded.role.id,
+        },
+      };
     } else {
       where = {
         id: {
-          [Op.gt]: decoded.role.id
+          [Op.gt]: decoded.role.id,
         },
-      }
+      };
     }
-    let response = []
+    let response = [];
     try {
       const result = await UserProfile.findAll({
         include: [
           {
             model: db.userroles,
             as: "role",
-            where: {...where}
+            where: { ...where },
           },
         ],
-      })
+      });
 
       response = result.map((res) => {
-        const {password, is_verified_account, role, ...others} = res.dataValues 
-        return others
-      })
+        const { password, is_verified_account, role, ...others } =
+          res.dataValues;
+        return others;
+      });
 
-      return response
+      return response;
     } catch (error) {
       throw error;
     }
@@ -177,61 +197,150 @@ const userService = {
   updateUser: async (req, res) => {
     let result;
     const decoded = jwt_decode(req.headers.authorization);
+    let transaction = await sequelize.transaction();
     try {
-      const checkRole = await validateRole.update_delete(decoded, req.body.id, UserProfile);
-      if(checkRole === 1){
-        await sequelize.transaction(async (t) => {
+      const checkRole = await validateRole.update_delete(
+        decoded,
+        req.body.id,
+        UserProfile
+      );
+      if (checkRole === 1 || checkRole === 3) {
+        if (req.body.list_skills) {
+          let promises = [];
+          for (skill of req.body.list_skills) {
+            promises.push(
+              await User_Skillset.create({
+                user_id: decoded.id,
+                skillset_id: skill.id,
+              })
+            );
+          }
+          await Promise.all(promises);
           await UserProfile.update(
-            req?.file?.path ? { avatar: req?.file?.path } : { ...req.body },
+            { ...req.body, avatar: req?.file?.path },
+            {
+              where: {
+                id: checkRole === 1 ? decoded.id : req.body.id,
+              },
+            }
+          );
+        } else {
+          await UserProfile.update(
+            { ...req.body, avatar: req?.file?.path },
             {
               where: {
                 id: req.body.id,
               },
               returning: true,
-              transaction: t,
             }
           );
-          result = await UserProfile.findOne({
-            where: {
-              id: req.body.id,
-            },
-            transaction: t,
-          });
-        });
+        }
       } else if (checkRole === 0) {
-        throw new ClientError("You're not allowed to do this action")
-      } else if (checkRole === 2){
-        throw new ClientError("Bad request")
+        throw new ClientError("You're not allowed to do this action");
+      } else if (checkRole === 2) {
+        throw new ClientError("Bad request");
       }
+      await transaction.commit();
       return result;
     } catch (err) {
+      await transaction.rollback();
       throw err;
     }
   },
 
   deleteUser: async (req, res) => {
-    try{
-      let user = {}
+    try {
+      let user = {};
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(decoded, req.body.id, UserProfile);
-      if(checkRole === 1) {
-        user = await UserProfile.update({
-          account_status: 'deleted'
-        }, {
-          where: {
-            id: req.body.id
+      const checkRole = await validateRole.update_delete(
+        decoded,
+        req.body.id,
+        UserProfile
+      );
+      if (checkRole === 1) {
+        user = await UserProfile.update(
+          {
+            account_status: "deleted",
+          },
+          {
+            where: {
+              id: req.body.id,
+            },
           }
-        })
+        );
       } else if (checkRole === 2) {
-        throw new ClientError("Bad request")
+        throw new ClientError("Bad request");
       } else if (checkRole === 0) {
-        throw new ClientError("You  are not allowed to do this action.")
+        throw new ClientError("You  are not allowed to do this action.");
       }
-      return user
-    } catch(err){
-      throw err
+      return user;
+    } catch (err) {
+      throw err;
     }
-  }
+  },
+
+  checkUser: async (req, res) => {
+    let check = false;
+    try {
+      if (req.body.email) {
+        const user = await UserProfile.findOne({
+          where: {
+            email: req.body.email,
+          },
+        });
+        if (!user) {
+          check = true;
+        } else {
+          check = false;
+        }
+      } else if (req.body.username) {
+        const user = await UserProfile.findOne({
+          where: {
+            username: req.body.username,
+          },
+        });
+        if (!user) {
+          check = true;
+        } else {
+          check = false;
+        }
+      }
+      return check;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  loginFacebook: (user_id) => {
+    try {
+      passport.use(
+        new FacebookStrategy(
+          {
+            clientID: 1282671125988781,
+            clientSecret: "c7367d5dcbba2cf3c11c5520684a7c05",
+            callbackURL: `http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user_id}`,
+            profileFields: ['id','displayName','name', 'photos']
+          },
+          async function (accessToken, refreshToken, profile, cb) {
+            console.log(user_id)
+            const user = await UserProfile.update({
+              first_name: profile?.name?.familyName,
+              last_name: profile?.name?.givenName,
+              avatar: profile?.photos[0]?.value
+            }, {
+              where: {
+                id: user_id
+              }
+            })
+            return cb(user, null);
+          }
+        )
+      );
+      return passport;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = userService;

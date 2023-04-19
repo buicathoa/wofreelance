@@ -66,6 +66,19 @@ const userController = {
         } catch(err) {
             return handleError(res, err)
         }
+    },
+
+    checkUser: async(req, res) => {
+        try {
+            const result = await userService.checkUser(req, res)
+            if(!result) {
+                return handleSuccess(res, result, `This ${req?.body?.email ? req?.body?.email : req?.body?.username} has been existed.` )
+            } else {
+                return handleSuccess(res, result)
+            }
+        } catch(err) {
+            return handleError(res, err)
+        }
     }
 }
 

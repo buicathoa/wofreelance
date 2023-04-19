@@ -53,8 +53,6 @@ db.userroles = require("./userModel/userroles")(sequelize,DataTypes)
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 
-//subcategory: website development...
-db.jobsubcategories = require("./JobCategory/jobsubcategories")(sequelize, DataTypes)
 
 //skillset: javascript, react,...
 db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
@@ -62,8 +60,8 @@ db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
 //Junction table many to many (skillset - posts): skillset_id and post_id
 db.post_skillsets = require("./Posts/post_skillsets")(sequelize, DataTypes)
 
-//Junction table many to many (subcategory - skillset): subcategory_id, skillset_id
-db.subcategory_skillset = require("./JobCategory/subcategory_skillset")(sequelize, DataTypes)
+
+db.user_skillset = require("./userModel/user_skillset")(sequelize, DataTypes)
 
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
@@ -87,14 +85,18 @@ db.userprofile.belongsTo(db.userroles, {
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
 //Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
-db.jobcategories.hasMany(db.jobsubcategories, {
+db.jobcategories.hasMany(db.jobskillset, {
   foreignKey: 'category_id',
-  as: 'subcategories'
+  as: 'list_skills'
 })
-db.jobsubcategories.belongsTo(db.jobcategories, {
+db.jobskillset.belongsTo(db.jobcategories, {
   foreignKey: 'category_id',
-  as: 'subcategories'
+  as: 'list_skills'
 })
+
+
+
+
 
 
 db.userprofile.hasMany(db.posts, {
@@ -103,6 +105,9 @@ db.userprofile.hasMany(db.posts, {
 db.posts.belongsTo(db.userprofile, {
   foreignKey: 'user_id'
 })
+
+
+
 
 
 // ========================================================================================== End ==========================================================================================//
@@ -137,15 +142,16 @@ db.jobskillset.belongsToMany(db.posts, {
 
 
 
-db.jobsubcategories.belongsToMany(db.jobskillset, {
-  through: db.subcategory_skillset,
-  foreignKey: 'subcategory_id',
-  otherKey: 'skillset_id'
+db.userprofile.belongsToMany(db.jobskillset, {
+  through: db.user_skillset,
+  foreignKey: 'user_id',
+  otherKey: 'skillset_id',
+  as: 'list_skills'
 })
-db.jobskillset.belongsToMany(db.jobsubcategories, {
-  through: db.subcategory_skillset,
+db.jobskillset.belongsToMany(db.userprofile, {
+  through: db.user_skillset,
   foreignKey: 'skillset_id',
-  otherKey: 'subcategory_id'
+  otherKey: 'user_id',
 })
 
 // ========================================================================================== End ==========================================================================================//

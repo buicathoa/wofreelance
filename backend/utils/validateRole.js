@@ -52,7 +52,7 @@ const validateRole = {
       });
       if (user) {
         if (decoded.role?.id < user.role_id) {
-          return 1;
+          return 3;
         } else if (decoded?.role?.id === user?.role_id) {
           if (decoded?.id === user?.id) {
             return 1;
@@ -63,7 +63,7 @@ const validateRole = {
           return 0;
         }
       } else {
-        return 2;
+        return 1;
       }
     } else {
       const user = await model.findOne({

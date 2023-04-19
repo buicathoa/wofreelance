@@ -255,6 +255,31 @@ const JobCategoryService = {
       throw err;
     }
   },
+  getAllSkillsetForNewFreelance: async (req, res) => {
+    try {
+      const results = await JobCategories.findAndCountAll({
+        include: [
+          {
+            model: jobskillset,
+            as: 'list_skills',
+            attributes: [
+              'id',
+              'name',
+              [sequelize.literal('(select count(wofreelance.post_skillsets.id) from wofreelance.post_skillsets where skillset_id = wofreelance.list_skills.id)'), 'job_matching_count']
+            ],
+            where: req.body.skill ? {
+              name: {
+                [Op.like]: `%${req.body.skill}%`
+              }
+            } : {}
+          },
+        ],
+      });
+      return results.rows;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = JobCategoryService;

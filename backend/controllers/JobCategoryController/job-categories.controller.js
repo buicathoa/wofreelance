@@ -35,40 +35,6 @@ const jobCategoriesController = {
         }
     },
 
-    //sub-category
-    createSubCategory: async (req, res) => {
-        try{
-            const result = await JobCategoryService.createSubCategory(req, res)
-            return handleSuccess(res, result)
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-    updateSubCategory: async (req, res) => {
-        try{
-            const result = await JobCategoryService.updateSubCategory(req, res)
-            return handleSuccess(res, result)
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-    deleteSubCategory: async (req, res) => {
-        try{
-            const result = await JobCategoryService.deleteSubCategory(req, res)
-            return handleSuccess(res, {message: "Delete success."})
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-    getAllSubCategory: async (req, res) => {
-        try{
-            const result = await JobCategoryService.getAllSubCategory(req, res)
-            return handleSuccess(res, result)
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-
     //Skillset category
     createSkillsetcategory: async (req, res) => {
         try{
@@ -88,15 +54,16 @@ const jobCategoriesController = {
         }
     },
 
-    getAllSubcategoryandSkillset: async(req, res) => {
+    getAllSkillsetForNewFreelance: async(req, res) => {
         try{
-            const subcate_skill = await JobCategoryService.getAllSubcategoryandSkillset(req, res)
-            return handleSuccess(res, subcate_skill, {message: "Your subcate_skill was created."})
+            const listCategory = await JobCategoryService.getAllSkillsetForNewFreelance(req, res)
+            return handleSuccess(res, listCategory, {message: "Success"})
         }
         catch(err){
             return handleError(res, err)
         }
     },
+    
     //Sub-child category
     // createSubChildCategory: async (req, res) => {
     //     try{

@@ -44,13 +44,13 @@ export interface SignupFormInterface {
 }
 
 export interface SkillselectedComponentInterface {
-    skillsetSelected: Array<SkillsetInterface>,
-    setSkillsetSelected:  React.Dispatch<React.SetStateAction<Array<SkillsetInterface>>>,
-    setPercent: React.Dispatch<React.SetStateAction<number>>,
+    skillsetSelected?: Array<SkillsetInterface>,
+    setSkillsetSelected?:  React.Dispatch<React.SetStateAction<Array<SkillsetInterface>>>,
+    setPercent?: React.Dispatch<React.SetStateAction<number>>,
 }
 
 export interface LinkAccountsComponentInterface {
-    setPercent: React.Dispatch<React.SetStateAction<number>>,
+    setPercent?: React.Dispatch<React.SetStateAction<number>>,
 }
 
 export interface ProfileDetailInterface {

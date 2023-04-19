@@ -192,7 +192,7 @@ const Signup = () => {
         if (step === 1) {
             if (values?.agree) {
                 checkExistUser(values).then(res => {
-                    if(res.code !== 200) {
+                    if(!res.data) {
                         openWarning(res?.message!)
                     } else {
                         setformValues(values)
@@ -204,7 +204,7 @@ const Signup = () => {
             }
         } else if (step === 2) {
             checkExistUser(values).then(res => {
-                if(res.code === 201) {
+                if(!res.data) {
                     openWarning(values.username ? 'Username already existed' : 'Email already existed')
                 } else {
                     const newData = Object.assign(formValues, values)

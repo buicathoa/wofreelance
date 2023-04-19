@@ -2,9 +2,8 @@
 const {
   Model
 } = require('sequelize');
-const db = require('..');
 module.exports = (sequelize, DataTypes) => {
-  class Subcategory_Skillset extends Model {
+  class user_skillset extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Subcategory_Skillset.init({
-    skillset_id: {
+  user_skillset.init({
+    skillset_id:{
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -23,17 +22,17 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    subcategory_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'jobsubcategories',
+        model: 'userprofiles',
         key: 'id'
       }
     }
   }, {
     sequelize,
-    modelName: 'Subcategory_Skillset',
+    modelName: 'user_skillset',
   });
-  return Subcategory_Skillset;
+  return user_skillset;
 };
