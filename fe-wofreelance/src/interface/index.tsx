@@ -2,7 +2,9 @@ export interface ResponseFormatItem {
     message?: string,
     data?: {
         data?: any,
-        token?: any
+        token?: any,
+        avatar?: string,
+        list_skills?: Array<SkillsetInterface>
     },
     code?: number,
     token?: string

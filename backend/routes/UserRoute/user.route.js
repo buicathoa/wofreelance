@@ -1,11 +1,11 @@
 // import userController from "../controllers/userController"
 const router = require("express").Router();
 const userController = require("../../controllers/UserController/user.controller");
-const { uploadImage } = require("../../utils/helper");
 const db = require("../../models");
 const authorize = require("../../middlewares/authorize");
 const userService = require("../../services/UserService/user.service");
 const passport = require("../../services/UserService/login-facebook.service");
+const { uploadImage } = require("../../utils/helper");
 
 router.post("/register", userController.registerAccount);
 router.post("/login", userController.loginUser);
@@ -22,8 +22,11 @@ router.post(
 router.post(
   "/update",
   authorize(["director", "admin", "user"]),
-  uploadImage("avatar").single("image"),
-  userController.updateUser
+  uploadImage("avatar").single('avatar'),
+  // userController.updateUser
+   async (req, res) => {
+    userController.updateUser(req, res)
+  }
 );
 router.post(
   "/delete",

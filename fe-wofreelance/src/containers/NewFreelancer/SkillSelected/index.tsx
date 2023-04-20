@@ -15,7 +15,7 @@ const SkillSelected = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    const [skillsetSelected, setSkillsetSelected] = useState<Array<SkillsetInterface>>([])
+    const [skillsetSelected, setSkillsetSelected] = useState<Array<SkillsetInterface> | undefined>([])
     const [categorySelected, setCategorySelected] = useState<CategoryInterface>({})
     const [listCategoy, setListCategoy] = useState<Array<CategoryInterface>>([])
     const [listSkills, setListSkills] = useState<Array<SkillsetInterface>>([])
@@ -46,6 +46,11 @@ const SkillSelected = () => {
         if (localStorage.getItem('access_token')) {
             getUserInfo({}).then(res => {
                 if (res.data) {
+                    setSkillsetSelected(res?.data?.list_skills)
+                    const sum: any = res?.data?.list_skills?.reduce((accumulator, currentValue: SkillsetInterface) => {
+                        return accumulator + currentValue.job_matching_count!
+                    }, 0)
+                    setMatchJobs(sum)
                     return
                 } else {
                     navigate("/signin")
@@ -135,7 +140,7 @@ const SkillSelected = () => {
                 </div>
                 <div className="new-freelancer-progress">
                     <Progress
-                        percent={20}
+                        percent={10}
                         strokeColor={{
                             '0%': '#108ee9',
                             '100%': '#87d068',
@@ -204,7 +209,7 @@ const SkillSelected = () => {
                     </div>
                 </div>
             </div>
-            <div className={`list-button`}>
+            <div className={`list-button skills`}>
                 <Button onClick={handleMoveNextStep} className="next">Next</Button>
             </div>
         </div>

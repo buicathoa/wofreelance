@@ -17,7 +17,10 @@ const User = createSlice({
         getUserInfoSuccess: (state, actions) => {
             state.user = actions.payload
         },
-        updateUser: (state, actions) => {}
+        updateUser: (state, actions) => {},
+        updateUserSuccess: (state, actions) => {
+            state.user = actions.payload
+        }
     })
 })
 

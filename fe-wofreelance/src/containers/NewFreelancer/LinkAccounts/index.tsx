@@ -37,9 +37,7 @@ const LinkAccounts = () => {
     }, [])
 
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
-    console.log(
-        'userne', user
-    )
+
     const handleLinkWithFacebook = (type: string) => {
         window.open(`http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user.id}`, '_self')
     }
@@ -61,7 +59,7 @@ const LinkAccounts = () => {
                 </div>
                 <div className="new-freelancer-progress">
                     <Progress
-                        percent={40}
+                        percent={20}
                         strokeColor={{
                             '0%': '#108ee9',
                             '100%': '#87d068',
@@ -108,7 +106,10 @@ const LinkAccounts = () => {
             </div>
             <div className={`list-button link-accounts`}>
                 <Button onClick={handleMoveBackStep} className="back">Back</Button>
+                <div className="next-step">
+                <Button onClick={handleMoveNextStep} className="skip">Skip</Button>
                 <Button onClick={handleMoveNextStep} className="next">Next</Button>
+                </div>
             </div>
         </div>
     )

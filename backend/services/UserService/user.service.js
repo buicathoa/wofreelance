@@ -18,7 +18,7 @@ const Post = db.posts
 const sequelize = db.sequelize;
 const userService = {
   registerAccount: async (req, res) => {
-    const { email, password, role_id, is_verified_account } = req;
+    const { email, password, role_id, is_verified_account, username } = req;
     try {
       const salt = await bcrypt.genSalt(10);
       const hashed = await bcrypt.hash(password, salt);
@@ -34,10 +34,13 @@ const userService = {
         newUser = await UserProfile.create({
           email: email,
           password: hashed,
-          // referer_code: referer_code,
           is_verified_account: is_verified_account,
+          facebook: false,
+          linkedin: false,
           role_id: role_id,
           account_status: "offline",
+          account_type: 'normal',
+          username: username
         });
         return newUser;
       }
@@ -116,7 +119,7 @@ const userService = {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
-      user = await UserProfile.findOne({
+      await UserProfile.findOne({
         where: {
           id: req.body.id ? req.body.id : decoded.id,
         },
@@ -127,6 +130,12 @@ const userService = {
           {
             model: Skillset,
             as: "list_skills",
+            attributes: [
+              'id',
+              'name',
+              [sequelize.literal('(select count(wofreelance.post_skillsets.id) from wofreelance.post_skillsets where skillset_id = wofreelance.list_skills.id)'), 'job_matching_count']
+            ],
+            through: {}
           },
           {
             model: UserRole,
@@ -136,18 +145,25 @@ const userService = {
             model: Post
           }
         ],
+      }).then(res => {
+        const {password, is_verified_account, ...others} = res.dataValues;
+        let list_skills = []
+        if(others?.list_skills.length > 0) {
+          list_skills = others.list_skills.map((skill) => {
+            return {job_matching_count: skill.dataValues.job_matching_count, id: skill.dataValues.id, name: skill.dataValues.name}
+          })
+        }
+        user = {...others, list_skills: list_skills}
       });
-
-      const { password, is_verified_account, ...others } = user.dataValues;
 
       if (req.body.id) {
         if (decoded.role.id <= user.role.id) {
-          return others;
+          return user;
         } else {
           throw new ClientError("You're not allowed to do this action", 404);
         }
       } else {
-        return others;
+        return user;
       }
     } catch (err) {
       throw err;
@@ -229,19 +245,25 @@ const userService = {
             { ...req.body, avatar: req?.file?.path },
             {
               where: {
-                id: req.body.id,
+                id: checkRole === 1 ? decoded.id : req.body.id,
               },
               returning: true,
             }
           );
         }
+        result = await UserProfile.findOne({
+          where: {
+            id: checkRole === 1 ? decoded.id : req.body.id
+          }
+        })
       } else if (checkRole === 0) {
         throw new ClientError("You're not allowed to do this action");
       } else if (checkRole === 2) {
         throw new ClientError("Bad request");
       }
       await transaction.commit();
-      return result;
+      const { password, ...others } = result.dataValues;
+      return others;
     } catch (err) {
       await transaction.rollback();
       throw err;
@@ -319,14 +341,15 @@ const userService = {
             clientID: 1282671125988781,
             clientSecret: "c7367d5dcbba2cf3c11c5520684a7c05",
             callbackURL: `http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user_id}`,
-            profileFields: ['id','displayName','name', 'photos']
+            profileFields: ['id','displayName','name', 'picture.type(large)']
           },
           async function (accessToken, refreshToken, profile, cb) {
             console.log(user_id)
             const user = await UserProfile.update({
               first_name: profile?.name?.familyName,
               last_name: profile?.name?.givenName,
-              avatar: profile?.photos[0]?.value
+              avatar: profile?.photos[0]?.value,
+              facebook: true
             }, {
               where: {
                 id: user_id

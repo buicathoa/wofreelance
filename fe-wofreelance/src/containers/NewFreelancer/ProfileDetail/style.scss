@@ -1,0 +1,67 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.new-freelancer-content{
+    
+    // &.profile-detail{
+    //     margin: 0 auto;
+    //     max-width: calc(540 / $fdf) * $rem;
+    // }
+    .profile-detail-wrapper{
+        .profile-detail-avatar{
+            .avatar-frame{
+                position: relative;
+                width: calc(200 / $fdf) * $rem;
+                height: calc(200 / $fdf) * $rem;
+                border-radius: 5px;
+                border: 1px solid #dedede;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                img{
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                .anticon{
+                    font-size: calc(24 / $fdf) * $rem;
+                    color: $maincolor;
+                }
+                .camera-icon{
+                    font-size: calc(24 / $fdf) * $rem;
+                    color: $maincolor;
+                    position: absolute;
+                    bottom: calc(-15 / $fdf) * $rem;
+                    right: calc(-15 / $fdf) * $rem;
+                    padding: calc(16 / $fdf) * $rem;
+                    border-radius: 50%;
+                    background-color: #ffffff;
+                    box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+                }
+                .input-file{
+                    display: none;
+                }
+            }
+        }
+        .profile-detail-form {
+            margin-top: calc(48 / $fdf) * $rem;
+            .profile-form-header{
+                margin-bottom: calc(24 / $fdf) * $rem;
+                .title{
+                    font-weight: 700;
+                    color: $textcolor;
+                    line-height: 1.33;
+                    font-size: calc(24 / $fdf) * $rem;
+                    margin-bottom: calc(12 / $fdf) * $rem;
+                }
+                .description{
+                    color: $textcolor;
+                    font-weight: 400;
+                    font-size: calc(16 / $fdf) * $rem;
+                    line-height: 1.5;
+                }
+            }
+        }
+    }
+}

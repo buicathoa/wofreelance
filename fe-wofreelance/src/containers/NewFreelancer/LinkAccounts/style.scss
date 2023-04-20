@@ -81,32 +81,32 @@
       }
     }
   }
-  .list-button {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 auto;
-    margin-bottom: calc(24 / $fdf) * $rem;
-    max-width: calc(540 / $fdf) * $rem;
-    &.skills {
-      max-width: 75rem;
-      padding: 0 calc(48 / $fdf) * $rem;
-      justify-content: flex-end;
-    }
-    button {
-      &.next {
-        font-weight: 600;
-        width: calc(80 / $fdf) * $rem;
-        height: calc(40 / $fdf) * $rem;
-        background-color: $maincolor;
-        color: #ffffff;
-      }
-      &.back {
-        font-weight: 600;
-        width: calc(80 / $fdf) * $rem;
-        height: calc(40 / $fdf) * $rem;
-        background-color: #ffffff;
-        color: $textcolor;
-      }
-    }
-  }
+  // .list-button {
+  //   display: flex;
+  //   justify-content: space-between;
+  //   margin: 0 auto;
+  //   margin-bottom: calc(24 / $fdf) * $rem;
+  //   max-width: calc(540 / $fdf) * $rem;
+  //   &.skills {
+  //     max-width: 75rem;
+  //     padding: 0 calc(48 / $fdf) * $rem;
+  //     justify-content: flex-end;
+  //   }
+  //   button {
+  //     &.next {
+  //       font-weight: 600;
+  //       width: calc(80 / $fdf) * $rem;
+  //       height: calc(40 / $fdf) * $rem;
+  //       background-color: $maincolor;
+  //       color: #ffffff;
+  //     }
+  //     &.back {
+  //       font-weight: 600;
+  //       width: calc(80 / $fdf) * $rem;
+  //       height: calc(40 / $fdf) * $rem;
+  //       background-color: #ffffff;
+  //       color: $textcolor;
+  //     }
+  //   }
+  // }
 }

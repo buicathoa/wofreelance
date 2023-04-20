@@ -1,4 +1,3 @@
-
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { ClientError } = require("../errors");
@@ -8,36 +7,37 @@ const cloudinary = require("cloudinary").v2;
 
 const uploadImage = (type) => {
     cloudinary.config({
-        cloud_name: "dd8brzr2h",
-        api_key: "853366335435569",
-        api_secret: "_o__p71eK0MwNAIMHHbJaeYQRsg",
-      });
-      const storage = new CloudinaryStorage({
-        cloudinary: cloudinary,
-        params: {
-          // folder: type === 'avatar' ? 'avatar' : 'posts',
-          folder: type === 'avatar' ? 'wofreelance/avatar' : 'wofreelance/post'
-        },
-        filename: function (req, file, cb) {
-          cb(null, file.originalname); 
-        }
-      });
-      return multer({
-        storage: storage,
-        limits: {
-          fileSize: 4 * 1024 * 1024,
-        },
-      });
-}
+      cloud_name: "dd8brzr2h",
+      api_key: "853366335435569",
+      api_secret: "_o__p71eK0MwNAIMHHbJaeYQRsg",
+    });
+    const storage = new CloudinaryStorage({
+      cloudinary,
+      allowedFormats: ["jpg", "png"],
+      params: {
+        // folder: type === 'avatar' ? 'avatar' : 'posts',
+        folder: type === "avatar" ? "wofreelance/avatar" : "wofreelance/post",
+      },
+      filename: function (req, file, cb) {
+        cb(null, file.originalname);
+      },
+    });
+    return multer({
+      storage: storage,
+      limits: {
+        fileSize: 4 * 1024 * 1024,
+      },
+    });
+};
 
 const removeVietnameseTones = (str) => {
-  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
-  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
-  str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
-  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
-  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
-  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
-  str = str.replace(/đ/g,"d");
+  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+  str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+  str = str.replace(/đ/g, "d");
   str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
   str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
   str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
@@ -51,35 +51,40 @@ const removeVietnameseTones = (str) => {
   str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // ˆ ̆ ̛  Â, Ê, Ă, Ơ, Ư
   // Remove extra spaces
   // Bỏ các khoảng trắng liền nhau
-  str = str.replace(/ + /g," ");
+  str = str.replace(/ + /g, " ");
   str = str.trim();
   // Remove punctuations
   // Bỏ dấu câu, kí tự đặc biệt
-  str = str.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g," ");
+  str = str.replace(
+    /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
+    " "
+  );
   return str;
-}
+};
 
 const findWithMultipleQuery = (prop, queryProp, value) => {
-  return value === undefined ? {[prop]: {$exists: true}} : {[prop]: {[queryProp]: value}}
-}
+  return value === undefined
+    ? { [prop]: { $exists: true } }
+    : { [prop]: { [queryProp]: value } };
+};
 
 const checkRole = (currentRole, destRole) => {
   try {
-    if(currentRole === 'admin'){
-      if(destRole === 'super_admin' || destRole === 'admin'){
-        throw new ClientError("You're not allowed to do this action.")
+    if (currentRole === "admin") {
+      if (destRole === "super_admin" || destRole === "admin") {
+        throw new ClientError("You're not allowed to do this action.");
       } else {
-        return true
+        return true;
       }
-    } else if(currentRole === 'user'){
-      throw new ClientError("You're not allowed to do this action.", 403)
+    } else if (currentRole === "user") {
+      throw new ClientError("You're not allowed to do this action.", 403);
     } else {
-      return true
+      return true;
     }
   } catch (err) {
-    throw err
+    throw err;
   }
-}
+};
 
 // const genLocation = async (address_detail, province_id, district_id, ward_id) => {
 //   let provinceName;
@@ -104,4 +109,9 @@ const checkRole = (currentRole, destRole) => {
 //     return `${address_detail}, ${wardName}, ${districtName}, ${provinceName === 'Thành phố Hồ Chí Minh' ? 'TpHCM' : provinceName}`
 // }
 
-module.exports = {uploadImage, removeVietnameseTones, findWithMultipleQuery, checkRole }
+module.exports = {
+  uploadImage,
+  removeVietnameseTones,
+  findWithMultipleQuery,
+  checkRole,
+};

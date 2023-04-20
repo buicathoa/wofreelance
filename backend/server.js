@@ -38,7 +38,9 @@ app.use(function(req, res, next) {
     next();
   });
 
-app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.json({limit: '50mb'})); // for parsing application/json
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true,  parameterLimit:50000}));
+app.use(express.static(__dirname + "/public"));
 
 app.use("/v1/user", userRoute)
 app.use("/v1/job-categories", jobCategoriesRoute)

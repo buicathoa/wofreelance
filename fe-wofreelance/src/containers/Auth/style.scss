@@ -61,43 +61,42 @@
         font-weight: 700;
       }
     }
-    .main-content {
-      .auth-form {
-        .ant-row {
-          &.forgot-password {
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: calc(16 / $fdf) * $rem;
-            .ant-col-12 {
-              &:first-child {
-                .custom-form-item {
-                  margin-bottom: unset !important;
-                }
-              }
-              &:last-child {
-                text-align: right;
+    .auth-form {
+      .ant-row {
+        &.forgot-password {
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: calc(16 / $fdf) * $rem;
+          .ant-col-12 {
+            &:first-child {
+              .custom-form-item {
+                margin-bottom: unset !important;
               }
             }
-          }
-          &.agree-policy {
-            font-size: calc(14 / $fdf) * $rem;
-            .important {
-              text-decoration: underline;
+            &:last-child {
+              text-align: right;
             }
           }
         }
-        .form-buttons {
-          margin-bottom: calc(32 / $fdf) * $rem;
-          button {
-            background-color: $maincolor;
-            color: #ffffff;
-            font-weight: 600;
-            width: 100%;
-            height: calc(40 / $fdf) * $rem;
-            font-size: calc(20 / $fdf) * $rem;
+        &.agree-policy {
+          font-size: calc(14 / $fdf) * $rem;
+          .important {
+            text-decoration: underline;
           }
         }
       }
+      .form-buttons {
+        margin-bottom: calc(32 / $fdf) * $rem;
+        button {
+          background-color: $maincolor;
+          color: #ffffff;
+          font-weight: 600;
+          width: 100%;
+          height: calc(40 / $fdf) * $rem;
+          font-size: calc(20 / $fdf) * $rem;
+        }
+      }
+    }
       .account-type-container {
         padding: calc(16 / $fdf) * $rem;
         .account-type-item {
@@ -129,7 +128,6 @@
           }
         }
       }
-    }
     .divider {
       border-bottom: 1px solid #dedede;
       margin-bottom: calc(16 / $fdf) * $rem;

@@ -265,7 +265,7 @@ const JobCategoryService = {
             attributes: [
               'id',
               'name',
-              [sequelize.literal('(select count(wofreelance.post_skillsets.id) from wofreelance.post_skillsets where skillset_id = wofreelance.list_skills.id)'), 'job_matching_count']
+              [sequelize.literal('(select count(wofreelance.post_skillsets.id) from wofreelance.post_skillsets where skillset_id = wofreelance.list_skills.id)'), 'job_matching_count'],
             ],
             where: req.body.skill ? {
               name: {

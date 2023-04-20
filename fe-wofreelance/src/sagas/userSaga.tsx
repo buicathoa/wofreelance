@@ -93,7 +93,10 @@ function* getUserInfo(action:AnyAction):Generator {
 function* updateUser(action:AnyAction):Generator {
     const { param, resolve, reject } = action.payload
     try{
-        const response = yield apiRequest(apiUrl.user.updateUser, param, 'general')
+        const response = yield apiRequest(apiUrl.user.updateUser, param, 'form')
+        if(response) {
+            yield put(UserActions.updateUserSuccess((response as ResponseFormatItem).data))
+        }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

@@ -5,7 +5,6 @@ import LinkAccounts from '../containers/NewFreelancer/LinkAccounts'
 import ProfileDetail from '../containers/NewFreelancer/ProfileDetail'
 import SkillSelected from '../containers/NewFreelancer/SkillSelected'
 
-
 export const routerNotSidebar = [
     {
         element: <Auth/>,
@@ -27,10 +26,10 @@ export const routerNotSidebar = [
         element: <LinkAccounts/>,
         path: '/new-freelancer/link-accounts'
     },
-    // {
-    //     element: <ProfileDetail/>,
-    //     path: '/new-freelancer/profile-detail'
-    // },
+    {
+        element: <ProfileDetail/>,
+        path: '/new-freelancer/profile-detail/:id'
+    },
 ]
 
 export const routerSidebar = [
