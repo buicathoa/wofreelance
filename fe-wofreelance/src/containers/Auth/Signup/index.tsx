@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
 import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
 import { freelancer_logo, facebook_icon_white, hire_account, work_account } from '../../../assets'
@@ -10,7 +10,7 @@ import {  } from 'react-router-dom';
 import { UserActions } from '../../../reducers/userReducer';
 import { ResponseFormatItem, SignupFormInterface } from '../../../interface';
 import { openError, openWarning } from '../../../components/Notifications';
-
+import { SocketContext } from '../../../SocketContext';
 const Signup = () => {
     let location = useLocation()
     let navigate = useNavigate()
@@ -42,10 +42,19 @@ const Signup = () => {
           dispatch(UserActions.signin({ param, resolve, reject }));
         });
       };
+    //   const socket = useContext(SocketContext);
 
-    useEffect(() => {
-
-    }, [location])
+    //   useEffect(() => {
+    //     // Listen for custom event from server
+    //     socket.on("connect success", (data) => {
+    //       console.log(data);
+    //     });
+    
+    //     return () => {
+    //       // Clean up listener
+    //       socket.off("connect success");
+    //     };
+    //   }, [socket]);
 
     const handleBackStep = () => {
         if (step > 1) {

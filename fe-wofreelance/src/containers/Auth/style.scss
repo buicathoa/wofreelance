@@ -5,6 +5,45 @@
   padding-top: calc(16 / $fdf) * $rem;
   font-family: $roboto;
   height: 100vh;
+  .auth-form {
+    .ant-row {
+      &.forgot-password {
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: calc(16 / $fdf) * $rem;
+        .ant-col-12 {
+          &:first-child {
+            .custom-form-item {
+              margin-bottom: unset !important;
+            }
+          }
+          &:last-child {
+            text-align: right;
+          }
+        }
+        &.facebook{
+          justify-content: flex-end;
+        }
+      }
+      &.agree-policy {
+        font-size: calc(14 / $fdf) * $rem;
+        .important {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .form-buttons {
+    margin-bottom: calc(32 / $fdf) * $rem;
+    button {
+      background-color: $maincolor;
+      color: #ffffff;
+      font-weight: 600;
+      width: 100%;
+      height: calc(40 / $fdf) * $rem;
+      font-size: calc(20 / $fdf) * $rem;
+    }
+  }
   .auth-component {
     box-shadow: 0 0 6px #dedede;
     border-radius: 5px;
@@ -12,11 +51,13 @@
     padding: calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem;
     background-color: #ffffff;
     margin: 0 auto;
+
     .auth-logo {
       padding: calc(32 / $fdf) * $rem calc(32 / $fdf) * $rem 0;
       display: flex;
       justify-content: center;
       position: relative;
+
       span {
         position: absolute;
         left: 5%;
@@ -25,9 +66,11 @@
         cursor: pointer;
       }
     }
-    .auth-container{
+
+    .auth-container {
       padding: calc(32 / $fdf) * $rem calc(32 / $fdf) * $rem 0;
     }
+
     .auth-description {
       color: $textcolor;
       font-weight: 700;
@@ -35,10 +78,12 @@
       padding: calc(16 / $fdf) * $rem 0;
       text-align: center;
     }
+
     .notice {
       font-size: calc(16 / $fdf) * $rem;
       padding: calc(16 / $fdf) * $rem 0;
     }
+
     .auth-login-social {
       display: flex;
       align-items: center;
@@ -48,6 +93,7 @@
       border-radius: 5px;
       padding: calc(8 / $fdf) * $rem calc(22 / $fdf) * $rem;
       margin-bottom: calc(24 / $fdf) * $rem;
+
       img {
         width: calc(36 / $fdf) * $rem;
         height: calc(36 / $fdf) * $rem;
@@ -56,91 +102,124 @@
         background-color: #ffffff;
         border-radius: 50%;
       }
+
       span {
         color: #ffffff;
         font-weight: 700;
       }
     }
-    .auth-form {
-      .ant-row {
-        &.forgot-password {
-          justify-content: space-between;
-          align-items: center;
+
+    .account-type-container {
+      padding: calc(16 / $fdf) * $rem;
+
+      .account-type-item {
+        padding: calc(16 / $fdf) * $rem;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 10px 20px #0000000f, 0 2px 6px #0000000f,
+          0 0 1px #0000000f;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:hover {
+          box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+        }
+
+        &:first-child {
           margin-bottom: calc(16 / $fdf) * $rem;
-          .ant-col-12 {
-            &:first-child {
-              .custom-form-item {
-                margin-bottom: unset !important;
-              }
-            }
-            &:last-child {
-              text-align: right;
-            }
-          }
         }
-        &.agree-policy {
-          font-size: calc(14 / $fdf) * $rem;
-          .important {
-            text-decoration: underline;
-          }
+
+        img {
+          padding: 0 calc(12 / $fdf) * $rem;
+          width: calc(100 / $fdf) * $rem;
+          height: calc(84 / $fdf) * $rem;
         }
-      }
-      .form-buttons {
-        margin-bottom: calc(32 / $fdf) * $rem;
-        button {
-          background-color: $maincolor;
-          color: #ffffff;
-          font-weight: 600;
-          width: 100%;
-          height: calc(40 / $fdf) * $rem;
-          font-size: calc(20 / $fdf) * $rem;
+
+        .content {
+          padding: 0 calc(12 / $fdf) * $rem;
+          font-weight: 700;
+        }
+
+        span {
+          padding: 0 calc(12 / $fdf) * $rem;
+          font-weight: 700;
         }
       }
     }
-      .account-type-container {
-        padding: calc(16 / $fdf) * $rem;
-        .account-type-item {
-          padding: calc(16 / $fdf) * $rem;
-          display: flex;
-          align-items: center;
-          box-shadow: 0 10px 20px #0000000f, 0 2px 6px #0000000f,
-            0 0 1px #0000000f;
-            border-radius: 5px;
-            cursor: pointer;
-            &:hover{
-              box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
-            }
-            &:first-child{
-              margin-bottom: calc(16 / $fdf) * $rem;
-            }
-          img {
-            padding: 0 calc(12 / $fdf) * $rem;
-            width: calc(100 / $fdf) * $rem;
-            height: calc(84 / $fdf) * $rem;
-          }
-          .content {
-            padding: 0 calc(12 / $fdf) * $rem;
-            font-weight: 700;
-          }
-          span {
-            padding: 0 calc(12 / $fdf) * $rem;
-            font-weight: 700;
-          }
-        }
-      }
+
     .divider {
       border-bottom: 1px solid #dedede;
       margin-bottom: calc(16 / $fdf) * $rem;
     }
+
     .sign-up {
       font-size: calc(12 / $fdf) * $rem;
       font-weight: 400;
       color: $textcolor;
       text-align: center;
+
       .important {
         font-weight: 600;
         color: rgb(75, 178, 238);
       }
+    }
+  }
+
+  .auth-facebook-component {
+    max-width: calc(400 / $fdf) * $rem;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 0 6px #dedede;
+    padding: calc(12 / $fdf) * $rem calc(24 / $fdf) * $rem;
+    border-radius: 5px;
+
+    .auth-facebook-header {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: calc(32 / $fdf) * $rem calc(32 / $fdf) * $rem 0;
+
+      img {
+        width: calc(199 / $fdf) * $rem;
+        height: calc(48 / $fdf) * $rem;
+      }
+
+      .anticon {
+        position: absolute;
+        left: 0;
+        top: 70%;
+        transform: translateY(-50%);
+      }
+    }
+
+    .auth-facebook-title {
+      padding: calc(16 / $fdf) * $rem;
+      line-height: 1.4;
+      font-weight: 700;
+      color: $textcolor;
+      font-size: calc(20 / $fdf) * $rem;
+      text-align: center;
+    }
+
+    .auth-facebook-avatar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: calc(16 / $fdf) * $rem;
+
+      img {
+        width: calc(48 / $fdf) * $rem;
+        height: calc(48 / $fdf) * $rem;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+    }
+
+    .auth-facebook-description {
+      margin-bottom: calc(16 / $fdf) * $rem;
+      line-height: 1.43;
+      font-weight: 400;
+      font-size: calc(14 / $fdf) * $rem;
+      color: $textcolor;
     }
   }
 }

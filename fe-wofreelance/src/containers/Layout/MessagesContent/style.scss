@@ -1,0 +1,81 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.message-content-wrapper{
+    width: calc(400 / $fdf) * $rem;
+    .message-content-header{
+        padding:  calc(24 / $fdf) * $rem  calc(24 / $fdf) * $rem  calc(4 / $fdf) * $rem;
+        display: flex;
+        align-items: center;
+        font-size: calc(16 / $fdf) * $rem;
+        line-height: 1.5;
+        justify-content: space-between;
+        .title{
+            font-weight: 700;
+            color: $textcolor;
+        }
+        a{
+            font-size: calc(14 / $fdf) * $rem;
+        }
+    }
+    .message-content-main{
+        .message-content-empty{
+            padding: calc(24 / $fdf) * $rem calc(12 / $fdf) * $rem;
+            .message-content-empty-image{
+                display: flex;
+                justify-content: center;
+                img{
+                    width: calc(106 / $fdf) * $rem;
+                    height: calc(88 / $fdf) * $rem;
+                }
+            }
+            .message-content-empty-text{
+                font-size: calc(13 / $fdf) * $rem;
+                line-height: 1.2;
+                font-weight: 400;
+                text-align: center;
+            }
+        }
+        .messages-list{
+            padding:  0 calc(12 / $fdf) * $rem;
+            padding-bottom: calc(16 / $fdf) * $rem;
+            .message-item{
+                padding: calc(12 / $fdf) * $rem;
+                display: flex;
+                &:hover{
+                    background-color: $hovercolor;
+                    cursor: pointer;
+                }
+                .avatar{
+                    margin-right: calc(8 / $fdf) * $rem;
+                    img{
+                        width: calc(48 / $fdf) * $rem;
+                        height: calc(48 / $fdf) * $rem;
+                        border-radius: 2px;
+                        object-fit: cover;
+                    }
+                }
+                .message-item-content{
+                    width: calc(100% - calc(72 / $fdf) * $rem);
+                    .sender-info{
+                        display: flex;
+                        justify-content: space-between;
+                        .sender-name{
+                            font-size: calc(14 / $fdf) * $rem;
+                            color: $textcolor;
+                            font-weight: 600;
+                            .sender-email{
+                                font-weight: 400;
+                            }
+                        }
+                        .message-latest-time{
+                            font-size: calc(12 / $fdf) * $rem;
+                            color: $textcolor;
+                            opacity: 0.5;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

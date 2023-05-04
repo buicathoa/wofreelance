@@ -1,0 +1,47 @@
+@import "../../../../css/custom";
+@import "../../../../css/variable";
+
+.language_birthday {
+    .language_birthday-header {
+        margin-bottom: calc(12 / $fdf) * $rem;
+
+        .introduction {
+            font-weight: 700;
+            font-size: calc(24 / $fdf) * $rem;
+            color: $textcolor;
+            margin-bottom: calc(12 / $fdf) * $rem;
+            line-height: 1.43;
+        }
+
+        .description {
+            font-size: calc(16 / $fdf) * $rem;
+            line-height: 1.5;
+            color: $textcolor;
+            margin-bottom: calc(16 / $fdf) * $rem;
+        }
+    }
+
+    .language_birthday-form {
+        .language_birthday-form-item {
+            .title {
+                font-weight: 700;
+                font-size: calc(24 / $fdf) * $rem;
+                color: $textcolor;
+                margin-bottom: calc(12 / $fdf) * $rem;
+                line-height: 1.43;
+            }
+
+            .custom-form-item {
+                &.title {
+                    label{
+                        font-weight: 700;
+                    font-size: calc(24 / $fdf) * $rem;
+                    color: $textcolor;
+                    margin-bottom: calc(12 / $fdf) * $rem;
+                    line-height: 1.43;
+                    }
+                }
+            }
+        }
+    }
+}

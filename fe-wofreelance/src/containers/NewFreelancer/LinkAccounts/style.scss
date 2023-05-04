@@ -4,6 +4,7 @@
 .new-freelancer-wrapper {
   overflow-x: hidden;
   .new-freelancer-container {
+    padding: 0 calc(8 / $fdf) * $rem;
     .new-freelancer-header {
       padding: calc(4 / $fdf) * $rem calc(16 / $fdf) * $rem;
       display: flex;

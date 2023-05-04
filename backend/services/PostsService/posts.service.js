@@ -8,7 +8,6 @@ const { Op, col, Sequelize } = require("sequelize");
 const { ClientError } = require("../../errors");
 
 const RestApiMethods = require("../../utils/QueryInsertPattern");
-const dbConnection = require("../../server");
 const { validateRole } = require("../../utils/validateRole");
 const QueryParameter = require("../../utils/QueryParameter");
 const Post = db.posts;

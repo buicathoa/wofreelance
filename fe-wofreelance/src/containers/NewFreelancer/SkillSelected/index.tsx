@@ -140,7 +140,7 @@ const SkillSelected = () => {
                 </div>
                 <div className="new-freelancer-progress">
                     <Progress
-                        percent={10}
+                        percent={0}
                         strokeColor={{
                             '0%': '#108ee9',
                             '100%': '#87d068',

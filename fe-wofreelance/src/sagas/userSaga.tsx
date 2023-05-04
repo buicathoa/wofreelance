@@ -2,13 +2,13 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { push } from 'react-router-redux';
 import { apiRequest } from "../utils/apiRequest";
-import { apiUrl } from "../constants";
+import { HREF, apiUrl } from "../constants";
 import { AppActions } from "../reducers/appReducer";
 import { AnyAction } from "@reduxjs/toolkit";
 import { UserActions } from "../reducers/userReducer";
 import { ResponseFormatItem } from "../interface";
 
-export function* UserTaskSaga():Generator {
+export function* UserTaskSaga(): Generator {
     // yield takeLatest(GeneralMenuActions.fetchAllGeneralMenu().type, fetchAllGeneralMenus)
     yield takeLatest(UserActions.signin({}).type, signIn)
     yield takeLatest(UserActions.checkExistUser({}).type, checkExistUser)
@@ -16,91 +16,110 @@ export function* UserTaskSaga():Generator {
     yield takeLatest(UserActions.signinFacebook({}).type, signinFacebook)
     yield takeLatest(UserActions.getUserInfo({}).type, getUserInfo)
     yield takeLatest(UserActions.updateUser({}).type, updateUser)
+    yield takeLatest(UserActions.getAllLanguages({}).type, getAllLanguages)
 }
 
-function* signIn(action:AnyAction):Generator {
+function* signIn(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
+    try {
         const response = yield apiRequest(apiUrl.user.signin, param, 'general')
-        if(response) {
+        if (response) {
             yield put(UserActions.signinSuccess((response as ResponseFormatItem).data))
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }
 }
 
-function* checkExistUser(action:AnyAction):Generator {
+function* checkExistUser(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
+    try {
         const response = yield apiRequest(apiUrl.user.checkExistUser, param, 'general')
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }
 }
 
-function* registerAccount(action:AnyAction):Generator {
+function* registerAccount(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
+    try {
         const response = yield apiRequest(apiUrl.user.register, param, 'general')
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }
 }
 
-function* signinFacebook(action:AnyAction):Generator {
+function* signinFacebook(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
+    try {
         // yield put(push("http://localhost:1203/v1/user/auth/facebook/callback"))
         const response = yield apiRequest(apiUrl.user.signinFacebook, param, 'general')
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }
 }
 
-function* getUserInfo(action:AnyAction):Generator {
+function* getUserInfo(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
-        const response = yield apiRequest(apiUrl.user.getUserInfo, param, 'general')
-        if(response) {
+    try {
+        const response:any = yield apiRequest(apiUrl.user.getUserInfo, param, 'general')
+        if (response.err.response.status === 400) {
+            yield put(push(`${HREF}/not-found`))
+        } else {
             yield put(UserActions.getUserInfoSuccess((response as ResponseFormatItem).data))
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }
 }
 
-function* updateUser(action:AnyAction):Generator {
+function* updateUser(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
-    try{
+    try {
         const response = yield apiRequest(apiUrl.user.updateUser, param, 'form')
-        if(response) {
+        if (response) {
             yield put(UserActions.updateUserSuccess((response as ResponseFormatItem).data))
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
-    catch(err) {
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
+function* getAllLanguages(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response = yield apiRequest(apiUrl.user.getAllLanguages, param, 'general')
+        if (response) {
+            yield put(UserActions.getAllLanguagesSuccess((response as ResponseFormatItem).data))
+        }
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
         yield put(AppActions.openLoading(false))
         if (reject) yield reject(err)
     }

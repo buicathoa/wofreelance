@@ -1,26 +1,27 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import { BrowserRouter, createBrowserRouter, Route } from 'react-router-dom';
-import Layout from './containers/Layout';
-import HomePage from './containers/HomePage';
-import Login from './containers/Auth';
-import store from './reducers/rootReducer';
+import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import Loading from './components/Loading';
 
+import Loading from './components/Loading';
+import App from './App';
+import Layout from './containers/Layout';
+import store from './reducers/rootReducer';
+import { SocketContext, socket } from "./SocketContext";
+
+import './index.css';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 
 root.render(
+  <SocketContext.Provider value={socket}>
     <Provider store={store}>
       <BrowserRouter>
-      <Loading />
+        <Loading />
         <App />
       </BrowserRouter>
     </Provider>
+  </SocketContext.Provider>
 );
 

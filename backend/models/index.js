@@ -49,6 +49,7 @@ db.Sequelize = Sequelize;
 //user profile
 db.userprofile = require("./userModel/userprofile")(sequelize, DataTypes)
 db.userroles = require("./userModel/userroles")(sequelize,DataTypes)
+db.languages = require("./userModel/languages")(sequelize,DataTypes)
 
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
@@ -60,8 +61,11 @@ db.jobskillset = require("./JobCategory/jobskillset")(sequelize, DataTypes)
 //Junction table many to many (skillset - posts): skillset_id and post_id
 db.post_skillsets = require("./Posts/post_skillsets")(sequelize, DataTypes)
 
-
+// Junction table skill of user 
 db.user_skillset = require("./userModel/user_skillset")(sequelize, DataTypes)
+
+// Junction table language of user 
+db.user_languages = require("./userModel/user_languages")(sequelize, DataTypes)
 
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
@@ -93,10 +97,6 @@ db.jobskillset.belongsTo(db.jobcategories, {
   foreignKey: 'category_id',
   as: 'list_skills'
 })
-
-
-
-
 
 
 db.userprofile.hasMany(db.posts, {
@@ -154,6 +154,19 @@ db.jobskillset.belongsToMany(db.userprofile, {
   otherKey: 'user_id',
 })
 
+
+
+db.userprofile.belongsToMany(db.languages, {
+  through: db.user_languages,
+  foreignKey: 'user_id',
+  otherKey: 'language_id',
+  as: 'languages'
+})
+db.languages.belongsToMany(db.userprofile, {
+  through: db.user_languages,
+  foreignKey: 'language_id',
+  otherKey: 'user_id',
+})
 // ========================================================================================== End ==========================================================================================//
 
 

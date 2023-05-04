@@ -1,4 +1,5 @@
 export const BASE_URL = 'http://localhost:1203/v1'
+export const BACKEND_URL = 'http://localhost:1203'
 export const HREF = 'http://localhost:3000/'
 export const apiUrl = {
     user: {
@@ -8,7 +9,8 @@ export const apiUrl = {
         login: 'user/login',
         signinFacebook: 'user/auth/facebook',
         getUserInfo: "user/get-info",
-        updateUser: "user/update"
+        updateUser: "user/update",
+        getAllLanguages: "user/language/get-all"
     },
     categories: {
         getAll: 'job-categories/get-all',

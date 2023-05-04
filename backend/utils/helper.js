@@ -1,15 +1,16 @@
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { ClientError } = require("../errors");
+const path = require('path');
 // const { Province, District, Ward } = require("./models/LocationModel");
 // const { Province, District, Ward } = require("./models/location");
 const cloudinary = require("cloudinary").v2;
 
 const uploadImage = (type) => {
     cloudinary.config({
-      cloud_name: "dd8brzr2h",
-      api_key: "853366335435569",
-      api_secret: "_o__p71eK0MwNAIMHHbJaeYQRsg",
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
     });
     const storage = new CloudinaryStorage({
       cloudinary,
@@ -86,6 +87,20 @@ const checkRole = (currentRole, destRole) => {
   }
 };
 
+const emailTemplate = (mailTo, user_id, image) => {
+  return `<div className="wrapper" style="padding: 20px; background-color: #f7f7f7; border-radius: 5px;">
+  <div className="logo" style="display: flex; justify-content: center;">
+       <img src="https://res.cloudinary.com/dqzprqtqg/image/upload/v1682311730/root/freelancer_logo_tblwk1.jpg" />
+  </div>
+  <div className="container" style="padding: 20px; background-color: #ffffff; margin-top: 16px;">
+      <h3>Hi ${mailTo}</h3>
+      <p>We at Wofreelance.com take the trust and safety of our users seriously. We just need you to verify your email address by clicking the button below:</p><br/>
+      <a href="${process.env.URL_HOST}/v1/user/email-verified?id=${user_id}" style="background-color: #0ab2a8; color: white; padding: 10px; border-radius: 10px; text-decoration: none;">Verify your email</a>
+      <h3>Regards,</h3><span>The World of Freelance Team.</span>
+  </div>
+</div>`
+}
+
 // const genLocation = async (address_detail, province_id, district_id, ward_id) => {
 //   let provinceName;
 //   let districtName;
@@ -114,4 +129,5 @@ module.exports = {
   removeVietnameseTones,
   findWithMultipleQuery,
   checkRole,
+  emailTemplate
 };

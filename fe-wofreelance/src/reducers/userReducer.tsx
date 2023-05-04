@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit'
 const User = createSlice({
     name: 'user',
     initialState: {
-        user: {} 
+        user: {},
+        languages: [] 
     },
     reducers: ({
         signin: (state, actions) => {},
@@ -20,7 +21,11 @@ const User = createSlice({
         updateUser: (state, actions) => {},
         updateUserSuccess: (state, actions) => {
             state.user = actions.payload
-        }
+        },
+        getAllLanguages: (state, actions) => {},
+        getAllLanguagesSuccess: (state, actions) => {
+            state.languages = actions.payload
+        },
     })
 })
 

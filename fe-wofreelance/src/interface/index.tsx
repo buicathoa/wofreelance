@@ -85,7 +85,27 @@ export interface UserInterface {
     updatedAt?: Date,
     role_id?: number,
     username?: string,
-    account_type?: string
+    account_type?: string,
+    languages?: Array<LanguagesInterface>,
+    first_name?: string
+}
+
+export interface LanguagesInterface {
+    id?: number,
+    language?: string,
+    code?: string,
+    english_name?: string,
+    iso_639_1?: string,
+    iso_639_2?: string,
+    createdAt?: Date,
+    updatedAt?: Date
+}
+
+export interface PhotoandNameComponentInterface{
+    fileUploaded?: File,
+    setFileUploaded?: React.Dispatch<React.SetStateAction<File>>,
+    formValues?: any,
+    setformValues?: React.Dispatch<React.SetStateAction<any>>
 }
 
 export interface Notifications {

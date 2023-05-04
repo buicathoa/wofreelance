@@ -1,0 +1,30 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.group-content-wrapper{
+    font-family: $roboto;
+    width: calc(400 / $fdf) * $rem;
+    padding-bottom: calc(16 / $fdf) * $rem;
+    .group-content-item{
+        padding: calc(16 / $fdf) * $rem calc(24 / $fdf) * $rem 0;
+        .group-content-item-header{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .title{
+                font-size: calc(16 / $fdf) * $rem;
+                line-height: 1.5;
+                font-weight: 700;
+            }
+        }
+        .group-content-item-content{
+            padding: calc(16 / $fdf) * $rem calc(8 / $fdf) * $rem 0;
+            padding-left: 0;
+            .time-updated{
+                margin-top: calc(8 / $fdf) * $rem;
+                font-size: calc(12 / $fdf) * $rem;
+                color: #6e6c6c;
+            }
+        }
+    }
+}

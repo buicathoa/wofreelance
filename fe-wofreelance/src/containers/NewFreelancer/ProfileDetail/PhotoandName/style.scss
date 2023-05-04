@@ -1,9 +1,9 @@
 @import "../../../../css/custom";
 @import "../../../../css/variable";
 
-.profile-detail-wrapper{
-    .profile-detail-avatar{
-        .avatar-frame{
+.photo-name-wrapper {
+    .photo-name-avatar {
+        .avatar-frame {
             position: relative;
             width: calc(200 / $fdf) * $rem;
             height: calc(200 / $fdf) * $rem;
@@ -13,16 +13,19 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto;
-            img{
+
+            img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
             }
-            .anticon{
+
+            .anticon {
                 font-size: calc(24 / $fdf) * $rem;
                 color: $maincolor;
             }
-            .camera-icon{
+
+            .camera-icon {
                 font-size: calc(24 / $fdf) * $rem;
                 color: $maincolor;
                 position: absolute;
@@ -33,23 +36,28 @@
                 background-color: #ffffff;
                 box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
             }
-            .input-file{
+
+            .input-file {
                 display: none;
             }
         }
     }
-    .profile-detail-form {
+
+    .photo-name-form {
         margin-top: calc(48 / $fdf) * $rem;
-        .profile-form-header{
+
+        .profile-form-header {
             margin-bottom: calc(24 / $fdf) * $rem;
-            .title{
+
+            .title {
                 font-weight: 700;
                 color: $textcolor;
                 line-height: 1.33;
                 font-size: calc(24 / $fdf) * $rem;
                 margin-bottom: calc(12 / $fdf) * $rem;
             }
-            .description{
+
+            .description {
                 color: $textcolor;
                 font-weight: 400;
                 font-size: calc(16 / $fdf) * $rem;

@@ -1,9 +1,12 @@
 import Auth from '../containers/Auth'
 import Signup from '../containers/Auth/Signup'
-import HomePage from '../containers/HomePage'
+import EmailVerification from '../containers/NewFreelancer/EmailVerification'
 import LinkAccounts from '../containers/NewFreelancer/LinkAccounts'
 import ProfileDetail from '../containers/NewFreelancer/ProfileDetail'
 import SkillSelected from '../containers/NewFreelancer/SkillSelected'
+import Dashboard from '../containers/Dashboard'
+import Lists from '../containers/Lists'
+import UserProfile from '../containers/User'
 
 export const routerNotSidebar = [
     {
@@ -30,12 +33,19 @@ export const routerNotSidebar = [
         element: <ProfileDetail/>,
         path: '/new-freelancer/profile-detail/:id'
     },
+    {
+        element: <EmailVerification/>,
+        path: '/new-freelancer/email-verification'
+    },
+    // {
+    //     element:
+    // }
 ]
 
 export const routerSidebar = [
     {
         exact: true,
-        element: <HomePage/>,
-        path: '/'
+        element: <UserProfile/>,
+        path: '/u/:id'
     },
 ]

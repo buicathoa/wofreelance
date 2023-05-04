@@ -1,85 +1,137 @@
-const userService = require("../../services/UserService/user.service")
-const { handleSuccess, handleError } = require("../../utils/handleResponse")
+const CONSTANT = require("../../constants");
+const userService = require("../../services/UserService/user.service");
+const db = require("./../../models");
+const UserProfile = db.userprofile;
+const { handleSuccess, handleError } = require("../../utils/handleResponse");
 
 const userController = {
-    registerAccount: async(req, res) => {
-        try{
-            const userCreated = await userService.registerAccount(req.body, res)
-            if(userCreated === 201){
-                return res.status(201).json("This email address was created.")
-            } else {
-                return handleSuccess(res, userCreated, {message: "Account is created successfully."})
-            }
-            // return handleSuccess(res, userCreated, {message: "Account was created!"})
-        }
-        catch(err){
-            return handleError(res, err)
-        }
-    },
-
-    loginUser: async (req, res) => {
-        try {
-            const result = await userService.loginUser(req.body, res) 
-            if(result === 1){
-                return handleSuccess(res, {message: 'Invalid email or password.'})
-            } else if(result === 2){
-                return handleSuccess(res, {message: "User is not active."})
-            } else {
-                return handleSuccess(res, result, {message: 'Login success.'})
-            }
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-
-    getUserInfo: async(req, res) => {
-        try {
-            const result = await userService.getUserInfo(req, res)
-            return handleSuccess(res, result)
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-
-    getAllUser: async(req, res) => {
-        try {
-            const result = await userService.getAllUser(req, res)
-            return handleSuccess(res, result)
-        } catch (err) {
-            return handleError(res, err)
-        }
-    },
-
-    updateUser: async(req, res) => {
-        try {
-            const result = await userService.updateUser(req, res)
-            return handleSuccess(res, result)
-        } catch(err) {
-            return handleError(res, err)
-        }
-    },
-
-    deleteUser: async(req, res) => {
-        try {
-            const result = await userService.deleteUser(req, res)
-            return handleSuccess(res, {message: 'Action successfully.'})
-        } catch(err) {
-            return handleError(res, err)
-        }
-    },
-
-    checkUser: async(req, res) => {
-        try {
-            const result = await userService.checkUser(req, res)
-            if(!result) {
-                return handleSuccess(res, result, `This ${req?.body?.email ? req?.body?.email : req?.body?.username} has been existed.` )
-            } else {
-                return handleSuccess(res, result)
-            }
-        } catch(err) {
-            return handleError(res, err)
-        }
+  registerAccount: async (req, res) => {
+    try {
+      const userCreated = await userService.registerAccount(req.body, res);
+      if (userCreated === 201) {
+        return res.status(201).json("This email address was created.");
+      } else {
+        return handleSuccess(res, userCreated, {
+          message: "Account is created successfully.",
+        });
+      }
+      // return handleSuccess(res, userCreated, {message: "Account was created!"})
+    } catch (err) {
+      return handleError(res, err);
     }
-}
+  },
 
-module.exports = userController
+  loginUser: async (req, res) => {
+    try {
+      const result = await userService.loginUser(req.body, res);
+      if (result === 1) {
+        return res.status(400).json({ message: "Invalid email, password or account status" });
+      } else if (result === 2) {
+        return res.status(403).json({ message: "Account may not active" });
+      } else {
+        return handleSuccess(res, result, { message: "Login success." });
+      }
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  getUserInfo: async (req, res) => {
+    try {
+      const result = await userService.getUserInfo(req, res);
+      if (!result) {
+        return res.status(400).json({ message: "User not found." });
+      } else {
+        return handleSuccess(res, result);
+      }
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  getAllUser: async (req, res) => {
+    try {
+      const result = await userService.getAllUser(req, res);
+      return handleSuccess(res, result);
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  updateUser: async (req, res) => {
+    try {
+      const result = await userService.updateUser(req, res);
+      return handleSuccess(res, result);
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  deleteUser: async (req, res) => {
+    try {
+      const result = await userService.deleteUser(req, res);
+      return handleSuccess(res, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  checkUser: async (req, res) => {
+    try {
+      const result = await userService.checkUser(req, res);
+      if (!result) {
+        return handleSuccess(
+          res,
+          result,
+          `This ${
+            req?.body?.email ? req?.body?.email : req?.body?.username
+          } has been existed.`
+        );
+      } else {
+        return handleSuccess(res, result);
+      }
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  createLanguage: async (req, res) => {
+    try {
+      const result = await userService.createLanguage(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  getAllLanguage: async (req, res) => {
+    try {
+      const result = await userService.getAllLanguage(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  verificationEmail: async (req, res) => {
+    try {
+      const result = await userService.verificationEmail(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  emailVerified: async (req, res, socket, io) => {
+    try {
+      res.redirect(
+        `${process.env.URL_FRONTEND}/new-freelancer/email-verification`
+      );
+      // await io.to(`user_id_${result.id}`).emit(USER_INFO, result)
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+};
+
+module.exports = userController;

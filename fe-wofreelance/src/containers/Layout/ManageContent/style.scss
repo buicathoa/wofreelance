@@ -1,0 +1,44 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.manage-content-wrapper{
+    font-family: $roboto;
+    padding-bottom: calc(16 / $fdf) * $rem;
+    .manage-content-item{
+        padding: calc(16 / $fdf) * $rem calc(24 / $fdf) * $rem 0;
+        .manage-content-item-header{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .title{
+                font-size: calc(16 / $fdf) * $rem;
+                line-height: 1.5;
+                font-weight: 700;
+            }
+        }
+        .manage-content-item-content{
+            padding: calc(8 / $fdf) * $rem calc(8 / $fdf) * $rem 0;
+            padding-left: 0;
+            .content-item{
+                display: flex;
+                align-items: center;
+                padding: calc(5 / $fdf) * $rem calc(8 / $fdf) * $rem;
+                padding-left: 0;
+                .anticon{
+                    margin-right: calc(8 / $fdf) * $rem;
+                    &.heart{
+                        color: rgb(245, 110, 133);
+                    }
+                }
+                .content-text{
+                    line-height: 1.43;
+                    font-size: calc(14 / $fdf) * $rem;
+                    &.tasklist{
+                        font-weight: 700;
+                        color: $maincolor
+                    }
+                }
+            }
+        }
+    }
+}

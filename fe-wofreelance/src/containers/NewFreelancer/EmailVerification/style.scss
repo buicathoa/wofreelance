@@ -1,0 +1,39 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.email-verification {
+    text-align: center;
+    .note-text{
+        line-height: 1.33;
+        font-weight: 700;
+        color: $textcolor;
+        font-size: calc(24 / $fdf) * $rem;
+        &.warning{
+            margin-bottom: calc(24 / $fdf) * $rem;
+        }
+    }
+
+    .resend-email{
+        color: rgb(78, 78, 230);
+    }
+
+    .email-info{
+        font-weight: 400;
+        color: $textcolor;
+        line-height: 1.5;
+        font-size: calc(16 / $fdf) * $rem;
+        margin-bottom: calc(24 / $fdf) * $rem;
+    }
+    .verified {
+        // display: flex;
+        // flex-direction: column;
+        // justify-content: space-between;
+        .note-text{
+            margin-bottom: calc(48 / $fdf) * $rem;
+            &.email {
+                font-weight: 400;
+                font-size: calc(18 / $fdf) * $rem;
+            }
+        }
+    }
+}

@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { link_accounts, facebook_icon, linkedin_icon } from '../../../assets'
-import { PlusOutlined, CheckOutlined } from '@ant-design/icons'
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { freelancer_logo, facebook_icon_white } from '../../../assets'
-
-import './style.scss'
-import { RootState } from '../../../reducers/rootReducer'
-import { LinkAccountsComponentInterface, ResponseFormatItem, UserInterface } from '../../../interface';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { PlusOutlined, CheckOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom';
 import { Button, Progress } from 'antd';
+
+import { link_accounts, facebook_icon, linkedin_icon, freelancer_logo } from '../../../assets'
+
+import { RootState } from '../../../reducers/rootReducer'
 import { UserActions } from '../../../reducers/userReducer';
 
+import { ResponseFormatItem, UserInterface } from '../../../interface';
+
+import './style.scss'
+
 const LinkAccounts = () => {
-    const location = useLocation()
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -47,7 +48,7 @@ const LinkAccounts = () => {
     }
 
     const handleMoveNextStep = () => {
-        navigate('/new-freelancer/profile-detail')
+        navigate('/new-freelancer/profile-detail/photo-name')
     }
 
     return (
