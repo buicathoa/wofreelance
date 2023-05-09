@@ -132,6 +132,15 @@ const userController = {
       return handleError(res, err);
     }
   },
+
+  loginFbTK : async (req, res) => {
+    try {
+      const result = await userService.loginFacebookToken(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  }
 };
 
 module.exports = userController;

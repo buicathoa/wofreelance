@@ -30,11 +30,16 @@ const Layout = () => {
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
   useEffect(() => {
-    if (localStorage.getItem('access_token')) {
-      getUserInfo({username: id})
+    const user_token: any = getCookie('access_token')
+    if(user_token){
+      localStorage.setItem('access_token', user_token)
+      getUserInfo({})
+    } else {
+      getUserInfo({})
     }
   }, [])
 
+  console.log('user', user)
   return (
     <div>
       {/* A "layout route" is a good place to put markup you want to

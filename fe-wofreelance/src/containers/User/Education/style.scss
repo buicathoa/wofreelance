@@ -1,0 +1,93 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.card-education{
+    font-family: $roboto;
+    .no-data{
+        .card-text{
+            font-style: italic;
+            text-align: left;
+        }
+    }
+    .modify-form {
+        .ant-form {
+            padding: 0 calc(12 / $fdf) * $rem;
+        }
+    
+        .list-button {
+            &.user {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+    
+                button {
+                    font-size: calc(16 / $fdf) * $rem;
+                    text-align: center;
+                    width: calc(100 / $fdf) * $rem;
+                    &:nth-child(1) {
+                        margin-right: calc(16 / $fdf) * $rem;
+                    }
+                }
+            }
+        }
+    
+        .ant-col-10,
+        .ant-col-12 {
+            padding-right: calc(16 / $fdf) * $rem;
+        }
+    
+        .ant-col-12 {
+            .title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #2c2c2c;
+                line-height: 1.375rem;
+            }
+        }
+    }
+    .list-experiences{
+        .education-item{
+            .education-item-header{
+                margin-bottom: calc(12 / $fdf) * $rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .title{
+                    color: $textcolor;
+                    font-size: calc(16 / $fdf) * $rem;
+                    line-height: 1.5;
+                    font-weight: 700;
+                }
+                .anticon{
+                    font-size: calc(16 / $fdf) * $rem;
+                    cursor: pointer;
+                }
+            }
+            .education-item-content{
+                .company-name{
+                    color: $textcolor;
+                    font-size: calc(14 / $fdf) * $rem;
+                    line-height: 1.5;
+                    font-weight: 700;
+                }
+                .working-process-time{
+                    display: flex;
+                }
+            }
+        }
+    }
+}
+.education-popover{
+    padding-left: 0;
+    padding: calc(16 / $fdf) * $rem;
+    li{
+        list-style-type: none;
+        color: $textcolor;
+        font-weight: 400;
+        font-size: calc(16 / $fdf) * $rem;
+        cursor: pointer;
+        &:hover{
+            background-color: $hovercolor;
+        }
+    }
+}

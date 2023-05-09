@@ -45,12 +45,6 @@ const Auth = () => {
     });
   };
 
-  const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(UserActions.getUserInfo({ param, resolve, reject }));
-    });
-  };
-
   useEffect(() => {
     const login_type: any = getCookie('login_type')
     if (login_type === 'facebook') {
@@ -61,7 +55,6 @@ const Auth = () => {
     }
   }, [])
 
-  console.log('loginType', loginType)
 
 
   const onSubmitForm = (values: any) => {
@@ -83,7 +76,6 @@ const Auth = () => {
 
   return (
     <div className="auth-wrapper">
-      {loginType !== 'facebook' ?
         <div className="auth-component">
           <div className="auth-logo">
             <img src={freelancer_logo} />
@@ -133,50 +125,7 @@ const Auth = () => {
           <div className="sign-up">
             Do you have account? <Link to="/signup" className="important">Sign Up</Link>
           </div>
-        </div> :
-        <div className="auth-facebook-component">
-          <div className="auth-facebook-header">
-            <LeftOutlined />
-            <img src={freelancer_logo} alt="" />
-          </div>
-          <div className="auth-facebook-title">Link to existing Freelancer account</div>
-          <div className="auth-facebook-avatar">
-            <img src={userFbInfo.avatar} alt="" />
-          </div>
-          <div className="auth-facebook-title">Welcome {userFbInfo.first_name}</div>
-          <div className="auth-facebook-description">
-            Your email address is already associated with a Freelancer account. Enter your password below to link accounts.
-          </div>
-          <div className="auth-form">
-            <Form
-              id="add_edit_approved_response_form"
-              form={form}
-              layout="vertical"
-              name="add_edit_approved_response_form"
-              onFinish={onSubmitForm}
-              initialValues={formValues}
-              scrollToFirstError
-              validateMessages={validateMessages}
-              requiredMark={false}
-            >
-              <Form.Item name="email" className="custom-form-item" rules={validateSchema.username}>
-                <Input placeholder='Email' className='form-input' />
-              </Form.Item>
-              <Form.Item name="password" className="custom-form-item" rules={validateSchema.password}>
-                <Input.Password placeholder='Password' className='form-input' />
-              </Form.Item>
-              <Row className="forgot-password facebook">
-                <Col span={12}>
-                  <Link to="/forgot-password">Forget password</Link>
-                </Col>
-              </Row>
-            </Form>
-          </div>
-          <div className="form-buttons">
-            <Button form="add_edit_approved_response_form" key="submit" htmlType="submit">Log in</Button>
-          </div>
-        </div>
-      }
+        </div> 
     </div>
   )
 }

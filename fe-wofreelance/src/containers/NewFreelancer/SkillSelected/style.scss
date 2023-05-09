@@ -30,11 +30,11 @@
     .ant-row {
       .ant-col {
         &.category-selection {
-          padding-right: calc(24 / $fdf) * $rem;
+          padding-right: calc(16 / $fdf) * $rem;
           margin-bottom: calc(24 / $fdf) * $rem;
           .ant-card {
             box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
-            width: calc(350 / $fdf) * $rem;
+            // width: calc(350 / $fdf) * $rem;
             .ant-card-body{
               padding: calc(16 / $fdf) * $rem !important;
               .empty-list{
@@ -53,6 +53,7 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                font-size: calc(14 / $fdf) * $rem;
                 cursor: pointer;
                 &:hover {
                   background-color: #f0f0f0;

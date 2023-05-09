@@ -8,7 +8,10 @@ import { ResponseFormatItem, UserInterface } from "../../interface";
 import { UserActions } from "../../reducers/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
-import LayoutBottomGeneral from "../../components/LayoutBottomGeneral";
+import axios from 'axios'
+import LayoutBottomGeneral from "../../components/LayoutBottom/LayoutBottomGeneral";
+import { BASE_URL } from "../../constants";
+import { getCookie } from "../../utils/helper";
 const Layout = () => {
   const dispatch = useDispatch()
   const location = useLocation()
@@ -28,11 +31,25 @@ const Layout = () => {
 
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
-  useEffect(() => {
-    if (localStorage.getItem('access_token')) {
-      getUserInfo({})
-    }
-  }, [])
+  // useEffect(() => {
+  //   const user_token: any = getCookie('access_token')
+  //   if(user_token){
+  //     localStorage.setItem('access_token', user_token)
+  //     getUserInfo({})
+  //   } else {
+  //     getUserInfo({})
+  //   }
+  // }, [])
+  
+  // useEffect(() => {
+  //   axios.get(`${BASE_URL}/user/dashboard`).then((user) => {
+  //     debugger
+  //   })
+
+  //   if (localStorage.getItem('access_token')) {
+  //     getUserInfo({})
+  //   }
+  // }, [])
 
   return (
       <div>

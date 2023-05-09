@@ -87,7 +87,9 @@ export interface UserInterface {
     username?: string,
     account_type?: string,
     languages?: Array<LanguagesInterface>,
-    first_name?: string
+    first_name?: string,
+    last_name?: string,
+    list_skills?: Array<SkillsetInterface>
 }
 
 export interface LanguagesInterface {

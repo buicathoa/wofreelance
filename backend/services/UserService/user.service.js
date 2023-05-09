@@ -22,16 +22,28 @@ const Languages = db.languages;
 const User_Languages = db.user_languages;
 const io = require("./../../server");
 const CONSTANT = require("../../constants");
+const store = require("store");
+
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
 const sequelize = db.sequelize;
 const userService = {
   registerAccount: async (req, res) => {
-    const { email, password, role_id, is_verified_account, username } = req;
+    const {
+      email,
+      password,
+      role_id,
+      is_verified_account,
+      username,
+      account_type,
+    } = req;
     try {
       const salt = await bcrypt.genSalt(10);
-      const hashed = await bcrypt.hash(password, salt);
+      let hashed = ''
+      if(account_type === 'normal') {
+        hashed = await bcrypt.hash(password, salt)
+      }
       const checkUser = await UserProfile.findOne({
         where: {
           email: email,
@@ -42,14 +54,13 @@ const userService = {
       } else {
         //first solution
         newUser = await UserProfile.create({
+          ...req,
           email: email,
-          password: hashed,
+          password: account_type === 'normal' ? hashed : null,
           is_verified_account: false,
-          facebook: false,
-          linkedin: false,
           role_id: role_id,
           account_status: "offline",
-          account_type: "normal",
+          account_type: account_type,
           username: username,
         });
         return newUser;
@@ -60,7 +71,7 @@ const userService = {
   },
 
   loginUser: async (req, res) => {
-    const { email, password } = req;
+    const { email, password, account_type } = req;
 
     try {
       //second solution
@@ -88,30 +99,55 @@ const userService = {
       });
 
       if (user) {
-        if (!bcrypt.compareSync(password, user.password) || !user.is_verified_account) {
-          return 1;
-        } else {
-          const accesstoken = jwt.sign(
-            {
-              id: user.id,
-              role: user?.role,
-              email: user?.email,
-              // role_name: user.role.role_name,
-              // role_id: user.role.id,
-              fullname: user?.fullname,
-            },
-            process.env.MY_SECRET_ACCESS_KEY,
-            {
-              expiresIn: "24h",
-            }
-          );
-          const { password, ...others } = user.dataValues;
-
+        const accesstoken = jwt.sign(
+          {
+            id: user.id,
+            role: user?.role,
+            email: user?.email,
+            // role_name: user.role.role_name,
+            // role_id: user.role.id,
+            fullname: user?.fullname,
+          },
+          process.env.MY_SECRET_ACCESS_KEY,
+          {
+            expiresIn: "24h",
+          }
+        );
+        if(account_type === 'facebook') {
           return {
             message: "Login success.",
-            data: others,
+            data: user,
             token: accesstoken,
           };
+        } else {
+          if (
+            !bcrypt.compareSync(password, user.password) ||
+            !user.is_verified_account
+          ) {
+            return 1;
+          } else {
+            const accesstoken = jwt.sign(
+              {
+                id: user.id,
+                role: user?.role,
+                email: user?.email,
+                // role_name: user.role.role_name,
+                // role_id: user.role.id,
+                fullname: user?.fullname,
+              },
+              process.env.MY_SECRET_ACCESS_KEY,
+              {
+                expiresIn: "24h",
+              }
+            );
+            const { password, ...others } = user.dataValues;
+  
+            return {
+              message: "Login success.",
+              data: others,
+              token: accesstoken,
+            };
+          }
         }
       } else {
         return 1;
@@ -125,7 +161,7 @@ const userService = {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
-      await UserProfile.findOne({
+      const userFound = await UserProfile.findOne({
         where: {
           id: req.body.id ? req.body.id : decoded.id,
           ...req.body,
@@ -162,36 +198,32 @@ const userService = {
             through: {},
           },
         ],
-      }).then((res1) => {
-        if (res1 !== null) {
-          const { password, ...others } = res1.dataValues;
-          let list_skills = [];
-          if (others?.list_skills.length > 0) {
-            list_skills = others.list_skills.map((skill) => {
-              return {
-                job_matching_count: skill.dataValues.job_matching_count,
-                id: skill.dataValues.id,
-                name: skill.dataValues.name,
-              };
-            });
-          }
-          user = { ...others, list_skills: list_skills };
-          if (req.body.id) {
-            if (decoded.role.id <= user.role.id) {
-              return user;
-            } else {
-              throw new ClientError(
-                "You're not allowed to do this action",
-                404
-              );
-            }
-          } else {
+      });
+      if (userFound !== null) {
+        const { password, ...others } = userFound.dataValues;
+        let list_skills = [];
+        if (others?.list_skills.length > 0) {
+          list_skills = others.list_skills.map((skill) => {
+            return {
+              job_matching_count: skill.dataValues.job_matching_count,
+              id: skill.dataValues.id,
+              name: skill.dataValues.name,
+            };
+          });
+        }
+        user = { ...others, list_skills: list_skills };
+        if (req.body.id) {
+          if (decoded.role.id <= user.role.id) {
             return user;
+          } else {
+            throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
-          return 1;
+          return user;
         }
-      });
+      } else {
+        return 1;
+      }
     } catch (err) {
       throw err;
     }
@@ -375,24 +407,61 @@ const userService = {
               user_id !== null
                 ? `http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user_id}`
                 : `http://localhost:1203/v1/user/auth/facebook/callback`,
-            profileFields: ["id", "displayName", "name", "picture.type(large)", "email"],
+            profileFields: [
+              "id",
+              "displayName",
+              "name",
+              "picture.type(large)",
+              "email",
+            ],
           },
           async function (accessToken, refreshToken, profile, cb) {
             let user;
-            if(!user_id) {
-              const userInfo = {
-                first_name: profile?.name?.familyName,
-                last_name: profile?.name?.givenName,
-                avatar: profile?.photos[0]?.value,
-                facebook: true,
-                account_type: 'facebook',
-                role_id: 3,
-                email: profile.emails[0].value
+            if (!user_id) {
+              const userFound = await UserProfile.findOne({
+                where: {
+                  email: profile.emails[0].value,
+                },
+              });
+              if (userFound) {
+                const accesstoken = jwt.sign(
+                  {
+                    id: userFound.id,
+                    role: userFound?.role,
+                    email: userFound?.email,
+                    // role_name: userFound.role.role_name,
+                    // role_id: userFound.role.id,
+                    fullname: userFound?.fullname,
+                  },
+                  process.env.MY_SECRET_ACCESS_KEY,
+                  {
+                    expiresIn: "24h",
+                  }
+                );
+
+                await res.cookie("access_token", accesstoken, {
+                  maxAge: 900000,
+                });
+                return cb(userFound, true);
+              } else {
+                const userInfo = {
+                  first_name: profile?.name?.familyName,
+                  last_name: profile?.name?.givenName,
+                  avatar: profile?.photos[0]?.value,
+                  facebook: true,
+                  account_type: "facebook",
+                  role_id: 3,
+                  email: profile.emails[0].value,
+                  isNewRecord: true
+                };
+                await res.cookie("user_info", JSON.stringify(userInfo), {
+                  maxAge: 900000,
+                });
+                return cb(userInfo, false);
+                // await res.cookie('login_type', 'facebook', { maxAge: 900000 })
               }
-              await res.cookie('user_info', JSON.stringify(userInfo), { maxAge: 900000});
-              await res.cookie('login_type', 'facebook', { maxAge: 900000 })
             } else {
-              user =  await UserProfile.update(
+              user = await UserProfile.update(
                 {
                   first_name: profile?.name?.familyName,
                   last_name: profile?.name?.givenName,
@@ -406,11 +475,45 @@ const userService = {
                 }
               );
             }
-            return cb(user, null);
           }
         )
       );
       return passport;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  loginFacebookToken: async (req, res) => {
+    const { email, account_type } = req.body;
+    try {
+      const user = await UserProfile.findOne({
+        where: {
+          email: email,
+          account_type: account_type,
+        },
+      });
+      if (user) {
+        const accesstoken = jwt.sign(
+          {
+            id: user.id,
+            role: user?.role,
+            email: user?.email,
+            role_name: user.role.role_name,
+            role_id: user.role.id,
+            fullname: user?.fullname,
+          },
+          process.env.MY_SECRET_ACCESS_KEY,
+          {
+            expiresIn: "24h",
+          }
+        );
+        return {
+          message: "Login success.",
+          data: others,
+          token: accesstoken,
+        };
+      }
     } catch (err) {
       throw err;
     }

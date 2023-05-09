@@ -14,6 +14,7 @@ const User = createSlice({
         checkExistUser: (state, actions) => {},
         registerAccount:(state, actions) => {},
         signinFacebook: (state, actions) => {},
+        signinFacebookTK: (state, actions) => {},
         getUserInfo: (state, actions) => {},
         getUserInfoSuccess: (state, actions) => {
             state.user = actions.payload

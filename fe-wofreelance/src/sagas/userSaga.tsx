@@ -14,6 +14,7 @@ export function* UserTaskSaga(): Generator {
     yield takeLatest(UserActions.checkExistUser({}).type, checkExistUser)
     yield takeLatest(UserActions.registerAccount({}).type, registerAccount)
     yield takeLatest(UserActions.signinFacebook({}).type, signinFacebook)
+    yield takeLatest(UserActions.signinFacebookTK({}).type, signinFacebookTK)
     yield takeLatest(UserActions.getUserInfo({}).type, getUserInfo)
     yield takeLatest(UserActions.updateUser({}).type, updateUser)
     yield takeLatest(UserActions.getAllLanguages({}).type, getAllLanguages)
@@ -75,15 +76,25 @@ function* signinFacebook(action: AnyAction): Generator {
     }
 }
 
+function* signinFacebookTK(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        // yield put(push("http://localhost:1203/v1/user/auth/facebook/callback"))
+        const response = yield apiRequest(apiUrl.user.signinFacebookTK, param, 'general')
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
 function* getUserInfo(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
         const response:any = yield apiRequest(apiUrl.user.getUserInfo, param, 'general')
-        if (response.err.response.status === 400) {
-            yield put(push(`${HREF}/not-found`))
-        } else {
-            yield put(UserActions.getUserInfoSuccess((response as ResponseFormatItem).data))
-        }
+        yield put(UserActions.getUserInfoSuccess((response as ResponseFormatItem).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

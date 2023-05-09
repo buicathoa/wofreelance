@@ -14,27 +14,80 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   UserProfile.init({
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isEmail: {
+          msg: 'Please enter a valid email address'
+        },
+      }
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: () => {
+        console.log('oidoioi123')
+        if(this.account_type === 'facebook') {
+          return true
+        } else {
+          return false
+        }
+      },
+      // validate: {
+      //   customValidator(value) {
+      //     if (value === null && this.account_type === 'normal') {
+      //       throw new Error("You must provide a password");
+      //     }
+      //   }
+      // }
+     },
     is_verified_account: DataTypes.BOOLEAN,
     facebook: DataTypes.BOOLEAN,
     linkedin: DataTypes.BOOLEAN,
-    avatar: DataTypes.STRING,
+    avatar: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: true
+      }
+    },
     education: DataTypes.STRING,
     birthdate: DataTypes.DATE,
     title: DataTypes.STRING,
     describe: DataTypes.STRING,
-    personal_website: DataTypes.STRING,
+    personal_website: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: true
+      }
+    },
     yoe: DataTypes.INTEGER,
     cv_uploaded: DataTypes.STRING,
     other_certifications: DataTypes.STRING,
-    account_status: DataTypes.STRING,
+    account_status: {
+      type: DataTypes.STRING,
+      required: true,
+      validate: {
+        isIn: {
+          args: [['offline','online','deleted']],
+          msg: 'Must be offline, online or deleted'
+        },
+      }
+    },
     latest_online_time: DataTypes.STRING,
     joined: DataTypes.STRING,
     is_open: DataTypes.BOOLEAN,
     working_time: DataTypes.STRING,
     username: DataTypes.STRING,
-    account_type: DataTypes.STRING,
+    account_type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isIn: {
+          args: [['facebook', 'normal']],
+          msg: 'Must be normal or facebook',
+        },
+      },
+    },
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
     role_id: {

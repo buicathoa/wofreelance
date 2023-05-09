@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
-import { useLocation, Link, useNavigate } from 'react-router-dom'
+import { useLocation, Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
 import { freelancer_logo, facebook_icon_white, hire_account, work_account } from '../../../assets'
 import { AppActions } from '../../../reducers/appReducer';
 import '../style.scss'
 import { LeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { useAppDispatch } from '../../../reducers/hook';
-import {  } from 'react-router-dom';
+import { } from 'react-router-dom';
 import { UserActions } from '../../../reducers/userReducer';
-import { ResponseFormatItem, SignupFormInterface } from '../../../interface';
+import { ResponseFormatItem, SignupFormInterface, UserInterface } from '../../../interface';
 import { openError, openWarning } from '../../../components/Notifications';
 import { SocketContext } from '../../../SocketContext';
+import { deleteCookie, getCookie } from '../../../utils/helper';
 const Signup = () => {
+    const { id } = useParams()
     let location = useLocation()
     let navigate = useNavigate()
     const account_type = [
@@ -24,37 +26,66 @@ const Signup = () => {
     const [componentType, setComponentType] = useState('')
     const [formValues, setformValues] = useState<SignupFormInterface>({})
     const [step, setStep] = useState(1)
+    const [loginType, setLoginType] = useState('normal')
+    const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
 
-    const checkExistUser = (param:any):Promise<ResponseFormatItem> => {
+    useEffect(() => {
+        if (location.search) {
+            const step: any = location.search.split('=').at(-1)
+            const parseSteptoInt = parseInt(step)
+            if (parseSteptoInt === 1 || parseSteptoInt === 2 || parseSteptoInt === 3) {
+                setStep(parseSteptoInt)
+                const user_info: any = getCookie('user_info')
+                if (user_info) {
+                    setUserFbInfo(JSON.parse(user_info))
+                    setLoginType('facebook')
+                } else {
+                    setLoginType('normal')
+                }
+            }
+        }
+    }, [location])
+
+    const checkExistUser = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-          dispatch(UserActions.checkExistUser({ param, resolve, reject }));
+            dispatch(UserActions.checkExistUser({ param, resolve, reject }));
         });
-      };
+    };
 
-      const registerAccount = (param:any):Promise<ResponseFormatItem> => {
+    const registerAccount = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-          dispatch(UserActions.registerAccount({ param, resolve, reject }));
+            dispatch(UserActions.registerAccount({ param, resolve, reject }));
         });
-      };
+    };
 
-      const signin = (param: any): Promise<ResponseFormatItem> => {
+    const signin = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-          dispatch(UserActions.signin({ param, resolve, reject }));
+            dispatch(UserActions.signin({ param, resolve, reject }));
         });
-      };
-    //   const socket = useContext(SocketContext);
+    };
 
-    //   useEffect(() => {
-    //     // Listen for custom event from server
-    //     socket.on("connect success", (data) => {
-    //       console.log(data);
-    //     });
-    
-    //     return () => {
-    //       // Clean up listener
-    //       socket.off("connect success");
-    //     };
-    //   }, [socket]);
+    const signinFacebookTK = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(UserActions.signinFacebookTK({ param, resolve, reject }));
+        });
+    };
+
+    const validateMessages = {
+        required: 'This field is required'
+    }
+
+    const validateSchema = {
+        username: [
+            {
+                required: true
+            }
+        ],
+        password: [
+            {
+                required: true
+            }
+        ]
+    }
 
     const handleBackStep = () => {
         if (step > 1) {
@@ -64,16 +95,30 @@ const Signup = () => {
 
     const handleSelectAccountType = (account: any) => {
         dispatch(AppActions.openLoading(true))
-        registerAccount({...formValues, service_role: account.name, role_id: 3, account_type: 'normal', is_verified_account: true}).then((res) => {
-            if(res.data) {
-                signin({email: formValues.email, password: formValues.password}).then((response) => {
-                    if(response.code === 200) {
-                        localStorage.setItem("access_token", response.data!.token)
-                        navigate("/new-freelancer/skills")
-                    }
-                })
-            }
-        })
+        if (Object.keys(userFbInfo).length > 0) {
+            const payload = { ...userFbInfo, service_role: account.name, role_id: 3, account_type: 'facebook', is_verified_account: true }
+            registerAccount(payload).then((res) => {
+                if (res.data) {
+                    signin({ email: payload.email, account_type: 'facebook' }).then((response) => {
+                        if (response.code === 200) {
+                            localStorage.setItem("access_token", response.data!.token)
+                            navigate("/new-freelancer/skills")
+                        }
+                    })
+                }
+            })
+        } else {
+            registerAccount({ ...formValues, service_role: account.name, role_id: 3, account_type: 'normal', is_verified_account: true }).then((res) => {
+                if (res.data) {
+                    signin({ email: formValues.email, password: formValues.password }).then((response) => {
+                        if (response.code === 200) {
+                            localStorage.setItem("access_token", response.data!.token)
+                            navigate("/new-freelancer/skills")
+                        }
+                    })
+                }
+            })
+        }
     }
 
     const renderMainContent = () => {
@@ -122,6 +167,17 @@ const Signup = () => {
             case 2:
                 return (
                     <div className="main-content">
+                        {loginType === 'facebook' && <div className="auth-facebook-component">
+                            <div className="auth-facebook-title">Link to existing Freelancer account</div>
+                            <div className="auth-facebook-avatar">
+                                <img src={userFbInfo.avatar} alt="" />
+                            </div>
+                            <div className="auth-facebook-title">Welcome {userFbInfo.first_name}</div>
+                            <div className="auth-facebook-description">
+                                Your email address is already associated with a Freelancer account. Enter your password below to link accounts.
+                            </div>
+                        </div>}
+
                         <div className="auth-form">
                             <Form
                                 id="signup_form"
@@ -201,7 +257,7 @@ const Signup = () => {
         if (step === 1) {
             if (values?.agree) {
                 checkExistUser(values).then(res => {
-                    if(!res.data) {
+                    if (!res.data) {
                         openWarning(res?.message!)
                     } else {
                         setformValues(values)
@@ -213,10 +269,11 @@ const Signup = () => {
             }
         } else if (step === 2) {
             checkExistUser(values).then(res => {
-                if(!res.data) {
+                if (!res.data) {
                     openWarning(values.username ? 'Username already existed' : 'Email already existed')
                 } else {
-                    const newData = Object.assign(formValues, values)
+                    const newData = Object.assign(formValues, values, userFbInfo)
+                    deleteCookie('user_info')
                     setformValues(newData)
                     setStep(3)
                 }

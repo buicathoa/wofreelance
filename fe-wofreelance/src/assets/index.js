@@ -12,6 +12,10 @@ import check_email from "./images/check_email.svg";
 import email_verify from "./images/email_verify.svg";
 import notification from "./images/notification.svg";
 import live_chat from "./images/live_chat.svg";
+import certifications from "./images/certifications.svg";
+import portfolio from "./images/portfolio.svg";
+import rating_empty from "./images/rating_empty.jpg";
+
 
 export {
   freelancer_logo,
@@ -27,5 +31,8 @@ export {
   check_email,
   email_verify,
   notification,
-  live_chat
+  live_chat,
+  certifications,
+  portfolio,
+  rating_empty
 };

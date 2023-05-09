@@ -1,0 +1,32 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.nav-bar-bottom-wrapper {
+    height: calc(50 / $fdf) * $rem;
+    background-color: $textcolor;
+
+    .nav-bar-bottom-container {
+        display: flex;
+        align-items: center;
+        margin: 0 auto;
+        max-width: calc(1200 / $fdf) * $rem;
+
+        a {
+            list-style-type: none;
+            text-decoration: none;
+            cursor: auto;
+            &:hover {
+                cursor: pointer;
+                background-color: #aaa5a5
+            }
+
+            .nav-bar-bottom-item {
+                padding: calc(16 / $fdf) * $rem;
+                color: #f7f7f7;
+                font-weight: 500;
+                border-bottom: 5p solid #ffffff;
+                font-size: calc(14 / $fdf) * $rem;
+            }
+        }
+    }
+}

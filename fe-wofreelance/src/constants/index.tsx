@@ -8,6 +8,7 @@ export const apiUrl = {
         register: 'user/register',
         login: 'user/login',
         signinFacebook: 'user/auth/facebook',
+        signinFacebookTK: 'user/login/fb',
         getUserInfo: "user/get-info",
         updateUser: "user/update",
         getAllLanguages: "user/language/get-all"

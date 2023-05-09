@@ -156,7 +156,7 @@ const SkillSelected = () => {
                     <div className="content-divider">OR</div>
                     <div className="new-freelancer-main-content">
                         <Row>
-                            <Col md={8} sm={24} xs={24} className="category-selection">
+                            <Col md={9} sm={24} xs={24} className="category-selection">
                                 <Card title="Select a category">
                                     {listCategoy?.map((cate: any, index: number) => {
                                         return (
@@ -168,7 +168,7 @@ const SkillSelected = () => {
                                     })}
                                 </Card>
                             </Col>
-                            <Col md={8} sm={12} xs={24} className="category-selection">
+                            <Col md={9} sm={12} xs={24} className="category-selection">
                                 <Card title={debouncedText !== '' ? `Search results for "${debouncedText}"` : categorySelected.name ? categorySelected.name : 'No category selected'} className={`${listSkills?.length === 0 && 'empty-list'}`}>
                                     {listSkills?.length > 0 ? listSkills?.map((skill: any, index: number) => {
                                         return (
@@ -181,7 +181,7 @@ const SkillSelected = () => {
                                         : <span className="empty-list">Select a category to start adding skills to your profile.</span>}
                                 </Card>
                             </Col>
-                            <Col md={8} sm={24} xs={24} className="skills-selected-result">
+                            <Col md={6} sm={24} xs={24} className="skills-selected-result">
                                 <div className="skills-selected-header">
                                     {skillsetSelected ? skillsetSelected.length : 0} out of 20 skills selected
                                 </div>

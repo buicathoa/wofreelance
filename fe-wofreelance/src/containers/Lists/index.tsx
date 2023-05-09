@@ -9,7 +9,7 @@ import { ResponseFormatItem, UserInterface } from "../../interface";
 import { UserActions } from "../../reducers/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
-import LayoutBottomGeneral from "../../components/LayoutBottomGeneral";
+import LayoutBottomGeneral from "../../components/LayoutBottom/LayoutBottomGeneral";
 const Lists = () => {
     const dispatch = useDispatch()
     const location = useLocation()

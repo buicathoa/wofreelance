@@ -1,14 +1,14 @@
 import { Routes, Route, Outlet, Link, useLocation } from "react-router-dom";
-import { freelancer_logo } from '../../assets'
+import { freelancer_logo } from '../../../assets'
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, CalendarOutlined, TeamOutlined } from '@ant-design/icons'
 import { Badge, Button, Popover } from "antd";
 import './style.scss'
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { ResponseFormatItem, UserInterface } from "../../interface";
-import { UserActions } from "../../reducers/userReducer";
+import { ResponseFormatItem, UserInterface } from "../../../interface";
+import { UserActions } from "../../../reducers/userReducer";
 import { useSelector } from "react-redux";
-import { RootState } from "../../reducers/rootReducer";
+import { RootState } from "../../../reducers/rootReducer";
 import { NavLink } from "react-router-dom";
 const LayoutBottomGeneral = () => {
   const dispatch = useDispatch()
@@ -22,11 +22,11 @@ const LayoutBottomGeneral = () => {
 
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
-  useEffect(() => {
-    if (localStorage.getItem('access_token')) {
-      getUserInfo({})
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (localStorage.getItem('access_token')) {
+  //     getUserInfo({})
+  //   }
+  // }, [])
 
   useEffect(() => {
 

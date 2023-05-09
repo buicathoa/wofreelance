@@ -2,7 +2,8 @@ const cors = require("cors");
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-
+const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 const mysql = require("mysql2");
 const sql = require("mssql");
 const app = express();
@@ -43,6 +44,16 @@ dbConnection.connect((err) => {
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+
+// app.use(session({
+//   secret: 'your_secret_here',
+//   resave: false,
+//   saveUninitialized: true,
+//   store: new MemoryStore({
+//     checkPeriod: 86400000 // prune expired entries every 24h
+//   })
+// }));
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(

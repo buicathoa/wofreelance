@@ -5,7 +5,7 @@ body {
   margin: 0 !important;
 }
 
-.ant-popover-inner{
+.ant-popover-inner {
   padding: 0 !important;
 }
 
@@ -218,6 +218,7 @@ body {
   padding: 0 calc(12 / $fdf) * $rem;
   border: 1px solid #d9d9d9;
   border-radius: calc(5 / $fdf) * $rem;
+
   .ant-select-selection-placeholder {
     font-family: $roboto;
     font-weight: 400;
@@ -225,6 +226,7 @@ body {
     line-height: calc(24 / $fdf) * $rem;
     color: rgba(0, 0, 0, 0.25);
   }
+
   .ant-picker-input {
     input {
       font-family: $roboto;
@@ -232,6 +234,7 @@ body {
       font-size: calc(16 / $fdf) * $rem;
       color: #2c2c2c;
       line-height: calc(24 / $fdf) * $rem;
+
       &::placeholder {
         font-family: $roboto;
         font-weight: 400;
@@ -417,7 +420,7 @@ body {
     label {
       font-family: $roboto;
       font-size: calc(16 / $fdf) * $rem;
-      font-weight: 400;
+      font-weight: 600;
       color: #2c2c2c;
       line-height: calc(22 / $fdf) * $rem;
     }
@@ -984,13 +987,14 @@ body {
 }
 
 html {
-  // font-size: calc($fdf/1440 * 100) * $vw;
+  font-size: calc($fdf/1800 * 100) * $vw;
 }
 
 .list-button {
   margin: 0 auto;
   margin-bottom: calc(16 / $fdf) * $rem;
   padding: 0 calc(8 / $fdf) * $rem;
+
   button {
     &.next {
       font-weight: 600;
@@ -1000,7 +1004,8 @@ html {
       color: #ffffff;
     }
 
-    &.back, &.skip {
+    &.back,
+    &.skip {
       font-weight: 600;
       width: calc(80 / $fdf) * $rem;
       height: calc(40 / $fdf) * $rem;
@@ -1015,22 +1020,122 @@ html {
     padding: 0 calc(48 / $fdf) * $rem;
     justify-content: flex-end;
   }
-  &.link-accounts{
+
+  &.link-accounts {
     display: flex;
     max-width: calc(540 / $fdf) * $rem;
     justify-content: space-between;
-    .next-step{
+
+    .next-step {
       display: flex;
       align-items: center;
-      .skip{
+
+      .skip {
         margin-right: calc(8 / $fdf) * $rem;
       }
     }
   }
-  &.profile-detail{
+
+  &.profile-detail {
     display: flex;
-    max-width: calc(540 / $fdf) * $rem;;
+    max-width: calc(540 / $fdf) * $rem;
+    ;
     justify-content: space-between;
+  }
+}
+
+.ant-card {
+  box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+  margin-bottom: calc(24 / $fdf) * $rem;
+
+  .ant-card-head {
+    .ant-card-head-title {
+      font-size: calc(16 / $fdf) * $rem;
+      color: $textcolor;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .ant-card-extra {
+      padding: calc(12 / $fdf) * $rem 0;
+
+      a, span,
+      button {
+        background: #1772eb;
+        // line-height: 1.43;
+        padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
+        border-color: #1772eb;
+        color: #f7f7f7;
+        font-size: calc(14 / $fdf) * $rem;
+        font-size: 600;
+        span {
+          border-color: #1772eb;
+          color: #f7f7f7;
+          font-size: calc(14 / $fdf) * $rem;
+          font-size: 600;
+        }
+      }
+    }
+  }
+
+  .ant-card-body {
+    padding: calc(16 / $fdf) * $rem;
+
+    .card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: $textcolor;
+      font-weight: 400;
+      font-size: calc(14 / $fdf) * $rem;
+      line-height: 1.43;
+      margin-bottom: calc(16 / $fdf) * $rem;
+
+      &.border {
+        padding: calc(4 / $fdf) * $rem calc(12 / $fdf) * $rem;
+        border-radius: 3px;
+        line-height: 1.2;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid #75787d;
+        display: block;
+        width: fit-content;
+      }
+
+      .card-item-left {
+        .anticon {
+          margin-right: calc(8 / $fdf) * $rem;
+        }
+      }
+    }
+
+    .card-content {
+      text-align: center;
+
+      .card-image {
+        display: flex;
+        justify-content: center;
+        margin-bottom: calc(12 / $fdf) * $rem;
+      }
+
+      .card-text {
+        font-weight: 400;
+        color: $textcolor;
+        font-size: calc(16 / $fdf) * $rem;
+        line-height: 1.43;
+        margin-bottom: calc(12 / $fdf) * $rem;
+        display: block;
+      }
+
+      button {
+        width: 100%;
+        background-color: #f7f7f7;
+        color: #4d525b;
+        border-color: #bec0c2;
+        font-weight: 600;
+        font-size: calc(14 / $fdf) * $rem;
+      }
+    }
   }
 }
 

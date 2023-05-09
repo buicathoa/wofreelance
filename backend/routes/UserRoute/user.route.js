@@ -6,6 +6,8 @@ const authorize = require("../../middlewares/authorize");
 const userService = require("../../services/UserService/user.service");
 const { uploadImage } = require("../../utils/helper");
 const {io} = require("../../server")
+const jwt = require("jsonwebtoken");
+const store = require('store');
 
 router.post("/register", userController.registerAccount);
 router.post("/login", userController.loginUser);
@@ -52,17 +54,27 @@ router.get(
     await userService.loginFacebook(user_id, res).authenticate("facebook", {
       failureRedirect: "/login",
       successRedirect: 'http://localhost:3000/new-freelancer/link-accounts',
-      session: false,
+      // session: false,
       scope:['email']
-    },function(err, user, info){
+    },function(user){
       if(!user_id) {
-        res.redirect('http://localhost:3000/signin')
+        if(!user.isNewRecord){
+          res.redirect('http://localhost:3000/dashboard')
+        } else {
+          res.redirect('http://localhost:3000/signup?step=2')
+        }
       } else {
         res.redirect('http://localhost:3000/new-freelancer/link-accounts');
       }
     })(req,res,next)
   },
 );
+
+router.get('/dashboard', async function (req, res, next) {
+  console.log(res)
+})
+
+router.post("/login/fb", userController.loginFbTK)
 
 router.post("/language/create", userController.createLanguage);
 
