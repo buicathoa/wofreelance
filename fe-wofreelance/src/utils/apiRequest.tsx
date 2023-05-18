@@ -14,5 +14,7 @@ export const apiRequest = (url: string, payload: any, type: string) => {
         .then(((res: any) => {
             return res.data
         }))
-        .catch((err: any) => ({ err }))
+        .catch((err: any) => {
+            throw err
+        })
 } 

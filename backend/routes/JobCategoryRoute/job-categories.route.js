@@ -15,7 +15,9 @@ router.post("/skillset-new-freelance/get-all", jobCategoriesController.getAllSki
 
 //child-categories
 router.post("/skillset/create", authorize(['director', 'admin']) , jobCategoriesController.createSkillsetcategory)
-router.post("/skillset/get-all", authorize(['director', 'admin', 'user']) , jobCategoriesController.getAllSkillset)
+router.post("/skillset/user/get-all", authorize(['director', 'admin', 'user']) , jobCategoriesController.getAllSkillsetForUser)
+router.post("/skillset/user/create-delete", authorize(['director', 'admin', 'user']) , jobCategoriesController.createDelSkillset)
+
 
 //Sub-child categoriesgetAllSubcategoryandSkillset
 // router.post("/sub-child/create", authorize(['super_admin'], 'others') , jobCategoriesController.createSubChildCategory)

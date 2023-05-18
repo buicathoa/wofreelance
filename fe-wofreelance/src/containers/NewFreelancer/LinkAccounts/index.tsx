@@ -7,7 +7,7 @@ import { Button, Progress } from 'antd';
 import { link_accounts, facebook_icon, linkedin_icon, freelancer_logo } from '../../../assets'
 
 import { RootState } from '../../../reducers/rootReducer'
-import { UserActions } from '../../../reducers/userReducer';
+import { UserActions } from '../../../reducers/listReducer/userReducer';
 
 import { ResponseFormatItem, UserInterface } from '../../../interface';
 

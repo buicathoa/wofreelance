@@ -1,0 +1,87 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\BASE\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add opencage-api-client
+
+PATH: 
+  C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\Git LFS;C:\Program Files\MongoDB\Server\4.2\bin;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\Binn\;C:\Program Files\Microsoft SQL Server\160\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\160\DTS\Binn\;C:\Program Files\Azure Data Studio\bin;C:\Users\BASE\AppData\Local\Microsoft\WindowsApps;C:\Users\BASE\AppData\Roaming\npm;C:\Users\BASE\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\BASE\Downloads\mongosh-1.5.3-win32-x64\mongosh-1.5.3-win32-x64;;C:\Program Files\Azure Data Studio\bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.14.2
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: EPERM: operation not permitted, unlink 'C:\wofreelance\backend\node_modules\bcrypt\lib\binding\napi-v3\bcrypt_lib.node'
+
+npm manifest: 
+  {
+    "name": "wofreelance",
+    "version": "1.0.0",
+    "description": "wofreelance project",
+    "main": "server.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "nodemon --delay 500ms server.js"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/buicathoa/wofreelance.git"
+    },
+    "author": "Joseph Hoa",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/buicathoa/wofreelance/issues"
+    },
+    "homepage": "https://github.com/buicathoa/wofreelance#readme",
+    "dependencies": {
+      "@types/express": "^4.17.17",
+      "@types/mysql": "^2.15.21",
+      "axios": "^1.3.4",
+      "bcrypt": "^5.1.0",
+      "body-parser": "^1.20.2",
+      "cookie-parser": "^1.4.6",
+      "cors": "^2.8.5",
+      "cryptr": "^6.2.0",
+      "dayjs": "^1.11.7",
+      "dotenv": "^16.0.3",
+      "express": "^4.18.2",
+      "express-session": "^1.17.3",
+      "fs": "^0.0.1-security",
+      "http-status-code": "^2.1.0",
+      "http-status-codes": "^2.2.0",
+      "joi": "^17.8.3",
+      "jsonwebtoken": "^9.0.0",
+      "jwt-decode": "^3.1.2",
+      "memorystore": "^1.6.7",
+      "moment": "^2.29.4",
+      "mssql": "^9.1.1",
+      "multer": "^1.4.5-lts.1",
+      "multer-storage-cloudinary": "^4.0.0",
+      "mysql": "^2.18.1",
+      "mysql2": "^3.2.0",
+      "nodemailer": "^6.9.1",
+      "nodemon": "^2.0.21",
+      "passport": "^0.6.0",
+      "passport-facebook": "^3.0.0",
+      "sequelize": "^6.30.0",
+      "sequelize-cli": "^6.6.0",
+      "socket.io": "^4.6.1",
+      "store": "^2.0.12",
+      "ts-node": "^10.9.1",
+      "typescript": "^4.9.5"
+    },
+    "devDependencies": {
+      "@types/node": "^18.14.6",
+      "i": "^0.3.7",
+      "npm": "^9.6.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

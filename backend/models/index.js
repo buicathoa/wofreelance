@@ -50,7 +50,10 @@ db.Sequelize = Sequelize;
 db.userprofile = require("./userModel/userprofile")(sequelize, DataTypes)
 db.userroles = require("./userModel/userroles")(sequelize,DataTypes)
 db.languages = require("./userModel/languages")(sequelize,DataTypes)
-
+db.experiences = require("./Experience/experiences")(sequelize,DataTypes)
+db.qualifications = require("./Qualifications/qualifications")(sequelize,DataTypes)
+db.countries = require("./Country/country")(sequelize,DataTypes)
+db.universities = require("./Universities/universities")(sequelize,DataTypes)
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 
@@ -66,6 +69,12 @@ db.user_skillset = require("./userModel/user_skillset")(sequelize, DataTypes)
 
 // Junction table language of user 
 db.user_languages = require("./userModel/user_languages")(sequelize, DataTypes)
+
+// Junction table exp of user 
+db.user_experiences = require("./userModel/user_experiences")(sequelize, DataTypes)
+
+// Junction table exp of user 
+db.user_educations = require("./userModel/user_education")(sequelize, DataTypes)
 
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
@@ -83,6 +92,16 @@ db.userroles.hasOne(db.userprofile, {
 db.userprofile.belongsTo(db.userroles, {
   foreignKey: 'role_id',
   as: 'role'
+})
+
+
+
+db.countries.hasOne(db.userprofile, {
+  foreignKey: 'country_id',
+  as: 'nationality'
+})
+db.userprofile.belongsTo(db.countries, {
+  foreignKey: 'country_id',
 })
 
 
@@ -107,7 +126,25 @@ db.posts.belongsTo(db.userprofile, {
 })
 
 
+db.countries.hasMany(db.universities, {
+  foreignKey: 'country_id',
+  as: 'universities'
+})
+db.universities.belongsTo(db.countries, {
+  foreignKey: 'country_id',
+  as: 'country'
+})
 
+
+
+// db.userprofile.hasMany(db.qualifications, {
+//   foreignKey: 'user_id',
+//   as: 'qualifications'
+// })
+// db.qualifications.belongsTo(db.userprofile, {
+//   foreignKey: 'user_id',
+//   as: 'user'
+// })
 
 
 // ========================================================================================== End ==========================================================================================//
@@ -167,6 +204,35 @@ db.languages.belongsToMany(db.userprofile, {
   foreignKey: 'language_id',
   otherKey: 'user_id',
 })
+
+
+
+
+db.userprofile.belongsToMany(db.experiences, {
+  through: db.user_experiences,
+  foreignKey: 'user_id',
+  otherKey: 'experience_id',
+  as: 'list_experiences'
+})
+db.experiences.belongsToMany(db.userprofile, {
+  through: db.user_experiences,
+  foreignKey: 'experience_id',
+  otherKey: 'user_id',
+})
+
+
+
+db.userprofile.belongsToMany(db.universities, {
+  through: db.user_educations,
+  foreignKey: 'user_id',
+  as: 'educations'
+})
+db.universities.belongsToMany(db.userprofile, {
+  through: db.user_educations,
+  foreignKey: 'education_id',
+  as: 'user'
+})
+
 // ========================================================================================== End ==========================================================================================//
 
 

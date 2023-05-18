@@ -70,7 +70,7 @@
 
             .post-profile {
                 display: flex;
-                align-items: center;
+                // align-items: center;
 
                 button {
                     background-color: #f20091;
@@ -78,6 +78,7 @@
                     color: #ffffff;
                     font-weight: 500;
                     font-size: calc(14 / $fdf) * $rem;
+                    height: 100%;
                     padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
                     border-radius: 5px;
                     display: flex;

@@ -15,6 +15,7 @@ import live_chat from "./images/live_chat.svg";
 import certifications from "./images/certifications.svg";
 import portfolio from "./images/portfolio.svg";
 import rating_empty from "./images/rating_empty.jpg";
+import delete_icon from "./images/delete_icon.png";
 
 
 export {
@@ -34,5 +35,6 @@ export {
   live_chat,
   certifications,
   portfolio,
-  rating_empty
+  rating_empty,
+  delete_icon
 };

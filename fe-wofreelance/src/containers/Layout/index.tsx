@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { freelancer_logo } from '../../assets'
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, TeamOutlined } from '@ant-design/icons'
 import { Badge, Button, Popover } from "antd";
@@ -6,7 +6,7 @@ import './style.scss'
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ResponseFormatItem, UserInterface } from "../../interface";
-import { UserActions } from "../../reducers/userReducer";
+import { UserActions } from "../../reducers/listReducer/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
 import BrowseContent from "./BrowseContent";
@@ -15,12 +15,11 @@ import GroupContent from "./GroupContent";
 import NotificationContent from "./NotificationContent";
 import MessagesContent from "./MessagesContent";
 import ProfileContent from "./ProfileContent";
-import { getCookie } from "../../utils/helper";
+import { checkLocalStorage, deleteCookie, getCookie } from "../../utils/helper";
 const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const {id} = useParams()
-
+  const location = useLocation()
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(UserActions.getUserInfo({ param, resolve, reject }));
@@ -30,16 +29,28 @@ const Layout = () => {
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
   useEffect(() => {
-    const user_token: any = getCookie('access_token')
-    if(user_token){
-      localStorage.setItem('access_token', user_token)
+    const userTokenCookie: any = getCookie('access_token')
+    if (userTokenCookie) {
+      localStorage.setItem('access_token', userTokenCookie)
       getUserInfo({})
+      deleteCookie('access_token')
     } else {
-      getUserInfo({})
+      if (!checkLocalStorage('access_token')) {
+        const nextLocation = location.pathname.replaceAll('/', '%252')
+        navigate(`/signin?next=${nextLocation}`)
+      } else if (location.pathname.includes('/u/')) {
+        const username = location.pathname.split('/').at(-1)
+        getUserInfo({ username: username })
+          .catch((err) => {
+            navigate('/not-found')
+          })
+      } else {
+        getUserInfo({})
+      }
     }
   }, [])
 
-  console.log('user', user)
+
   return (
     <div>
       {/* A "layout route" is a good place to put markup you want to
@@ -74,19 +85,19 @@ const Layout = () => {
           <div className="nav-menu-right">
             <div className="message-notify">
               <Popover content={<NotificationContent />} trigger="hover" placement="bottom">
-                <Badge count={5}>
+                <Badge count={5} size="small">
                   <BellOutlined />
                 </Badge>
               </Popover>
               <Popover content={<MessagesContent />} trigger="hover" placement="bottom">
-                <Badge count={10}>
+                <Badge count={10} size="small">
                   <MessageOutlined />
                 </Badge>
               </Popover>
             </div>
             <div className="post-profile">
               <Button>Post a Project</Button>
-              <Popover content={<ProfileContent />} trigger="hover" placement="bottom">
+              <Popover content={<ProfileContent user={user} />} trigger="hover" placement="bottom">
                 <div className="user-profile">
                   <img src={user?.avatar} alt="" />
                   <div className="name-balance">

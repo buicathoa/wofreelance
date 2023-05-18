@@ -6,7 +6,7 @@ import './style.scss'
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ResponseFormatItem, UserInterface } from "../../interface";
-import { UserActions } from "../../reducers/userReducer";
+import { UserActions } from "../../reducers/listReducer/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
 import LayoutBottomGeneral from "../../components/LayoutBottom/LayoutBottomGeneral";

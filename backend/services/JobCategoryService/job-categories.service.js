@@ -10,9 +10,9 @@ const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const JobCategories = db.jobcategories;
 const JobSubCategories = db.jobsubcategories;
-const jobskillset = db.jobskillset;
-const JobSubCategoriesAndSkillsets = db.subcategory_skillset;
-const SkillsetandPosts = db.skillsetandposts;
+const JobSkillset = db.jobskillset;
+const UserProfile = db.userprofile;
+const User_Skillset = db.user_skillset
 const SubCategoriesandSkillset = db.subcategoryandskillset;
 
 const sequelize = db.sequelize;
@@ -104,88 +104,6 @@ const JobCategoryService = {
     }
   },
 
-  //sub-categories
-
-  createSubCategory: async (req, res) => {
-    let listRecords = [];
-    let listInserted = [];
-    if (req.body.name.split(".")?.length > 0) {
-      req?.body?.name?.split(".")?.forEach((item) => {
-        listRecords.push({
-          name: item.trim(),
-          category_id: req.body.category_id,
-          createdAt: req.body.createdAt,
-          updatedAt: req.body.updatedAt,
-        });
-      });
-    }
-    try {
-      const result = await JobSubCategories.bulkCreate(listRecords);
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  updateSubCategory: async (req, res) => {
-    try {
-      let result;
-      await sequelize.transaction(async (t) => {
-        await JobSubCategories.update(
-          {
-            name: req.body.name,
-          },
-          {
-            where: {
-              id: req.body.id,
-            },
-            returning: true,
-          }
-        );
-
-        result = await JobSubCategories.findOne({
-          where: {
-            id: req.body.id,
-          },
-        });
-      });
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  deleteSubCategory: async (req, res) => {
-    try {
-      const result = await JobSubCategories.destroy({
-        where: {
-          id: req.body.id,
-        },
-      });
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  getAllSubCategory: async (req, res) => {
-    try {
-      const result = await SubCategoriesandSkillset.findAll({
-        include: [
-          {
-            model: jobskillset,
-            as: "list_skills",
-            attributes: ["name"],
-            through: { attributes: ["skillset_id"] },
-          },
-        ],
-      });
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
-
   //child-categories
 
   createSkillsetcategory: async (req, res) => {
@@ -198,69 +116,80 @@ const JobCategoryService = {
 
     try {
       //solution 1
-      // const result = await JobSkillsetCategories.create(req.body)
-      // return result
-
-      //solution 2
-      const table = "wofreelance.jobskillsets";
-      const column = Object.keys(req.body);
-      const query = RestApiMethods.insert(table, column);
-      const promises = [];
-      for (let record of listRecords) {
-        const result = await sequelize.query(query, { replacements: record }); // The first query
-        const promise = await sequelize.query(
-          `select * from ${table} where id = "${result[0]}"`
-        );
-        promises.push(promise);
-      }
-      const listInserted = [];
-      await Promise.all(promises).then((res) => {
-        if (res?.length > 0) {
-          res?.map((x) => {
-            listInserted.push(x[0][0]);
-          });
-        }
-      });
+      const result = await JobSkillset.create(req.body)
+      return result
       return listInserted;
     } catch (err) {
       throw err;
     }
   },
 
-  getAllSkillset: async (req, res) => {
+  getAllSkillsetForUser: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
     try {
-      //first solution
-      const result = await jobskillset.findAll();
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  getAllSubcategoryandSkillset: async (req, res) => {
-    try {
-      const result = await JobSubCategories.findAll({
+      const result = await UserProfile.findOne({
+        attributes: [],
+        where: {
+          id: req.body.user_id ?? decoded.id,
+        },
         include: [
           {
-            model: jobskillset,
-            attributes: ['id', 'name'],
-            through: {
-              attributes: []
-            }
+            model: JobSkillset,
+            as: 'list_skills'
           },
-        ],
+        ]
       });
       return result;
     } catch (err) {
       throw err;
     }
   },
+
+  createDelSkillset: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    let transaction = await sequelize.transaction();
+    let result
+    try {
+      await User_Skillset.destroy({
+        where: {
+          user_id: req.body.user_id ?? decoded.id 
+        }
+      })
+
+      const listPayload = []
+      for(let i of req.body.list_skills) {
+        listPayload.push({
+          skillset_id: i.id,
+          user_id: req.body.user_id ?? decoded.id
+        })
+      }
+      await User_Skillset.bulkCreate(listPayload)
+      result = await UserProfile.findOne({
+        attributes: [],
+        where: {
+          id: req.body.user_id ?? decoded.id,
+        },
+        include: [
+          {
+            model: JobSkillset,
+            as: 'list_skills'
+          },
+        ]
+      });
+      await transaction.commit()
+      return result
+    } catch (err) {
+      await transaction.rollback()
+      throw err;
+    }
+  },
+
   getAllSkillsetForNewFreelance: async (req, res) => {
     try {
       const results = await JobCategories.findAndCountAll({
         include: [
           {
-            model: jobskillset,
+            model: JobSkillset,
             as: 'list_skills',
             attributes: [
               'id',

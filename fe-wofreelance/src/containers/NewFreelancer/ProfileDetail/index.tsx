@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Form, Progress } from 'antd'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import axios from 'axios'
 
 import PhotoandName from './PhotoandName'
@@ -17,7 +17,7 @@ import { freelancer_logo } from '../../../assets'
 
 import { ResponseFormatItem, UserInterface } from '../../../interface'
 
-import { UserActions } from '../../../reducers/userReducer'
+import { UserActions } from '../../../reducers/listReducer/userReducer'
 import { RootState } from '../../../reducers/rootReducer'
 
 import { BASE_URL } from '../../../constants'
@@ -68,7 +68,7 @@ const ProfileDetail = () => {
         getAllLanguages({})
       }
       setformValues({
-        ...user, birthdate: user.birthdate ? moment(user.birthdate) : moment(), languages:
+        ...user, birthdate: user.birthdate ? dayjs(user.birthdate) : dayjs(), languages:
           user?.languages?.map((lang) => {
             return lang.id
           })

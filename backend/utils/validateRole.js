@@ -7,7 +7,7 @@ const UserProfile = db.userprofile;
 const validateRole = {
   create: async (decoded = null, user_id = null, model = null) => {
     if (user_id) {
-      const user = await UserProfile.findOne({
+      const user = await model.findOne({
         where: {
           id: user_id,
         },

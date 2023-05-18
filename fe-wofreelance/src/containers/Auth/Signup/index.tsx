@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState, useContext } from 'react'
 import { useLocation, Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
 import { freelancer_logo, facebook_icon_white, hire_account, work_account } from '../../../assets'
-import { AppActions } from '../../../reducers/appReducer';
+import { AppActions } from '../../../reducers/listReducer/appReducer';
 import '../style.scss'
 import { LeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { useAppDispatch } from '../../../reducers/hook';
 import { } from 'react-router-dom';
-import { UserActions } from '../../../reducers/userReducer';
+import { UserActions } from '../../../reducers/listReducer/userReducer';
 import { ResponseFormatItem, SignupFormInterface, UserInterface } from '../../../interface';
 import { openError, openWarning } from '../../../components/Notifications';
 import { SocketContext } from '../../../SocketContext';
@@ -96,7 +96,7 @@ const Signup = () => {
     const handleSelectAccountType = (account: any) => {
         dispatch(AppActions.openLoading(true))
         if (Object.keys(userFbInfo).length > 0) {
-            const payload = { ...userFbInfo, service_role: account.name, role_id: 3, account_type: 'facebook', is_verified_account: true }
+            const payload = { ...userFbInfo, ...formValues, service_role: account.name, role_id: 3, account_type: 'facebook', is_verified_account: true }
             registerAccount(payload).then((res) => {
                 if (res.data) {
                     signin({ email: payload.email, account_type: 'facebook' }).then((response) => {

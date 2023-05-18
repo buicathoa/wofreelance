@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
-
 const FacebookStrategy = require("passport-facebook").Strategy;
 const { handleError } = require("../../utils/handleResponse");
 const { Op } = require("sequelize");
@@ -20,6 +19,8 @@ const User_Skillset = db.user_skillset;
 const Post = db.posts;
 const Languages = db.languages;
 const User_Languages = db.user_languages;
+const Experience = db.experiences;
+
 const io = require("./../../server");
 const CONSTANT = require("../../constants");
 const store = require("store");
@@ -40,9 +41,9 @@ const userService = {
     } = req;
     try {
       const salt = await bcrypt.genSalt(10);
-      let hashed = ''
-      if(account_type === 'normal') {
-        hashed = await bcrypt.hash(password, salt)
+      let hashed = "";
+      if (account_type === "normal") {
+        hashed = await bcrypt.hash(password, salt);
       }
       const checkUser = await UserProfile.findOne({
         where: {
@@ -56,7 +57,7 @@ const userService = {
         newUser = await UserProfile.create({
           ...req,
           email: email,
-          password: account_type === 'normal' ? hashed : null,
+          password: account_type === "normal" ? hashed : null,
           is_verified_account: false,
           role_id: role_id,
           account_status: "offline",
@@ -83,17 +84,27 @@ const userService = {
           exclude: ["referer_code"],
         },
         include: [
-          {
-            model: Skillset,
-            as: "list_skills",
-          },
+        //   {
+        //     model: Skillset,
+        //     as: "list_skills",
+        //   },
           {
             model: UserRole,
             as: "role",
           },
-          {
-            model: Post,
-          },
+        //   {
+        //     model: Post,
+        //   },
+        //   {
+        //     model: Languages,
+        //     as: "languages",
+        //     through: {},
+        //   },
+        //   {
+        //     model: Experience,
+        //     as: "list_experiences",
+        //     through: {},
+        //   },
         ],
         group: ["id"],
       });
@@ -104,8 +115,8 @@ const userService = {
             id: user.id,
             role: user?.role,
             email: user?.email,
-            // role_name: user.role.role_name,
-            // role_id: user.role.id,
+            role_name: user.role.role_name,
+            role_id: user.role.id,
             fullname: user?.fullname,
           },
           process.env.MY_SECRET_ACCESS_KEY,
@@ -113,7 +124,7 @@ const userService = {
             expiresIn: "24h",
           }
         );
-        if(account_type === 'facebook') {
+        if (account_type === "facebook") {
           return {
             message: "Login success.",
             data: user,
@@ -141,7 +152,7 @@ const userService = {
               }
             );
             const { password, ...others } = user.dataValues;
-  
+
             return {
               message: "Login success.",
               data: others,
@@ -161,10 +172,20 @@ const userService = {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
+      const searchField = ["username", "email"];
+      let searchCond = {};
+      if (Object.keys(req.body).length > 0) {
+        for (let i of Object.keys(req.body)) {
+          if (req.body[i] !== null && searchField.includes(i)) {
+            searchCond = Object.assign({ [i]: req.body[i] });
+          }
+        }
+      }
+
       const userFound = await UserProfile.findOne({
         where: {
-          id: req.body.id ? req.body.id : decoded.id,
-          ...req.body,
+          id: req.body.user_id ?? decoded.id,
+          ...searchCond,
         },
         attributes: {
           exclude: ["referer_code"],
@@ -185,18 +206,23 @@ const userService = {
             ],
             through: {},
           },
-          {
-            model: UserRole,
-            as: "role",
-          },
-          {
-            model: Post,
-          },
-          {
-            model: Languages,
-            as: "languages",
-            through: {},
-          },
+          // {
+          //   model: UserRole,
+          //   as: "role",
+          // },
+          // {
+          //   model: Post,
+          // },
+          // {
+          //   model: Languages,
+          //   as: "languages",
+          //   through: {},
+          // },
+          // {
+          //   model: Experience,
+          //   as: "list_experiences",
+          //   through: {},
+          // },
         ],
       });
       if (userFound !== null) {
@@ -219,7 +245,7 @@ const userService = {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
-          return user;
+          return others;
         }
       } else {
         return 1;
@@ -281,51 +307,48 @@ const userService = {
       );
       if (checkRole === 1 || checkRole === 3) {
         if (req.body.list_skills) {
-          let promises = [];
+          await User_Skillset.destroy({
+            where: {
+              user_id: checkRole === 1 ? decoded.id : req.body.id,
+            },
+          });
           for (skill of req.body.list_skills) {
-            promises.push(
-              await User_Skillset.create({
-                user_id: checkRole === 1 ? decoded.id : req.body.id,
-                skillset_id: skill.id,
-              })
-            );
+            await User_Skillset.create({
+              user_id: checkRole === 1 ? decoded.id : req.body.id,
+              skillset_id: parseInt(skill.id),
+            });
           }
-          await Promise.all(promises);
         } else if (req.body.languages) {
-          const listLangs = req.body.languages.split(",");
+          const listLangs = req.body.languages;
+          await User_Languages.destroy({
+            where: {
+              user_id: checkRole === 1 ? decoded.id : req.body.id,
+            },
+          });
           for (lang of listLangs) {
-            await User_Languages.findOrCreate({
-              where: {
-                user_id: checkRole === 1 ? decoded.id : req.body.id,
-                language_id: parseInt(lang),
-              },
-              defaults: {
-                user_id: checkRole === 1 ? decoded.id : req.body.id,
-                language_id: parseInt(lang),
-              },
+            await User_Languages.create({
+              user_id: checkRole === 1 ? decoded.id : req.body.id,
+              language_id: parseInt(lang),
             });
           }
         }
+        const { list_skills, languages, ...objUpdate } = req.body;
         await UserProfile.update(
-          { ...req.body, avatar: req?.file?.path },
+          { ...objUpdate },
           {
             where: {
               id: checkRole === 1 ? decoded.id : req.body.id,
             },
           }
         );
-        result = await UserProfile.findOne({
-          where: {
-            id: checkRole === 1 ? decoded.id : req.body.id,
-          },
-        });
+        result = await userService.getUserInfo(req);
       } else if (checkRole === 0) {
         throw new ClientError("You're not allowed to do this action");
       } else if (checkRole === 2) {
         throw new ClientError("Bad request");
       }
       await transaction.commit();
-      const { password, ...others } = result.dataValues;
+      const { password, ...others } = result;
       return others;
     } catch (err) {
       await transaction.rollback();
@@ -396,7 +419,10 @@ const userService = {
     }
   },
 
-  loginFacebook: (user_id = null, res) => {
+  loginFacebook: (user_id = null, res, req) => {
+    const urlSplit = req.url.split("=")[1];
+    const moveNextRoute =
+      urlSplit && urlSplit?.includes("%252") ? `?next=${urlSplit}` : "";
     try {
       passport.use(
         new FacebookStrategy(
@@ -406,22 +432,28 @@ const userService = {
             callbackURL:
               user_id !== null
                 ? `http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user_id}`
-                : `http://localhost:1203/v1/user/auth/facebook/callback`,
+                : `http://localhost:1203/v1/user/auth/facebook/callback${moveNextRoute}`,
             profileFields: [
               "id",
               "displayName",
               "name",
               "picture.type(large)",
               "email",
+              "location",
             ],
           },
           async function (accessToken, refreshToken, profile, cb) {
-            let user;
             if (!user_id) {
               const userFound = await UserProfile.findOne({
                 where: {
                   email: profile.emails[0].value,
                 },
+                include: [
+                  {
+                    model: UserRole,
+                    as: "role",
+                  },
+                ],
               });
               if (userFound) {
                 const accesstoken = jwt.sign(
@@ -429,8 +461,8 @@ const userService = {
                     id: userFound.id,
                     role: userFound?.role,
                     email: userFound?.email,
-                    // role_name: userFound.role.role_name,
-                    // role_id: userFound.role.id,
+                    role_name: userFound?.role.role_name,
+                    role_id: userFound?.role.id,
                     fullname: userFound?.fullname,
                   },
                   process.env.MY_SECRET_ACCESS_KEY,
@@ -452,7 +484,7 @@ const userService = {
                   account_type: "facebook",
                   role_id: 3,
                   email: profile.emails[0].value,
-                  isNewRecord: true
+                  isNewRecord: true,
                 };
                 await res.cookie("user_info", JSON.stringify(userInfo), {
                   maxAge: 900000,
@@ -549,6 +581,66 @@ const userService = {
       const result = await Languages.findAll({});
       return result;
     } catch (err) {
+      throw err;
+    }
+  },
+
+  getAllSkillset: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    try {
+      const result = await UserProfile.findOne({
+        attributes: [],
+        where: {
+          id: req.body.user_id ?? decoded.id,
+        },
+        include: [
+          {
+            model: Skillset,
+            as: "list_skills",
+          },
+        ],
+      });
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  createDelSkillset: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    let transaction = await sequelize.transaction();
+    let result;
+    try {
+      await User_Skillset.destroy({
+        where: {
+          user_id: req.body.user_id ?? decoded.id,
+        },
+      });
+
+      const listPayload = [];
+      for (let i of req.body.list_skills) {
+        listPayload.push({
+          skillset_id: i.id,
+          user_id: req.body.user_id ?? decoded.id,
+        });
+      }
+      await User_Skillset.bulkCreate(listPayload);
+      result = await UserProfile.findOne({
+        attributes: [],
+        where: {
+          id: req.body.user_id ?? decoded.id,
+        },
+        include: [
+          {
+            model: Skillset,
+            as: "list_skills",
+          },
+        ],
+      });
+      await transaction.commit();
+      return result;
+    } catch (err) {
+      await transaction.rollback();
       throw err;
     }
   },

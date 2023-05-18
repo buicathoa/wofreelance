@@ -4,9 +4,100 @@
 .user-profile-wrapper {
     background-color: #f7f7f7;
     padding-bottom: calc(96 / $fdf) * $rem;
+    font-family: $roboto;
+
+    .nav-user {
+        // height: calc(64 / $fdf) * $rem;
+        background-color: #ffffff;
+        padding: 0 calc(8 / $fdf) * $rem;
+
+        &.display {
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: block;
+
+            .nav-container {
+                max-width: calc(1200 / $fdf) * $rem;
+                margin: 0 auto;
+                display: flex;
+
+                .main-information {
+                    display: flex;
+                    padding: calc(8 / $fdf) * $rem 0;
+
+                    .avatar {
+                        margin-right: calc(24 / $fdf) * $rem;
+
+                        img {
+                            width: calc(48 / $fdf) * $rem;
+                            height: calc(48 / $fdf) * $rem;
+                            border-radius: 2px;
+                            object-fit: cover;
+                        }
+                    }
+
+                    .name-reviews {
+                        .name {
+                            font-weight: 700;
+                            font-size: calc(20 / $fdf) * $rem;
+                            color: $textcolor;
+                        }
+                    }
+                }
+
+                .user-fast-navigation {
+                    ul {
+                        display: flex;
+                        margin-top: calc(16 / $fdf) * $rem !important;
+                        margin-bottom: unset !important;
+
+                        li {
+                            list-style: none;
+                            padding: calc(16 / $fdf) * $rem;
+                            font-size: calc(14 / $fdf) * $rem;
+                            color: #12151b;
+                            cursor: pointer;
+
+                            &.active {
+                                &:hover{
+                                    border-color: unset;
+                                }
+                                color: $maincolor;
+                                font-weight: 700;
+                                border-bottom: 2px solid $maincolor;
+                            }
+
+                            &:hover {
+                                font-weight: 400;
+                                border-bottom: 2px solid $bordercolor;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.none {
+            display: none;
+        }
+    }
 
     .col-right-card {
         width: calc(276 / $fdf) * $rem;
+    }
+
+    .list-skills {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .card-item {
+            margin-right: calc(4 / $fdf) * $rem;
+            margin-bottom: calc(4 / $fdf) * $rem;
+        }
     }
 
     .col-left-card {
@@ -138,6 +229,7 @@
                                     // margin-bottom: calc(16 / $fdf) * $rem;
                                     height: calc(30 / $fdf) * $rem;
                                     line-height: calc(30 / $fdf) * $rem;
+                                    cursor: pointer;
 
                                     span {
                                         background: #1772eb;

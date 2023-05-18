@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './style.scss'
 import { useDispatch, useSelector } from 'react-redux';
 import { ResponseFormatItem, UserInterface } from '../../../interface';
-import { UserActions } from '../../../reducers/userReducer';
+import { UserActions } from '../../../reducers/listReducer/userReducer';
 import { RootState } from '../../../reducers/rootReducer';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LayoutBottomProfile from '../../../components/LayoutBottom/LayoutBottomProfile';
@@ -78,7 +78,7 @@ const Publications = () => {
                 )
             } else {
                 return (
-                    <div className="list-experiences">
+                    <div className="list-item">
                         <div className="publication-item">
                             <div className="publication-item-header">
                                 <div className="title">Frontend</div>

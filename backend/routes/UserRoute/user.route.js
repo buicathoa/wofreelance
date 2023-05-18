@@ -51,15 +51,17 @@ router.get(
   },
   async function authenticateFacebook(req, res, next) {
     const user_id = await req.user_id;
-    await userService.loginFacebook(user_id, res).authenticate("facebook", {
+    await userService.loginFacebook(user_id, res, req).authenticate("facebook", {
       failureRedirect: "/login",
       successRedirect: 'http://localhost:3000/new-freelancer/link-accounts',
       // session: false,
-      scope:['email']
+      scope:['public_profile,email,user_friends,user_location']
     },function(user){
       if(!user_id) {
         if(!user.isNewRecord){
-          res.redirect('http://localhost:3000/dashboard')
+          const urlSplit = req.url.split('=')[1].split('&')[0];
+          const nextNavigate = (urlSplit && urlSplit?.includes('%252')) ? urlSplit.replaceAll('%252', '/') : ''
+          res.redirect(`http://localhost:3000${nextNavigate}`)
         } else {
           res.redirect('http://localhost:3000/signup?step=2')
         }
@@ -79,6 +81,10 @@ router.post("/login/fb", userController.loginFbTK)
 router.post("/language/create", userController.createLanguage);
 
 router.post("/language/get-all", userController.getAllLanguage);
+
+router.post("/skillset/get-all", authorize(['director', 'admin', 'user']) , userController.getAllSkillset)
+router.post("/skillset/create-delete", authorize(['director', 'admin', 'user']) , userController.createDelSkillset)
+
 
 router.get("/email-verification", userController.verificationEmail);
 

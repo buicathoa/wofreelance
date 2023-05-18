@@ -3,14 +3,18 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { routerMiddleware, routerReducer } from 'react-router-redux';
 // import { createRouterMiddleware, routerReducer } from "connected-next-router";
 import rootSaga from "../sagas/rootSaga";
-import AppReducer from "./appReducer";
-import UserReducer from "./userReducer";
-import CategoryReducer from "./categoryReducer";
+import AppReducer from "./listReducer/appReducer";
+import UserReducer from "./listReducer/userReducer";
+import CategoryReducer from "./listReducer/categoryReducer";
+import ExperienceReducer from "./listReducer/experienceReducer";
+import EducationReducer from "./listReducer/educationReducer";
 
 const rootReducer = combineReducers({
     app: AppReducer,
     user: UserReducer,
-    category: CategoryReducer
+    category: CategoryReducer,
+    experience: ExperienceReducer,
+    education: EducationReducer
 })
 
 const sagaMiddleware = createSagaMiddleware();

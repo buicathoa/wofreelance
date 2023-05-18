@@ -26,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: () => {
-        console.log('oidoioi123')
         if(this.account_type === 'facebook') {
           return true
         } else {
@@ -95,6 +94,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       references: {
         model: 'userroles',
+        key: 'id'
+      }
+    },
+    country_id: {
+      type: DataTypes.INTEGER,
+      // allowNull: false,
+      references: {
+        model: 'countries',
         key: 'id'
       }
     }

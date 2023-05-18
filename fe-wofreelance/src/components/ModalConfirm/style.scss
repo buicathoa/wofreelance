@@ -1,0 +1,47 @@
+@import "../../css/custom";
+
+.modal-confirm-container{
+    width: calc(500 / $fdf) * $rem !important;
+    text-align: center;
+    .ant-modal-content{
+        padding: 0 !important;
+        .ant-modal-close{
+            top: calc(16 / $fdf) * $rem
+        }
+        .ant-modal-header{
+            background-color: $hovercolor;
+            padding: calc(16 / $fdf) * $rem;
+            font-weight: 600;
+            .ant-modal-title{
+                text-align: left;
+            }
+        }
+        .ant-modal-body{
+            .modal-confirm-content-container{
+                img{
+                    width: calc(112 / $fdf) * $rem;
+                    height: calc(112 / $fdf) * $rem;
+                    object-fit: cover;
+                }
+                h4{
+                    margin: 0
+                }
+                h5{
+                    margin: 0;
+                    font-weight: 400;
+                }
+            }
+        }
+        .ant-modal-footer{
+            padding: calc(16 / $fdf) * $rem;
+            button{
+                font-size: calc(16 / $fdf) * $rem;
+                &:nth-child(2){
+                    background-color: $maincolor;
+                    color: #ffffff;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+}

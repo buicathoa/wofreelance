@@ -39,7 +39,7 @@ const userController = {
   getUserInfo: async (req, res) => {
     try {
       const result = await userService.getUserInfo(req, res);
-      if (!result) {
+      if (result === 1) {
         return res.status(400).json({ message: "User not found." });
       } else {
         return handleSuccess(res, result);
@@ -112,6 +112,25 @@ const userController = {
       return handleError(res, err);
     }
   },
+
+
+  getAllSkillset: async (req, res) => {
+    try {
+      const result = await userService.getAllSkillset(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+  createDelSkillset: async (req, res) => {
+    try {
+      const result = await userService.createDelSkillset(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
 
   verificationEmail: async (req, res) => {
     try {

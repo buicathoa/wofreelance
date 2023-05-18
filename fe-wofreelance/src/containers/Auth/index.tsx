@@ -1,13 +1,13 @@
 import React, { Component, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
 import { freelancer_logo, facebook_icon_white } from './../../assets'
-import { AppActions } from '../../reducers/appReducer';
+import { AppActions } from '../../reducers/listReducer/appReducer';
 import './style.scss'
 import { useAppDispatch } from '../../reducers/hook';
 import { Link } from 'react-router-dom';
 import { ResponseFormatItem, UserInterface } from '../../interface';
-import { UserActions } from '../../reducers/userReducer';
+import { UserActions } from '../../reducers/listReducer/userReducer';
 import { openError } from '../../components/Notifications';
 import axios from 'axios';
 import { getCookie } from '../../utils/helper';
@@ -19,6 +19,7 @@ const Auth = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
+  const {id} = useParams()
   const [formValues, setformValues] = useState({})
   const [loginType, setLoginType] = useState('')
   const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
@@ -70,8 +71,8 @@ const Auth = () => {
   }
 
   const handleLoginWithFacebook = () => {
-    window.open('http://localhost:1203/v1/user/auth/facebook/callback', '_self')
-    // signinFacebook({})
+    console.log(location.search)
+    window.open(`http://localhost:1203/v1/user/auth/facebook/callback${location.search}`, '_self')
   }
 
   return (

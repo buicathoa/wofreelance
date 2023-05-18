@@ -11,7 +11,7 @@ import { check_email, email_verify, freelancer_logo } from '../../../assets'
 import { BASE_URL } from '../../../constants';
 
 import { RootState } from '../../../reducers/rootReducer'
-import { UserActions } from '../../../reducers/userReducer';
+import { UserActions } from '../../../reducers/listReducer/userReducer';
 
 import { SocketContext } from '../../../SocketContext';
 
