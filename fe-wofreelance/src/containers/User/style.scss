@@ -39,6 +39,10 @@
                         }
                     }
 
+                    .hourly_rate {
+                        margin-top: calc(16 / $fdf) * $rem;
+                    }
+
                     .name-reviews {
                         .name {
                             font-weight: 700;
@@ -62,9 +66,10 @@
                             cursor: pointer;
 
                             &.active {
-                                &:hover{
+                                &:hover {
                                     border-color: unset;
                                 }
+
                                 color: $maincolor;
                                 font-weight: 700;
                                 border-bottom: 2px solid $maincolor;
@@ -121,219 +126,339 @@
     }
 
     .user-profile-content {
-        max-width: calc(1200 / $fdf) * $rem;
+        width: calc(1200 / $fdf) * $rem;
         margin: 0 auto;
         margin-top: calc(-296.2962962963 / $fdf) * $rem;
 
-        .content-left {
-            padding: 0 calc(12 / $fdf) * $rem;
+        .ant-row {
+            width: 100%;
 
-            .switch-view-profile {
-                display: flex;
-                justify-content: flex-end;
-                margin-bottom: calc(16 / $fdf) * $rem;
+            .content-left {
+                padding: 0 calc(12 / $fdf) * $rem;
 
-                button {
-                    font-weight: 600;
-                    color: $textcolor;
-                    font-size: calc(14 / $fdf) * $rem;
-                }
-            }
+                .switch-view-profile {
+                    display: flex;
+                    justify-content: flex-end;
+                    margin-bottom: calc(16 / $fdf) * $rem;
 
-            .main-content-left {
-
-                .user-info-wrapper {
-                    border-radius: 5px;
-                    background-color: #ffffff;
-                    padding: calc(16 / $fdf) * $rem;
-                    box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
-                    margin-bottom: calc(24 / $fdf) * $rem;
-
-                    .ant-col-8 {
-                        &.left-left {
-                            padding-right: calc(12 / $fdf) * $rem;
-                        }
-
-                        .avatar {
-                            img {
-                                width: calc(265 / $fdf) * $rem;
-                                height: calc(265 / $fdf) * $rem;
-                                border-radius: 5px;
-                                object-fit: cover;
-                                padding-right: calc(12 / $fdf) * $rem;
-                            }
-                        }
-
-                        .general-info-left {
-                            margin-top: calc(16 / $fdf) * $rem;
-
-                            .general-info-left-item {
-                                display: flex;
-                                align-items: center;
-                                margin-bottom: calc(12 / $fdf) * $rem;
-
-                                .icon-active {
-                                    width: calc(10 / $fdf) * $rem;
-                                    height: calc(10 / $fdf) * $rem;
-                                    background-color: #5dc26a;
-                                    border-radius: 50%;
-                                    margin-left: calc(10 / $fdf) * $rem;
-                                }
-
-                                .anticon {
-                                    font-size: calc(20 / $fdf) * $rem;
-                                }
-
-                                .content {
-                                    margin-left: calc(16 / $fdf) * $rem;
-                                    font-size: calc(14 / $fdf) * $rem;
-                                    line-height: 1.43;
-                                    font-weight: 400;
-
-                                    &.status {
-                                        color: #5dc26a;
-                                    }
-
-                                    &.money {
-                                        .country {
-                                            color: rgb(74, 74, 242);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    .ant-col-16 {
+                    button {
+                        font-weight: 600;
                         color: $textcolor;
+                        // font-size: calc(14 / $fdf) * $rem;
+                    }
+                }
 
-                        &.left-right {
-                            padding-left: calc(12 / $fdf) * $rem;
+                .main-content-left {
 
-                            .user-info-right-header {
-                                display: flex;
-                                align-items: center;
-                                justify-content: space-between;
+                    .user-info-wrapper {
+                        border-radius: 5px;
+                        background-color: #ffffff;
+                        padding: calc(16 / $fdf) * $rem;
+                        box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+                        margin-bottom: calc(24 / $fdf) * $rem;
 
-                                .user-profile-name {
-                                    font-size: calc(24 / $fdf) * $rem;
-                                    line-height: 1.33;
-                                    font-weight: 500;
+                        .ant-col-8 {
+                            .hourly_rate {
+                                margin-top: calc(16 / $fdf) * $rem;
+                            }
 
-                                    .email {
-                                        font-weight: 400;
+                            &.left-left {
+                                padding-right: calc(12 / $fdf) * $rem;
+
+                                .avatar {
+                                    position: relative;
+                                    // width: calc(256 / $fdf) * $rem;
+                                    // height: calc(256 / $fdf) * $rem;
+                                    img {
+                                        width: calc(265 / $fdf) * $rem;
+                                        height: calc(265 / $fdf) * $rem;
+                                        border-radius: 5px;
+                                        object-fit: cover;
+                                        padding-right: calc(12 / $fdf) * $rem;
                                     }
-                                }
 
-                                .edit-profile-button {
-                                    // margin-bottom: calc(16 / $fdf) * $rem;
-                                    height: calc(30 / $fdf) * $rem;
-                                    line-height: calc(30 / $fdf) * $rem;
-                                    cursor: pointer;
+                                    .camera-icon {
+                                        position: absolute;
+                                        top: calc(10 / $fdf) * $rem;
+                                        right: calc(10 / $fdf) * $rem;
+                                        
+                                        &.anticon {
+                                            padding: calc(4 / $fdf) * $rem calc(12 / $fdf) * $rem;
+                                            background-color: #ffffff;
+                                            border-radius: 2px;
+                                            font-size: calc(20 / $fdf) * $rem;
+                                            cursor: pointer;
+                                            &:hover{
+                                                background-color: $hovercolor;
+                                            }
+                                        }
 
-                                    span {
-                                        background: #1772eb;
-                                        padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
-                                        border-color: #1772eb;
-                                        color: #f7f7f7;
-                                        font-size: calc(14 / $fdf) * $rem;
-                                        font-size: 600;
+                                        .input-file {
+                                            display: none;
+                                        }
                                     }
                                 }
                             }
 
-                            .user-info-right-content {
-                                .position {
-                                    font-size: calc(20 / $fdf) * $rem;
-                                    line-height: 1.4;
-                                    font-weight: 400;
-                                    color: $textcolor;
-                                    margin-bottom: calc(16 / $fdf) * $rem;
-                                }
 
-                                .rating-budget {
+                            .general-info-left {
+                                margin-top: calc(16 / $fdf) * $rem;
+
+                                .general-info-left-item {
                                     display: flex;
+                                    align-items: center;
                                     margin-bottom: calc(12 / $fdf) * $rem;
-                                    align-items: center;
 
-                                    .rating {
-                                        padding-right: calc(32 / $fdf) * $rem;
-                                        display: flex;
-                                        align-items: center;
+                                    .icon-active {
+                                        width: calc(10 / $fdf) * $rem;
+                                        height: calc(10 / $fdf) * $rem;
+                                        background-color: #5dc26a;
+                                        border-radius: 50%;
+                                        margin-left: calc(10 / $fdf) * $rem;
+                                    }
 
-                                        .rating-budget-number {
-                                            margin-left: calc(12 / $fdf) * $rem;
-                                            font-size: calc(16 / $fdf) * $rem;
-                                            line-height: 1.7;
-                                            height: calc(24 / $fdf) * $rem;
+                                    .anticon {
+                                        font-size: calc(20 / $fdf) * $rem;
+                                    }
+
+                                    .content {
+                                        margin-left: calc(16 / $fdf) * $rem;
+                                        font-size: calc(14 / $fdf) * $rem;
+                                        line-height: 1.43;
+                                        font-weight: 400;
+
+                                        &.status {
+                                            color: #5dc26a;
                                         }
 
-                                        .anticon {
-                                            font-size: calc(26 / $fdf) * $rem;
+                                        &.money {
+                                            .country {
+                                                color: rgb(74, 74, 242);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        .ant-col-16 {
+                            color: $textcolor;
+
+                            &.left-right {
+                                padding-left: calc(12 / $fdf) * $rem;
+                                position: relative;
+
+                                .user-info-right-header {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    margin-bottom: calc(16 / $fdf) * $rem;
+
+                                    .user-profile-name {
+                                        font-size: calc(20 / $fdf) * $rem;
+                                        line-height: 1.33;
+                                        font-weight: 500;
+
+                                        .email {
+                                            font-weight: 400;
                                         }
                                     }
 
-                                    .amount-money {
-                                        display: flex;
-                                        align-items: center;
+                                    .edit-profile-button {
+                                        // margin-bottom: calc(16 / $fdf) * $rem;
+                                        height: calc(30 / $fdf) * $rem;
+                                        line-height: calc(30 / $fdf) * $rem;
+                                        cursor: pointer;
 
-                                        .anticon {
-                                            color: #4fb55d;
-                                            font-size: calc(26 / $fdf) * $rem;
-                                            margin-right: calc(12 / $fdf) * $rem;
+                                        &.none {
+                                            display: none;
                                         }
 
-                                        .rating-budget-number {
-                                            font-size: calc(16 / $fdf) * $rem;
-                                            line-height: 1.7;
-                                            height: calc(24 / $fdf) * $rem;
+                                        span {
+                                            background: #1772eb;
+                                            padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
+                                            border-color: #1772eb;
+                                            color: #f7f7f7;
+                                            font-size: calc(14 / $fdf) * $rem;
+                                            font-size: 600;
                                         }
                                     }
                                 }
 
-                                .job-history-overview {
-                                    display: flex;
-                                    align-items: center;
-                                    flex-wrap: wrap;
+                                .user-info-right-content {
+                                    .position {
+                                        font-size: calc(20 / $fdf) * $rem;
+                                        line-height: 1.4;
+                                        font-weight: 400;
+                                        color: $textcolor;
+                                        margin-bottom: calc(16 / $fdf) * $rem;
+                                    }
 
-                                    .overview-item {
-                                        width: 50%;
+                                    .rating-budget {
+                                        display: flex;
+                                        margin-bottom: calc(12 / $fdf) * $rem;
+                                        align-items: center;
+
+                                        .rating {
+                                            padding-right: calc(32 / $fdf) * $rem;
+                                            display: flex;
+                                            align-items: center;
+
+                                            .rating-budget-number {
+                                                margin-left: calc(12 / $fdf) * $rem;
+                                                font-size: calc(16 / $fdf) * $rem;
+                                                line-height: 1.7;
+                                                height: calc(24 / $fdf) * $rem;
+                                            }
+
+                                            .anticon {
+                                                font-size: calc(26 / $fdf) * $rem;
+                                            }
+                                        }
+
+                                        .amount-money {
+                                            display: flex;
+                                            align-items: center;
+
+                                            .anticon {
+                                                color: #4fb55d;
+                                                font-size: calc(26 / $fdf) * $rem;
+                                                margin-right: calc(12 / $fdf) * $rem;
+                                            }
+
+                                            .rating-budget-number {
+                                                font-size: calc(16 / $fdf) * $rem;
+                                                line-height: 1.7;
+                                                height: calc(24 / $fdf) * $rem;
+                                            }
+                                        }
+                                    }
+
+                                    .job-history-overview {
                                         display: flex;
                                         align-items: center;
+                                        flex-wrap: wrap;
+
+                                        .overview-item {
+                                            width: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            font-size: calc(16 / $fdf) * $rem;
+                                            line-height: 1.5;
+                                            color: $textcolor;
+                                            margin-bottom: calc(12 / $fdf) * $rem;
+
+                                            .quantity {
+                                                margin-right: calc(12 / $fdf) * $rem;
+                                                color: #5dc26a;
+                                                font-weight: 600;
+                                                flex: 0 0 20%;
+                                            }
+                                        }
+
+                                    }
+
+                                    .personal-describe {
                                         font-size: calc(16 / $fdf) * $rem;
                                         line-height: 1.5;
                                         color: $textcolor;
                                         margin-bottom: calc(12 / $fdf) * $rem;
-
-                                        .quantity {
-                                            margin-right: calc(12 / $fdf) * $rem;
-                                            color: #5dc26a;
-                                            font-weight: 600;
-                                            flex: 0 0 20%;
-                                        }
                                     }
-
                                 }
 
-                                .personal-describe {
-                                    font-size: calc(16 / $fdf) * $rem;
-                                    line-height: 1.5;
-                                    color: $textcolor;
-                                    margin-bottom: calc(12 / $fdf) * $rem;
+                                .list-button {
+                                    position: absolute;
+                                    bottom: 0;
+                                    right: calc(16 / $fdf) * $rem;
+
+                                    &.none {
+                                        display: none;
+                                    }
+
+                                    button {
+                                        &:nth-child(1) {
+                                            margin-right: calc(8 / $fdf) * $rem;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                .card-left-item {}
+                    .card-left-item {}
+                }
+            }
+
+            .content-right {
+                padding: 0 calc(12 / $fdf) * $rem;
+                margin-top: calc(72 / $fdf) * $rem;
+                margin-bottom: calc(24 / $fdf) * $rem;
             }
         }
+    }
+}
 
-        .content-right {
-            padding: 0 calc(12 / $fdf) * $rem;
-            margin-top: calc(72 / $fdf) * $rem;
-            margin-bottom: calc(24 / $fdf) * $rem;
+.change-image-modal{
+    width: calc(400 / $fdf) * $rem;
+    height: calc(510 / $fdf) * $rem;
+    background-color: #ffffff;
+    border-radius: 2px;
+    padding:  calc(32 / $fdf) * $rem calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .change-image-modal-content{
+        .title{
+            font-weight: 600;
+            font-size:  calc(24 / $fdf) * $rem;
+            line-height: 1.33;
+            color: $textcolor
+        }
+        .description{
+            font-weight: 400;
+            font-size:  calc(14 / $fdf) * $rem;
+            line-height: 1.33;
+            color: $textcolor;
+            margin-bottom: calc(16 / $fdf) * $rem;
+        }
+        .div-loading{
+            width: 100%;
+            height: calc(300 / $fdf) * $rem;
+            border: 1px dotted black;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+    }
+    .modify-avatar-button{
+        &.none{
+            display: none;
+        }
+        .set-as-default{
+            padding:  calc(6 / $fdf) * $rem  calc(13 / $fdf) * $rem;
+            font-weight: 600;
+            color: $textcolor;
+            background-color: $bordercolor;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 2px;
+            &:hover{
+                background-color: $hovercolor;
+            }
+        }
+        input{
+            display: none;
+        }
+        .change-picture{
+            text-align: center;
+            color:#1772eb;
+            margin-top: calc(8 / $fdf) * $rem;
+            cursor: pointer;
+            &:hover{
+                text-decoration: underline;
+            }
         }
     }
 }

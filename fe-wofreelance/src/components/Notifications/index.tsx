@@ -5,7 +5,7 @@ import { Notifications } from '../../interface'
 // import { errorIcon } from 'assets'
 // import './styles.scss'
 
-export const openSuccess = (notiMess = null, notiDuration = null, notiPlacement = null) => {
+export const openSuccess = (notiMess = 'Action success', notiDuration = 2, notiPlacement = null):any => {
     return notification.success({
         message: notiMess || 'Success',
         placement: notiPlacement || 'bottomRight',

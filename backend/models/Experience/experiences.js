@@ -29,8 +29,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       validate: {
         isAfterStartDate(value) {
-          console.log('value ne cha', value)
-          console.log('day ne cha', dayjs().format('YYYY-MM-DDTHH:mm:ss'))
           if (dayjs(value).isAfter(dayjs())) {
             throw new Error('Start day can not be larger than this moment.');
           }

@@ -17,7 +17,7 @@ const educationnController = {
   },
 
   updateEducationUser: async (req, res) => {
-    try {updateEducationUser
+    try {
       const result = await EducationService.updateEducationUser(req, res);
       return handleSuccess(res, result, { message: "Action success." });
     } catch (err) {

@@ -5,20 +5,19 @@ const path = require('path');
 // const { Province, District, Ward } = require("./models/LocationModel");
 // const { Province, District, Ward } = require("./models/location");
 const cloudinary = require("cloudinary").v2;
-
-const uploadImage = (type) => {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
+require('dotenv').config();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const uploadImage = () => {
     const storage = new CloudinaryStorage({
       cloudinary,
       allowedFormats: ["jpg", "png"],
-      params: {
-        // folder: type === 'avatar' ? 'avatar' : 'posts',
-        folder: type === "avatar" ? "wofreelance/avatar" : "wofreelance/post",
-      },
+      // params: {
+      //   folder: type === "avatar" ? "wofreelance/avatar" : "wofreelance/post",
+      // },
       filename: function (req, file, cb) {
         cb(null, file.originalname);
       },
@@ -129,5 +128,6 @@ module.exports = {
   removeVietnameseTones,
   findWithMultipleQuery,
   checkRole,
-  emailTemplate
+  emailTemplate,
+  cloudinary
 };

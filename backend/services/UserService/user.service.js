@@ -11,7 +11,7 @@ const { Op } = require("sequelize");
 const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const { validateRole } = require("../../utils/validateRole");
-const { emailTemplate } = require("../../utils/helper");
+const { emailTemplate, uploadImage, cloudinary } = require("../../utils/helper");
 const UserProfile = db.userprofile;
 const UserRole = db.userroles;
 const Skillset = db.jobskillset;
@@ -333,8 +333,17 @@ const userService = {
           }
         }
         const { list_skills, languages, ...objUpdate } = req.body;
+        let upload_avt;
+        if(req.files.length === 1) {
+          upload_avt = {avatar_cropped: req.files[0].path}
+        } else {
+          if(req.files.length > 1) {
+            upload_avt = {avatar_cropped: req.files[0].path, avatar:  req.files[1].path}
+          }
+        }
+
         await UserProfile.update(
-          { ...objUpdate },
+          { ...objUpdate, ...upload_avt },
           {
             where: {
               id: checkRole === 1 ? decoded.id : req.body.id,
@@ -476,10 +485,12 @@ const userService = {
                 });
                 return cb(userFound, true);
               } else {
+                const imageUrl = await cloudinary.uploader.upload(profile?.photos[0]?.value, {folder: 'avatar'})
                 const userInfo = {
                   first_name: profile?.name?.familyName,
                   last_name: profile?.name?.givenName,
-                  avatar: profile?.photos[0]?.value,
+                  avatar: imageUrl.secure_url,
+                  avatar_cropped: imageUrl.secure_url,
                   facebook: true,
                   account_type: "facebook",
                   role_id: 3,
@@ -490,14 +501,15 @@ const userService = {
                   maxAge: 900000,
                 });
                 return cb(userInfo, false);
-                // await res.cookie('login_type', 'facebook', { maxAge: 900000 })
               }
             } else {
+              const imageUrl = await cloudinary.uploader.upload(profile?.photos[0]?.value, {folder: 'avatar'})
               user = await UserProfile.update(
                 {
                   first_name: profile?.name?.familyName,
                   last_name: profile?.name?.givenName,
-                  avatar: profile?.photos[0]?.value,
+                  avatar: imageUrl?.secure_url,
+                  avatar_cropped: imageUrl?.secure_url,
                   facebook: true,
                 },
                 {

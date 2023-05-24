@@ -24,7 +24,7 @@ router.post(
 router.post(
   "/update",
   authorize(["director", "admin", "user"]),
-  uploadImage("avatar").single('avatar'),
+  uploadImage().array('avatar', 2),
   // userController.updateUser
    async (req, res) => {
     userController.updateUser(req, res)

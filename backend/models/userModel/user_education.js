@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const dayjs = require('dayjs')
 module.exports = (sequelize, DataTypes) => {
   class user_education extends Model {
     /**
@@ -13,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
+  
   user_education.init({
     user_id: {
       type: DataTypes.INTEGER,
@@ -44,11 +46,31 @@ module.exports = (sequelize, DataTypes) => {
     },
     start_year: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        isAfterStartDate(value) {
+          if (dayjs(value).isAfter(dayjs())) {
+            throw new Error('Start day can not be larger than this moment.');
+          }
+        },
+      },
     },
     end_year: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        isAfterStartDate(value) {
+          if(value !== null){
+            if (value < this.date_start) {
+              throw new Error('End date must be after start date');
+            } else {
+              if(dayjs(value).isAfter(dayjs())){
+                throw new Error('End day can not be larger than this moment.')
+              }
+            }
+          }
+        },
+      },
     }
   }, {
     sequelize,

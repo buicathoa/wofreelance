@@ -17,8 +17,8 @@ const User_Experiences = db.user_experiences;
 const JobSubCategories = db.jobsubcategories;
 const Countries = db.countries;
 const UserProfiles = db.userprofile;
-const User_Education = db.user_educations
-const Universities = db.universities
+const User_Education = db.user_educations;
+const Universities = db.universities;
 
 const sequelize = db.sequelize;
 // const sequelizeCategories = db.sequelizeCategories;
@@ -29,6 +29,7 @@ const EducationService = {
     const decoded = jwt_decode(req.headers.authorization);
     let transaction = await sequelize.transaction();
     let newEducation;
+    let education;
     try {
       const checkRole = await validateRole.create(
         decoded,
@@ -42,22 +43,56 @@ const EducationService = {
           country_id: req.body.country_id,
           degree: req.body.degree,
           start_year: req.body.start_year,
-          end_year: req.body.end_year
-        })
-        // newEducation = await User_Education.create({ ...req.body, user_id: req.body.user_id ?? decoded.id });
-        // if (newEducation) {
-        //   await User_Education.create({
-        //     user_id: req.body.user_id ?? decoded.id,
-        //     experience_id: newEducation.id,
-        //   });
-        // }
+          end_year: req.body.end_year,
+        });
+        if (newEducation) {
+          education = await UserProfiles.findOne({
+            attributes: [],
+            where: {
+              id: req.body.user_id ?? decoded.id,
+            },
+            include: [
+              {
+                // attributes: [],
+                model: Universities,
+                as: "educations",
+                // attributes: [],
+                through: {
+                  model: User_Education,
+                  where: {
+                    user_id: req.body.user_id ?? decoded.id,
+                    education_id: req.body.education_id,
+                    country_id: req.body.country_id,
+                  },
+                  attributes: [
+                    "id",
+                    "user_id",
+                    "education_id",
+                    "createdAt",
+                    "updatedAt",
+                    "degree",
+                    "start_year",
+                    "end_year",
+                    "country_id",
+                  ],
+                  order: [["updatedAt", "DESC"]],
+                  // order: [["updatedAt", "DESC"]],
+                },
+              },
+            ],
+          });
+        }
       } else if (checkRole === 0) {
         throw new ClientError("You're not allowed to do this action.", 403);
       } else if (checkRole === 2) {
         throw new ClientError("Bad request.");
       }
       await transaction.commit();
-      return newEducation;
+      const { user_education, ...other } = education.educations[0];
+      return {
+        ...user_education.dataValues,
+        university_name: other.dataValues.university_name,
+      };
       // return result
     } catch (err) {
       await transaction.rollback();
@@ -75,7 +110,7 @@ const EducationService = {
         UserProfiles
       );
       if (checkRole === 1) {
-        const {user_id, id, ...other} = req.body
+        const { user_id, id, ...other } = req.body;
         await User_Education.update(
           {
             ...other,
@@ -87,34 +122,50 @@ const EducationService = {
           }
         );
         education = await UserProfiles.findOne({
+          attributes: [],
           where: {
-            id: user_id ?? decoded.id
+            id: req.body.user_id ?? decoded.id,
           },
           include: [
             {
+              // attributes: [],
               model: Universities,
-              where: {
-                id: other.education_id
-              },
+              as: "educations",
+              // attributes: [],
               through: {
-                attributes: []
+                model: User_Education,
+                where: {
+                  user_id: req.body.user_id ?? decoded.id,
+                  education_id: other.education_id,
+                  country_id: other.country_id,
+                },
+                attributes: [
+                  "id",
+                  "user_id",
+                  "education_id",
+                  "createdAt",
+                  "updatedAt",
+                  "degree",
+                  "start_year",
+                  "end_year",
+                  "country_id",
+                ],
+                order: [["updatedAt", "DESC"]],
+                // order: [["updatedAt", "DESC"]],
               },
-              as: 'educations',
-              include: [
-                {
-                  model: Countries,
-                  as: 'country'
-                }
-              ]
             },
-          ]
-        })
+          ],
+        });
       } else if (checkRole === 2) {
         throw new ClientError("Bad request");
       } else if (checkRole === 0) {
         throw new ClientError("You  are not allowed to do this action.");
       }
-      return true;
+      const { user_education, ...other } = education.educations[0];
+      return {
+        ...user_education.dataValues,
+        university_name: other.dataValues.university_name,
+      };
     } catch (err) {
       throw err;
     }
@@ -156,46 +207,42 @@ const EducationService = {
         },
         include: [
           {
+            // attributes: [],
             model: Universities,
-            as: 'educations',
-            attributes: [
-              [
-                sequelize.literal(
-                  "(select wofreelance.user_educations.id from wofreelance.user_educations where education_id = wofreelance.educations.id)"
-                ),
-                "id",
-              ],
-              'university_name',
-              // 'id',
-              [
-                sequelize.literal(
-                  "(select wofreelance.user_educations.degree from wofreelance.user_educations where education_id = wofreelance.educations.id)"
-                ),
-                "degree",
-              ],
-              [
-                sequelize.literal(
-                  "(select wofreelance.user_educations.start_year from wofreelance.user_educations where education_id = wofreelance.educations.id)"
-                ),
-                "start_year",
-              ],
-              [
-                sequelize.literal(
-                  "(select wofreelance.user_educations.end_year from wofreelance.user_educations where education_id = wofreelance.educations.id)"
-                ),
-                "end_year",
-              ]
-            ],
+            as: "educations",
+            // attributes: [],
             through: {
-              attributes: []
+              model: User_Education,
+              where: {
+                user_id: req.body.user_id ?? decoded.id,
+              },
+              attributes: [
+                "id",
+                "user_id",
+                "education_id",
+                "createdAt",
+                "updatedAt",
+                "degree",
+                "start_year",
+                "end_year",
+                "country_id",
+              ],
+              order: [["updatedAt", "DESC"]],
+              // order: [["updatedAt", "DESC"]],
             },
           },
         ],
-        // through: {
-        //   attributes: ['id']
-        // }
       });
-      return user_educations.educations;
+
+      let response = [];
+      response = user_educations?.educations?.map((edu) => {
+        const { user_education, ...other } = edu.dataValues;
+        return {
+          ...user_education.dataValues,
+          university_name: other.university_name,
+        };
+      });
+      return response;
     } catch (err) {
       throw err;
     }
@@ -211,10 +258,10 @@ const EducationService = {
         include: [
           {
             model: Universities,
-            as: "universities",
+            as: "educations",
             attributes: {
-              exclude: ['country_id']
-            }
+              exclude: ["country_id"],
+            },
           },
         ],
       });

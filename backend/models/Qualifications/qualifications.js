@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const dayjs = require("dayjs")
 module.exports = (sequelize, DataTypes) => {
   class qualifications extends Model {
     /**
@@ -28,6 +29,15 @@ module.exports = (sequelize, DataTypes) => {
       start_year: {
         type: DataTypes.DATE,
         allowNull: false,
+        validate: {
+          isAfterStartDate(value) {
+            if(value !== null){
+              if(dayjs(value).isAfter(dayjs())){
+                throw new Error('End day can not be larger than this moment.')
+              }
+            }
+          },
+        }
       },
       user_id: {
         type: DataTypes.INTEGER,

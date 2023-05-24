@@ -15,8 +15,8 @@ import { certifications } from '../../../assets';
 import { removeAccentsToLower } from '../../../utils/helper';
 import { EducationActions } from '../../../reducers/listReducer/educationReducer';
 import dayjs from 'dayjs';
-
-
+import { AppActions } from '../../../reducers/listReducer/appReducer';
+import { ModalConfirm } from '../../../components/ModalConfirm';
 
 const Education = () => {
     const dispatch = useDispatch()
@@ -26,11 +26,13 @@ const Education = () => {
     const [modifyStatus, setModifyStatus] = useState<string>('')
     const [listExp, setListExp] = useState([])
     const [formValues, setformValues] = useState({})
+    const [recordSelected, setrecordSelected] = useState<EducationInterface>({})
+    const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
 
     const countries: Array<CountryInterface> = useSelector((state: RootState) => state.education.countries)
     const educations: Array<CountryInterface> = useSelector((state: RootState) => state.education.educations)
     const user_educations: Array<UserEducationInterface> = useSelector((state: RootState) => state.education.user_educations)
-    console.log('user_educations', user_educations)
+
     const validateMessages = {
         required: 'This field is required'
     }
@@ -64,12 +66,12 @@ const Education = () => {
     }
 
     useEffect(() => {
-        if (modifyStatus === 'edit' || modifyStatus === 'add') {
-            getAllCountries({})
-        } else {
-            getAllEducationUser({})
-        }
-    }, [modifyStatus])
+        getAllEducationUser({})
+    }, [])
+
+    useEffect(() => {
+        form.resetFields()
+    }, [formValues])
 
     const getAllCountries = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
@@ -83,9 +85,21 @@ const Education = () => {
         });
     };
 
+    const deleteEducation = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(EducationActions.deleteEducation({ param, resolve, reject }));
+        });
+    };
+
     const createEducation = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(EducationActions.createEducation({ param, resolve, reject }));
+        });
+    };
+
+    const updateEducation = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(EducationActions.updateEducation({ param, resolve, reject }));
         });
     };
 
@@ -100,9 +114,52 @@ const Education = () => {
     }
 
     const onSubmitForm = (values: any) => {
+        dispatch(AppActions.openLoading(true))
         if(modifyStatus === 'add'){
-            createEducation(values)
+            createEducation(values).then((res) => {
+                setModifyStatus('')
+                setformValues({})
+            })
+        } else {
+            updateEducation({...values, id: recordSelected.id}).then((res) => {
+                setModifyStatus('')
+                setformValues({})
+            })
         }
+    }
+
+    const handleModifyEducation = (action:string) => {
+        setModifyStatus(action)
+        getAllCountries({})
+    }
+
+    const handleEditEducation = async(edu: UserEducationInterface) => {
+        setModifyStatus('edit')
+        setrecordSelected(edu)
+        getAllCountries({}).then((resCountry) => {
+            if(resCountry) {
+                getAllEducation({country_id: edu.country_id}).then((resEdu) => {
+                    if(resEdu) {
+                        setformValues({...edu, start_year: dayjs(edu.start_year), end_year: dayjs(edu.end_year)})
+                    }
+                })
+            }
+        })
+    }
+
+    const handleDeleteEducation = (edu:EducationInterface) => {
+        setrecordSelected(edu)
+        setIsOpenModalConfirm(true)
+    }
+
+    const onConfirm = () => {
+        dispatch(AppActions.openLoading(true))
+        deleteEducation({id: recordSelected.id}).then((res) => {
+            if(res) {
+                setrecordSelected({})
+                setIsOpenModalConfirm(false)
+            }
+        })
     }
 
     const renderCardContent = () => {
@@ -180,12 +237,12 @@ const Education = () => {
                             </Col>
                             <Col span={8}>
                                 <Form.Item name="start_year" className="custom-form-item" label="Start year" rules={validateSchema.start_year}>
-                                    <DatePicker placeholder='Select year' picker="year" className='form-date' />
+                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY"/>
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
                                 <Form.Item name="end_year" className="custom-form-item" label="End year" rules={validateSchema.end_year}>
-                                    <DatePicker placeholder='Select year' picker="year" className='form-date' />
+                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY"/>
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -215,8 +272,8 @@ const Education = () => {
                                     <Popover
                                         content={
                                             <ul className="education-popover">
-                                                <li>Edit</li>
-                                                <li>Delete</li>
+                                                <li onClick={() => handleEditEducation(edu)}>Edit</li>
+                                                <li onClick={() => handleDeleteEducation(edu)}>Delete</li>
                                             </ul>
                                         }
                                         trigger="hover" placement='bottom'>
@@ -241,11 +298,16 @@ const Education = () => {
     }
 
     return (
-        <Card size="small" title="Education" className="card-education" extra={<Button onClick={() => setModifyStatus('add')}>Add education</Button>}>
+        <Card size="small" title="Education" className="card-education" extra={<Button onClick={() => handleModifyEducation('add')}>Add education</Button>}>
             {renderCardContent()}
-            {/* <div className="card-content no-data">
-                <span className="card-text">No portfolio items have been added yet.</span>
-            </div> */}
+            <ModalConfirm
+                title={'Confirm'}
+                // icon={delete_icon}
+                content={'Are you sure to delete this item'}
+                visible={isOpenModalConfirm}
+                setVisible={setIsOpenModalConfirm}
+                onConfirm={onConfirm}
+            />
         </Card>
     )
 }

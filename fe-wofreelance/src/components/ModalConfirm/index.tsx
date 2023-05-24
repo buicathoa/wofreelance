@@ -2,8 +2,9 @@ import React from 'react'
 import { ModalConfirmInterface } from '../../interface'
 import { Button, Modal } from 'antd'
 import './style.scss'
+import { delete_icon } from '../../assets'
 
-export const ModalConfirm = ({title, icon = null, content = null, description = null, visible, setVisible, onConfirm}: ModalConfirmInterface) => {
+export const ModalConfirm = ({title, icon = delete_icon, content = null, description = null, visible, setVisible, onConfirm}: ModalConfirmInterface) => {
 
     const onConfirmOk = () => {
         onConfirm()

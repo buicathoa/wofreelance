@@ -126,7 +126,7 @@ const ProfileDetail = () => {
         })
         break
       case 80:
-        updateUser(formData).then((res: any) => {
+        updateUser({...formData, birthdate: dayjs(values.birthdate)}).then((res: any) => {
           if (!res?.data?.is_verified_account) {
             axios.get(`${BASE_URL}/user/email-verification?username=${res?.data?.username}&first_name=${res?.data?.first_name}`)
           }

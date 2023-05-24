@@ -56,6 +56,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                padding-right: calc(16 / $fdf) * $rem;
                 .title{
                     color: $textcolor;
                     font-size: calc(18 / $fdf) * $rem;

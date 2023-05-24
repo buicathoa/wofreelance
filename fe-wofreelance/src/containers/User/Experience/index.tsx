@@ -150,6 +150,11 @@ const Experience = () => {
         setDateEnd(dayjs(e))
     }
 
+    const handleAddExperience = () => {
+        form.setFieldsValue({})
+        setModifyStatus('add')
+    }
+
     const renderCardContent = () => {
         if (modifyStatus === 'add' || modifyStatus === 'edit') {
             return (
@@ -270,7 +275,7 @@ const Experience = () => {
 
     return (
         <>
-            <Card size="small" title="Experience" className="card-experience" extra={<Button onClick={() => setModifyStatus('add')}>Add Experience</Button>}>
+            <Card size="small" title="Experience" className="card-experience" extra={<Button onClick={() => handleAddExperience()}>Add Experience</Button>}>
                 {renderCardContent()}
             </Card>
             <ModalConfirm

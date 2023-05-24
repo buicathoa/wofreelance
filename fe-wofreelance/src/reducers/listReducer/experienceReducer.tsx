@@ -12,7 +12,7 @@ const Experience = createSlice({
     reducers: ({
         getAllExperience: (state, actions) => {},
         getAllExperienceSuccess: (state, actions) => {
-            state.experiences = actions.payload.list_experiences
+            state.experiences = actions.payload
         },
         createExperience: (state, actions) => {},
         createExperienceSuccess: (state, actions) => {
@@ -25,7 +25,7 @@ const Experience = createSlice({
         updateExperience: (state, actions) => {},
         updateExperienceSuccess: (state, actions:any) => {
             state.experiences = [...state.experiences]?.map((exp) => {
-                if(exp.id === actions.payload.exp_id) {
+                if(exp.id === actions.payload.id) {
                     return {...actions.payload}
                 } else {
                     return {...exp}

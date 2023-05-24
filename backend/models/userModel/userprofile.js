@@ -104,6 +104,12 @@ module.exports = (sequelize, DataTypes) => {
         model: 'countries',
         key: 'id'
       }
+    },
+    hourly_rate: {
+      type: DataTypes.INTEGER,
+    },
+    avatar_cropped: {
+      type: DataTypes.STRING
     }
   }, {
     sequelize,

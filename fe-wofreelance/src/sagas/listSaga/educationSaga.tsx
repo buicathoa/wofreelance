@@ -81,7 +81,7 @@ function* updateEducation(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
         const response = yield apiRequest(apiUrl.education.update, param, 'general')
-        yield put(EducationActions.updateEducationSuccess(param))
+        yield put(EducationActions.updateEducationSuccess((response as any).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

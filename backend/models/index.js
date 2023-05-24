@@ -98,10 +98,11 @@ db.userprofile.belongsTo(db.userroles, {
 
 db.countries.hasOne(db.userprofile, {
   foreignKey: 'country_id',
-  as: 'nationality'
+  as: 'user'
 })
 db.userprofile.belongsTo(db.countries, {
   foreignKey: 'country_id',
+  as: 'country'
 })
 
 
@@ -128,7 +129,7 @@ db.posts.belongsTo(db.userprofile, {
 
 db.countries.hasMany(db.universities, {
   foreignKey: 'country_id',
-  as: 'universities'
+  as: 'educations'
 })
 db.universities.belongsTo(db.countries, {
   foreignKey: 'country_id',

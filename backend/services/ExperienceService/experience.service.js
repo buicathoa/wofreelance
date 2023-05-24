@@ -81,7 +81,7 @@ const ExperienceService = {
       } else if (checkRole === 0) {
         throw new ClientError("You  are not allowed to do this action.");
       }
-      return exp;
+      return true;
     } catch (err) {
       throw err;
     }
@@ -124,11 +124,20 @@ const ExperienceService = {
         include: [
           {
             model: Experience,
-            as: 'list_experiences'
+            as: 'list_experiences',
+            through: {
+              attributes: [],
+            },
+            sort: ['updatedAt', 'DESC']
           },
         ]
       });
-      return user_experiences;
+
+      // let response = user_experiences.list_experiences((exp) => {
+      //   const {user_experiences, ...other} = exp.dataValues 
+      //   return other
+      // })
+      return user_experiences?.list_experiences;
     } catch (err) {
       throw err;
     }

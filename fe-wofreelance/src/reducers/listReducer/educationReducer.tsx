@@ -14,7 +14,7 @@ const Education = createSlice({
     reducers: ({
         getAllEducation: (state, actions) => {},
         getAllEducationSuccess: (state, actions) => {
-            state.educations = actions.payload.universities
+            state.educations = actions.payload.educations
         },
         getAllEducationUser: (state, actions) => {},
         getAllEducationUserSuccess: (state, actions) => {
@@ -26,19 +26,19 @@ const Education = createSlice({
         },
         createEducation: (state, actions) => {},
         createEducationSuccess: (state, actions) => {
-            state.educations = [...state.educations, actions.payload]
+            state.user_educations = [...state.user_educations, actions.payload]
         },
         deleteEducation: (state, actions) => {},
         deleteEducationSuccess: (state, actions) => {
-            state.educations = [...state.educations]?.filter((exp) => exp.id !== actions.payload.id)
+            state.user_educations = [...state.user_educations]?.filter((exp) => exp.id !== actions.payload.id)
         },
         updateEducation: (state, actions) => {},
         updateEducationSuccess: (state, actions:any) => {
-            state.educations = [...state.educations]?.map((exp) => {
-                if(exp.id === actions.payload.exp_id) {
+            state.user_educations = [...state.user_educations]?.map((edu) => {
+                if(edu.id === actions.payload.id) {
                     return {...actions.payload}
                 } else {
-                    return {...exp}
+                    return {...edu}
                 }
             })
         }

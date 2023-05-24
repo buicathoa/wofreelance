@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 export interface ResponseFormatItem {
     message?: string,
     data?: {
@@ -100,7 +101,9 @@ export interface UserInterface {
     first_name?: string,
     last_name?: string,
     list_skills?: Array<SkillsetInterface>,
-    list_experiences?: Array<ExperiencesInterface>
+    list_experiences?: Array<ExperiencesInterface>,
+    hourly_rate?: number,
+    avatar_cropped?: string
 }
 
 export interface LanguagesInterface {
@@ -133,14 +136,26 @@ export interface EducationInterface {
     updatedAt?: Date
 }
 
+export interface QualificationInterface {
+    id?: number,
+    certificate_name?: string,
+    organization_name?: string,
+    summary?: string,
+    start_year?: dayjs.Dayjs,
+    createdAt?: Date,
+    updatedAt?: Date,
+    user_id?: number
+}
+
 export interface UserEducationInterface {
     degree?: string,
     end_year?: Date,
     id: number,
     start_year?: Date,
-    university_name?: string
+    university_name?: string,
+    country_id?: number,
+    country?: any
 }
-
 export interface CountryInterface {
     id?: number,
     country_name?: string,
@@ -199,8 +214,13 @@ export interface experienceReducerInterface {
     experiences: Array<ExperiencesInterface> 
 }
 
+export interface qualificationReducerInterface {
+    qualifications: Array<QualificationInterface> 
+}
+
 export interface educationReducerInterface {
     educations: Array<EducationInterface>,
     countries: Array<CountryInterface>,
     user_educations: Array<UserEducationInterface>
 }
+

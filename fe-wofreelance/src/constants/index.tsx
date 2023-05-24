@@ -29,6 +29,12 @@ export const apiUrl = {
         delete: 'experience/delete',
         update: 'experience/update'
     },
+    qualification: {
+        getAll: 'qualification/get-all',
+        create: 'qualification/create',
+        delete: 'qualification/delete',
+        update: 'qualification/update'
+    },
     education: {
         getAllEducation: 'education/get-all',
         getAll: 'education/user/get-all',
