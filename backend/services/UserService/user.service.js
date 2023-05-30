@@ -11,7 +11,12 @@ const { Op } = require("sequelize");
 const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const { validateRole } = require("../../utils/validateRole");
-const { emailTemplate, uploadImage, cloudinary } = require("../../utils/helper");
+const {
+  emailTemplate,
+  uploadImage,
+  cloudinary,
+  returnApiGetTimeAndLocation,
+} = require("../../utils/helper");
 const UserProfile = db.userprofile;
 const UserRole = db.userroles;
 const Skillset = db.jobskillset;
@@ -20,10 +25,12 @@ const Post = db.posts;
 const Languages = db.languages;
 const User_Languages = db.user_languages;
 const Experience = db.experiences;
+const Countries = db.countries;
 
 const io = require("./../../server");
 const CONSTANT = require("../../constants");
 const store = require("store");
+const dayjs = require("dayjs");
 
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
@@ -84,27 +91,27 @@ const userService = {
           exclude: ["referer_code"],
         },
         include: [
-        //   {
-        //     model: Skillset,
-        //     as: "list_skills",
-        //   },
+          //   {
+          //     model: Skillset,
+          //     as: "list_skills",
+          //   },
           {
             model: UserRole,
             as: "role",
           },
-        //   {
-        //     model: Post,
-        //   },
-        //   {
-        //     model: Languages,
-        //     as: "languages",
-        //     through: {},
-        //   },
-        //   {
-        //     model: Experience,
-        //     as: "list_experiences",
-        //     through: {},
-        //   },
+          //   {
+          //     model: Post,
+          //   },
+          //   {
+          //     model: Languages,
+          //     as: "languages",
+          //     through: {},
+          //   },
+          //   {
+          //     model: Experience,
+          //     as: "list_experiences",
+          //     through: {},
+          //   },
         ],
         group: ["id"],
       });
@@ -131,9 +138,10 @@ const userService = {
             token: accesstoken,
           };
         } else {
+          const { status } = req;
           if (
             !bcrypt.compareSync(password, user.password) ||
-            !user.is_verified_account
+            (!user.is_verified_account && status !== "sign_up")
           ) {
             return 1;
           } else {
@@ -142,8 +150,8 @@ const userService = {
                 id: user.id,
                 role: user?.role,
                 email: user?.email,
-                // role_name: user.role.role_name,
-                // role_id: user.role.id,
+                role_name: user.role.role_name,
+                role_id: user.role.id,
                 fullname: user?.fullname,
               },
               process.env.MY_SECRET_ACCESS_KEY,
@@ -151,7 +159,13 @@ const userService = {
                 expiresIn: "24h",
               }
             );
-            const { password, ...others } = user.dataValues;
+            const {
+              password,
+              ip_address,
+              role_id,
+              is_verified_account,
+              ...others
+            } = user.dataValues;
 
             return {
               message: "Login success.",
@@ -168,7 +182,7 @@ const userService = {
     }
   },
 
-  getUserInfo: async (req, res) => {
+  getUserInfo: async (req, res, status = null) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
@@ -206,18 +220,23 @@ const userService = {
             ],
             through: {},
           },
-          // {
-          //   model: UserRole,
-          //   as: "role",
-          // },
+          {
+            model: Countries,
+            as: "country",
+            attributes: ["id", "country_name", "country_official_name"],
+          },
+          {
+            model: UserRole,
+            as: "role",
+          },
           // {
           //   model: Post,
           // },
-          // {
-          //   model: Languages,
-          //   as: "languages",
-          //   through: {},
-          // },
+          {
+            model: Languages,
+            as: "languages",
+            through: {},
+          },
           // {
           //   model: Experience,
           //   as: "list_experiences",
@@ -226,7 +245,13 @@ const userService = {
         ],
       });
       if (userFound !== null) {
-        const { password, ...others } = userFound.dataValues;
+        const {
+          password,
+          ip_address,
+          role_id,
+          is_verified_account,
+          ...others
+        } = userFound.dataValues;
         let list_skills = [];
         if (others?.list_skills.length > 0) {
           list_skills = others.list_skills.map((skill) => {
@@ -238,14 +263,26 @@ const userService = {
           });
         }
         user = { ...others, list_skills: list_skills };
+        let timeResponse = null;
+        if (userFound.ip_address) {
+          const decoded = jwt_decode(userFound.ip_address);
+          const user_info = await axios.get(
+            `https://api.ipdata.co/${decoded.ip_address}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
+          );
+          const timeConvert =
+            new Date(user_info.data.time_zone.current_time).getTime() -
+            new Date().getTimezoneOffset() * 60 * 1000;
+          timeResponse = new Date(timeConvert).toLocaleString("en-US");
+        }
+
         if (req.body.id) {
           if (decoded.role.id <= user.role.id) {
-            return user;
+            return timeResponse ? { ...user, current_time: timeResponse } : {...user};
           } else {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
-          return others;
+          return timeResponse  ? { ...others, current_time: timeResponse } : {...others};
         }
       } else {
         return 1;
@@ -319,7 +356,7 @@ const userService = {
             });
           }
         } else if (req.body.languages) {
-          const listLangs = req.body.languages;
+          const listLangs = req.body.languages.split(",");
           await User_Languages.destroy({
             where: {
               user_id: checkRole === 1 ? decoded.id : req.body.id,
@@ -334,11 +371,14 @@ const userService = {
         }
         const { list_skills, languages, ...objUpdate } = req.body;
         let upload_avt;
-        if(req.files.length === 1) {
-          upload_avt = {avatar_cropped: req.files[0].path}
+        if (req.files.length === 1) {
+          upload_avt = { avatar_cropped: req.files[0].path };
         } else {
-          if(req.files.length > 1) {
-            upload_avt = {avatar_cropped: req.files[0].path, avatar:  req.files[1].path}
+          if (req.files.length > 1) {
+            upload_avt = {
+              avatar_cropped: req.files[0].path,
+              avatar: req.files[1].path,
+            };
           }
         }
 
@@ -350,7 +390,7 @@ const userService = {
             },
           }
         );
-        result = await userService.getUserInfo(req);
+        result = await userService.getUserInfo(req, res, "update");
       } else if (checkRole === 0) {
         throw new ClientError("You're not allowed to do this action");
       } else if (checkRole === 2) {
@@ -485,7 +525,10 @@ const userService = {
                 });
                 return cb(userFound, true);
               } else {
-                const imageUrl = await cloudinary.uploader.upload(profile?.photos[0]?.value, {folder: 'avatar'})
+                const imageUrl = await cloudinary.uploader.upload(
+                  profile?.photos[0]?.value,
+                  { folder: "avatar" }
+                );
                 const userInfo = {
                   first_name: profile?.name?.familyName,
                   last_name: profile?.name?.givenName,
@@ -503,8 +546,11 @@ const userService = {
                 return cb(userInfo, false);
               }
             } else {
-              const imageUrl = await cloudinary.uploader.upload(profile?.photos[0]?.value, {folder: 'avatar'})
-              user = await UserProfile.update(
+              const imageUrl = await cloudinary.uploader.upload(
+                profile?.photos[0]?.value,
+                { folder: "avatar" }
+              );
+              const user = await UserProfile.update(
                 {
                   first_name: profile?.name?.familyName,
                   last_name: profile?.name?.givenName,
@@ -518,6 +564,7 @@ const userService = {
                   },
                 }
               );
+              return cb(user, false);
             }
           }
         )
@@ -723,6 +770,58 @@ const userService = {
       return user;
     } catch (err) {
       await transaction.rollback();
+      throw err;
+    }
+  },
+
+  generatedAddress: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    try {
+      const ipAddress = await axios.get("https://api.ipify.org?format=json");
+      const salt = await bcrypt.genSalt(10);
+      let result = {};
+      if (ipAddress.data.ip) {
+        const user_info = await axios.get(
+          returnApiGetTimeAndLocation(ipAddress.data.ip)
+        );
+        const country = await Countries.findOne({
+          where: {
+            country_name: user_info.data.country_code,
+          },
+        });
+
+        const ip = jwt.sign(
+          {
+            ip_address: ipAddress.data.ip,
+          },
+          process.env.MY_SECRET_ACCESS_KEY,
+          {
+            expiresIn: "1000000 years",
+          }
+        );
+        await UserProfile.update(
+          {
+            ip_address: ip,
+          },
+          {
+            where: {
+              id: decoded.id,
+            },
+          }
+        );
+        // const timeConvert =
+        //   new Date(user_info.data.time_zone.current_time).getTime() -
+        //   new Date().getTimezoneOffset() * 60 * 1000;
+        // const timeResponse = new Date(timeConvert).toLocaleString("en-US");
+        result = {
+          province: user_info.data.city,
+          zip_code: user_info.data.postal,
+          country_id: parseInt(country.id) ?? null,
+          // current_time: timeResponse,
+        };
+      }
+      return result;
+    } catch (err) {
       throw err;
     }
   },

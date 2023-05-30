@@ -24,7 +24,6 @@ const Qualification = createSlice({
         },
         updateQualification: (state, actions) => {},
         updateQualificationSuccess: (state, actions:any) => {
-            debugger
             state.qualifications = [...state.qualifications]?.map((exp) => {
                 if(exp.id === actions.payload.id) {
                     return {...actions.payload}

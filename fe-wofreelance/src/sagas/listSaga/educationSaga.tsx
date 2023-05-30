@@ -15,7 +15,6 @@ export function* EducationSaga(): Generator {
     yield takeLatest(EducationActions.createEducation({}).type, createEducation)
     yield takeLatest(EducationActions.deleteEducation({}).type, deleteEducation)
     yield takeLatest(EducationActions.updateEducation({}).type, updateEducation)
-    yield takeLatest(EducationActions.getAllCountries({}).type, getAllCountries)
     yield takeLatest(EducationActions.getAllEducationUser({}).type, getAllEducationUser)
 }
 
@@ -82,20 +81,6 @@ function* updateEducation(action: AnyAction): Generator {
     try {
         const response = yield apiRequest(apiUrl.education.update, param, 'general')
         yield put(EducationActions.updateEducationSuccess((response as any).data))
-        yield put(AppActions.openLoading(false))
-        if (resolve) yield resolve(response)
-    }
-    catch (err) {
-        yield put(AppActions.openLoading(false))
-        if (reject) yield reject(err)
-    }
-}
-
-function* getAllCountries(action: AnyAction): Generator {
-    const { param, resolve, reject } = action.payload
-    try {
-        const response = yield apiRequest(apiUrl.country.getAll, param, 'general')
-        yield put(EducationActions.getAllCountriesSuccess((response as ResponseFormatItem).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

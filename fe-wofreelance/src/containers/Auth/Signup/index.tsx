@@ -94,31 +94,21 @@ const Signup = () => {
     }
 
     const handleSelectAccountType = (account: any) => {
+        const loginType = Object.keys(userFbInfo).length > 0 ? 'facebook' : 'normal'
         dispatch(AppActions.openLoading(true))
-        if (Object.keys(userFbInfo).length > 0) {
-            const payload = { ...userFbInfo, ...formValues, service_role: account.name, role_id: 3, account_type: 'facebook', is_verified_account: true }
-            registerAccount(payload).then((res) => {
-                if (res.data) {
-                    signin({ email: payload.email, account_type: 'facebook' }).then((response) => {
-                        if (response.code === 200) {
-                            localStorage.setItem("access_token", response.data!.token)
-                            navigate("/new-freelancer/skills")
-                        }
-                    })
-                }
-            })
-        } else {
-            registerAccount({ ...formValues, service_role: account.name, role_id: 3, account_type: 'normal', is_verified_account: true }).then((res) => {
-                if (res.data) {
-                    signin({ email: formValues.email, password: formValues.password }).then((response) => {
-                        if (response.code === 200) {
-                            localStorage.setItem("access_token", response.data!.token)
-                            navigate("/new-freelancer/skills")
-                        }
-                    })
-                }
-            })
-        }
+        const payload = {...formValues, service_role: account.name, role_id: 3, account_type: 'normal', is_verified_account: true}
+        const payloadApi = loginType === 'facebook' ? {...payload, account_type: 'facebook', ...userFbInfo} : {...payload}
+        registerAccount(payloadApi).then((res) => {
+            if (res.data) {
+                const payloadSignin = loginType === 'facebook' ?  {email: payloadApi.email, account_type: loginType } : { email: formValues.email, password: formValues.password, status: 'sign_up' }
+                signin(payloadSignin).then((response) => {
+                    if (response.code === 200) {
+                        localStorage.setItem("access_token", response.data!.token)
+                        navigate("/new-freelancer/skills")
+                    }
+                })
+            }
+        })
     }
 
     const renderMainContent = () => {

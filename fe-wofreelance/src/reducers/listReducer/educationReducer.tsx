@@ -5,7 +5,6 @@ import { educationReducerInterface } from '../../interface'
 const initialState: educationReducerInterface = {
     educations: [],
     user_educations: [],
-    countries: []
 }
 
 const Education = createSlice({
@@ -19,10 +18,6 @@ const Education = createSlice({
         getAllEducationUser: (state, actions) => {},
         getAllEducationUserSuccess: (state, actions) => {
             state.user_educations = actions.payload
-        },
-        getAllCountries: (state, actions) => {},
-        getAllCountriesSuccess: (state, actions) => {
-            state.countries = actions.payload
         },
         createEducation: (state, actions) => {},
         createEducationSuccess: (state, actions) => {

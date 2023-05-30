@@ -152,14 +152,16 @@ canvas {
 
 .form-select {
   height: calc(40 / $fdf) * $rem;
-
+  &.multiple{
+    height: unset;
+  }
   .ant-select-selector {
     height: 100% !important;
     padding: 0 calc(12 / $fdf) * $rem;
     border: 1px solid #d9d9d9;
     border-radius: calc(5 / $fdf) * $rem;
     background-color: #f1f4f6;
-
+    align-items: center;
     .ant-select-selection-placeholder {
       font-family: $roboto;
       font-weight: 400;
@@ -387,6 +389,7 @@ canvas {
     .form-select {
       .ant-select-selector {
         border: 1px solid #20a2a2;
+        align-items: center;
       }
     }
 

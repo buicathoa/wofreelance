@@ -4,6 +4,7 @@ import EmailVerification from '../containers/NewFreelancer/EmailVerification'
 import LinkAccounts from '../containers/NewFreelancer/LinkAccounts'
 import ProfileDetail from '../containers/NewFreelancer/ProfileDetail'
 import SkillSelected from '../containers/NewFreelancer/SkillSelected'
+import Located from '../containers/NewFreelancer/ProfileDetail/Located'
 import Dashboard from '../containers/Dashboard'
 import Lists from '../containers/Lists'
 import UserProfile from '../containers/User'
@@ -36,10 +37,7 @@ export const routerNotSidebar = [
     {
         element: <EmailVerification/>,
         path: '/new-freelancer/email-verification'
-    },
-    // {
-    //     element:
-    // }
+    }
 ]
 
 export const routerSidebar = [

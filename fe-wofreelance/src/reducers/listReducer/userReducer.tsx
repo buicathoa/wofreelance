@@ -5,6 +5,7 @@ const initialState: userReducerInterface = {
     user: {},
     user_skills: [],
     languages: [],
+    address_generated: {}
 }
 
 const User = createSlice({
@@ -31,7 +32,10 @@ const User = createSlice({
         getAllLanguagesSuccess: (state, actions) => {
             state.languages = actions.payload
         },
-
+        generatedAddress: (state, actions) => {},
+        generatedAddressSuccess: (state, actions) => {
+            state.address_generated = actions.payload
+        }
     })
 })
 

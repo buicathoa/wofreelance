@@ -86,6 +86,10 @@ const checkRole = (currentRole, destRole) => {
   }
 };
 
+const returnApiGetTimeAndLocation = (ip) => {
+  return `https://api.ipdata.co/${ip}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
+}
+
 const emailTemplate = (mailTo, user_id, image) => {
   return `<div className="wrapper" style="padding: 20px; background-color: #f7f7f7; border-radius: 5px;">
   <div className="logo" style="display: flex; justify-content: center;">
@@ -129,5 +133,6 @@ module.exports = {
   findWithMultipleQuery,
   checkRole,
   emailTemplate,
+  returnApiGetTimeAndLocation,
   cloudinary
 };

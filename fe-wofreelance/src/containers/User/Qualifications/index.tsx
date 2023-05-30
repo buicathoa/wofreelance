@@ -88,10 +88,10 @@ const Qualifications = () => {
             return (
                 <div className="modify-form">
                     <Form
-                        id="experience_form"
+                        id="qualifications_form"
                         form={form}
                         layout="vertical"
-                        name="experience_form"
+                        name="qualifications_form"
                         onFinish={onSubmitForm}
                         initialValues={formValues}
                         scrollToFirstError
@@ -125,7 +125,7 @@ const Qualifications = () => {
                     </Form>
                     <div className="list-button user">
                         <Button onClick={() => setModifyStatus('')} className="back">Cancel</Button>
-                        <Button form="experience_form" key="submit" htmlType="submit" className="next">Save</Button>
+                        <Button form="qualifications_form" key="submit" htmlType="submit" className="next">Save</Button>
                     </div>
                 </div>
             )

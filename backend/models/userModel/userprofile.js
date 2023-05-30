@@ -110,6 +110,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     avatar_cropped: {
       type: DataTypes.STRING
+    },
+    province: {
+      type: DataTypes.STRING
+    },
+    zip_code: {
+      type: DataTypes.INTEGER
+    },
+    address_detail: {
+      type: DataTypes.STRING
+    },
+    ip_address: {
+      type: DataTypes.STRING
     }
   }, {
     sequelize,

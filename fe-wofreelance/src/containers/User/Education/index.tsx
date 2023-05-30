@@ -17,6 +17,7 @@ import { EducationActions } from '../../../reducers/listReducer/educationReducer
 import dayjs from 'dayjs';
 import { AppActions } from '../../../reducers/listReducer/appReducer';
 import { ModalConfirm } from '../../../components/ModalConfirm';
+import { LocationActions } from '../../../reducers/listReducer/locationReducer';
 
 const Education = () => {
     const dispatch = useDispatch()
@@ -29,7 +30,7 @@ const Education = () => {
     const [recordSelected, setrecordSelected] = useState<EducationInterface>({})
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
 
-    const countries: Array<CountryInterface> = useSelector((state: RootState) => state.education.countries)
+    const countries: Array<CountryInterface> = useSelector((state: RootState) => state.location.countries)
     const educations: Array<CountryInterface> = useSelector((state: RootState) => state.education.educations)
     const user_educations: Array<UserEducationInterface> = useSelector((state: RootState) => state.education.user_educations)
 
@@ -75,7 +76,7 @@ const Education = () => {
 
     const getAllCountries = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(EducationActions.getAllCountries({ param, resolve, reject }));
+            dispatch(LocationActions.getAllCountries({ param, resolve, reject }));
         });
     };
 

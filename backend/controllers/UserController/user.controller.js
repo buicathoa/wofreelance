@@ -2,7 +2,9 @@ const CONSTANT = require("../../constants");
 const userService = require("../../services/UserService/user.service");
 const db = require("./../../models");
 const UserProfile = db.userprofile;
+const axios = require('axios')
 const { handleSuccess, handleError } = require("../../utils/handleResponse");
+require('dotenv').config();
 
 const userController = {
   registerAccount: async (req, res) => {
@@ -159,6 +161,28 @@ const userController = {
     } catch (err) {
       return handleError(res, err);
     }
+  },
+
+  generatedAddress: async (req, res) => {
+    try {
+      const result = await userService.generatedAddress(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
+    // try{
+    //   const ipAddress = await axios.get("https://api.ipify.org?format=json")
+    //   if(ipAddress) {
+    //     const user_info = await axios.get(
+    //       `https://api.ipdata.co/${ipAddress.ip}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
+    //     )
+    //     if(user_info && req.body.status === 'modify') {
+    //       console.log(user_info)
+    //     }
+    //   }
+    // } catch (err) {
+    //   throw err
+    // }
   }
 };
 

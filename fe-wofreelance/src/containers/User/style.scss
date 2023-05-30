@@ -5,7 +5,9 @@
     background-color: #f7f7f7;
     padding-bottom: calc(96 / $fdf) * $rem;
     font-family: $roboto;
-
+    .form-textarea{
+        font-size: calc(16 / $fdf) * $rem;
+    }
     .nav-user {
         // height: calc(64 / $fdf) * $rem;
         background-color: #ffffff;
@@ -41,6 +43,9 @@
 
                     .hourly_rate {
                         margin-top: calc(16 / $fdf) * $rem;
+                        text-align: center !important;
+                        input{
+                        }
                     }
 
                     .name-reviews {
@@ -126,7 +131,7 @@
     }
 
     .user-profile-content {
-        width: calc(1200 / $fdf) * $rem;
+        width: calc(1400 / $fdf) * $rem;
         margin: 0 auto;
         margin-top: calc(-296.2962962963 / $fdf) * $rem;
 
@@ -156,10 +161,18 @@
                         padding: calc(16 / $fdf) * $rem;
                         box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
                         margin-bottom: calc(24 / $fdf) * $rem;
-
+                        &.edit{
+                            height: calc(550 / $fdf) * $rem;
+                            .ant-row{
+                                height: 100%;
+                            }
+                        }
                         .ant-col-8 {
                             .hourly_rate {
                                 margin-top: calc(16 / $fdf) * $rem;
+                                input{
+                                    text-align: left;
+                                }
                             }
 
                             &.left-left {
@@ -170,11 +183,11 @@
                                     // width: calc(256 / $fdf) * $rem;
                                     // height: calc(256 / $fdf) * $rem;
                                     img {
-                                        width: calc(265 / $fdf) * $rem;
+                                        width: 100%;
                                         height: calc(265 / $fdf) * $rem;
                                         border-radius: 5px;
                                         object-fit: cover;
-                                        padding-right: calc(12 / $fdf) * $rem;
+                                        // padding-right: calc(12 / $fdf) * $rem;
                                     }
 
                                     .camera-icon {
@@ -218,12 +231,21 @@
                                     }
 
                                     .anticon {
-                                        font-size: calc(20 / $fdf) * $rem;
+                                        font-size: calc(24 / $fdf) * $rem;
+                                        color: #b1b0b0;
+                                        font-weight: 600;
+                                        &.country{
+                                            color: rgb(247, 71, 32);
+                                            
+                                        }
+                                        &.money{
+                                            color: rgb(14, 237, 14);
+                                        }
                                     }
 
                                     .content {
                                         margin-left: calc(16 / $fdf) * $rem;
-                                        font-size: calc(14 / $fdf) * $rem;
+                                        font-size: calc(18 / $fdf) * $rem;
                                         line-height: 1.43;
                                         font-weight: 400;
 
@@ -232,8 +254,17 @@
                                         }
 
                                         &.money {
-                                            .country {
-                                                color: rgb(74, 74, 242);
+                                            font-weight: 600;
+                                            color: $textcolor;
+                                        }
+                                        &.country {
+                                            color: rgb(247, 71, 32);
+                                            font-weight: 600;
+                                            font-size: calc(18 / $fdf) * $rem;
+                                            img{
+                                                width: calc(32 / $fdf) * $rem;
+                                                height: calc(22 / $fdf) * $rem;
+                                                margin-right: calc(8 / $fdf) * $rem;
                                             }
                                         }
                                     }
@@ -393,71 +424,6 @@
                 padding: 0 calc(12 / $fdf) * $rem;
                 margin-top: calc(72 / $fdf) * $rem;
                 margin-bottom: calc(24 / $fdf) * $rem;
-            }
-        }
-    }
-}
-
-.change-image-modal{
-    width: calc(400 / $fdf) * $rem;
-    height: calc(510 / $fdf) * $rem;
-    background-color: #ffffff;
-    border-radius: 2px;
-    padding:  calc(32 / $fdf) * $rem calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    .change-image-modal-content{
-        .title{
-            font-weight: 600;
-            font-size:  calc(24 / $fdf) * $rem;
-            line-height: 1.33;
-            color: $textcolor
-        }
-        .description{
-            font-weight: 400;
-            font-size:  calc(14 / $fdf) * $rem;
-            line-height: 1.33;
-            color: $textcolor;
-            margin-bottom: calc(16 / $fdf) * $rem;
-        }
-        .div-loading{
-            width: 100%;
-            height: calc(300 / $fdf) * $rem;
-            border: 1px dotted black;
-            border-radius: 2px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            text-align: center;
-        }
-    }
-    .modify-avatar-button{
-        &.none{
-            display: none;
-        }
-        .set-as-default{
-            padding:  calc(6 / $fdf) * $rem  calc(13 / $fdf) * $rem;
-            font-weight: 600;
-            color: $textcolor;
-            background-color: $bordercolor;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 2px;
-            &:hover{
-                background-color: $hovercolor;
-            }
-        }
-        input{
-            display: none;
-        }
-        .change-picture{
-            text-align: center;
-            color:#1772eb;
-            margin-top: calc(8 / $fdf) * $rem;
-            cursor: pointer;
-            &:hover{
-                text-decoration: underline;
             }
         }
     }

@@ -103,7 +103,13 @@ export interface UserInterface {
     list_skills?: Array<SkillsetInterface>,
     list_experiences?: Array<ExperiencesInterface>,
     hourly_rate?: number,
-    avatar_cropped?: string
+    avatar_cropped?: string,
+    country?: {
+        id?: number,
+        country_name?: string,
+        country_official_name?: string
+    },
+    current_time?: string
 }
 
 export interface LanguagesInterface {
@@ -115,6 +121,13 @@ export interface LanguagesInterface {
     iso_639_2?: string,
     createdAt?: Date,
     updatedAt?: Date
+}
+
+export interface AddressGeneratedInterface {
+    province?: string,
+    zip_code?: number,
+    country_id?: number,
+    current_time?: string
 }
 
 export interface ExperiencesInterface {
@@ -134,6 +147,13 @@ export interface EducationInterface {
     country_id?: number,
     createdAt?: Date,
     updatedAt?: Date
+}
+
+export interface AvatarUserInterface {
+    isOpenModifyAvt?: boolean,
+    setIsOpenModifyAvt: React.Dispatch<React.SetStateAction<boolean>>,
+    fileUploaded?: any,
+    setFileUploaded: React.Dispatch<React.SetStateAction<any>>
 }
 
 export interface QualificationInterface {
@@ -203,6 +223,7 @@ export interface userReducerInterface {
     user: UserInterface,
     user_skills: Array<SkillsetInterface>,
     languages: Array<LanguagesInterface>,
+    address_generated: AddressGeneratedInterface
 }
 
 export interface categoryReducerInterface {
@@ -220,7 +241,10 @@ export interface qualificationReducerInterface {
 
 export interface educationReducerInterface {
     educations: Array<EducationInterface>,
-    countries: Array<CountryInterface>,
     user_educations: Array<UserEducationInterface>
+}
+
+export interface locationReducerInterface {
+    countries: Array<CountryInterface>,
 }
 

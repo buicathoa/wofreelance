@@ -18,6 +18,7 @@ export function* UserTaskSaga(): Generator {
     yield takeLatest(UserActions.getUserInfo({}).type, getUserInfo)
     yield takeLatest(UserActions.updateUser({}).type, updateUser)
     yield takeLatest(UserActions.getAllLanguages({}).type, getAllLanguages)
+    yield takeLatest(UserActions.generatedAddress({}).type, generatedAddress)
 }
 
 function* signIn(action: AnyAction): Generator {
@@ -135,4 +136,21 @@ function* getAllLanguages(action: AnyAction): Generator {
         if (reject) yield reject(err)
     }
 }
+
+function* generatedAddress(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response = yield apiRequest(apiUrl.user.generatedAddress, param, 'general')
+        if (response) {
+            yield put(UserActions.generatedAddressSuccess((response as ResponseFormatItem).data))
+        }
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
 

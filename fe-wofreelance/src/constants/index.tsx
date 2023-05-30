@@ -11,7 +11,8 @@ export const apiUrl = {
         signinFacebookTK: 'user/login/fb',
         getUserInfo: "user/get-info",
         updateUser: "user/update",
-        getAllLanguages: "user/language/get-all"
+        getAllLanguages: "user/language/get-all",
+        generatedAddress: "user/generated/address"
     },
     categories: {
         getAll: 'job-categories/get-all',

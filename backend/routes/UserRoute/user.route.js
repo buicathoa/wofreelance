@@ -72,9 +72,7 @@ router.get(
   },
 );
 
-router.get('/dashboard', async function (req, res, next) {
-  console.log(res)
-})
+router.post('/generated/address', authorize(['director', 'admin', 'user']), userController.generatedAddress)
 
 router.post("/login/fb", userController.loginFbTK)
 

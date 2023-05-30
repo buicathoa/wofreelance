@@ -93,8 +93,8 @@ const JobCategoryService = {
       const result = await JobCategories.findAll({
         include: [
           {
-            model: JobSubCategories,
-            as: "subcategories",
+            model: JobSkillset,
+            as: "list_skills",
           },
         ],
       });

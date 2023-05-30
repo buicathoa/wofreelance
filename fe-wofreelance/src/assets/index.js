@@ -16,6 +16,7 @@ import certifications from "./images/certifications.svg";
 import portfolio from "./images/portfolio.svg";
 import rating_empty from "./images/rating_empty.jpg";
 import delete_icon from "./images/delete_icon.png";
+import international_located from "./images/international_located.svg";
 
 
 export {
@@ -36,5 +37,6 @@ export {
   certifications,
   portfolio,
   rating_empty,
-  delete_icon
+  delete_icon,
+  international_located
 };

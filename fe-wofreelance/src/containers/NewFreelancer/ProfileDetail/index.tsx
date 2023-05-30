@@ -22,6 +22,8 @@ import { RootState } from '../../../reducers/rootReducer'
 
 import { BASE_URL } from '../../../constants'
 import './style.scss'
+import Located from './Located'
+import { LocationActions } from '../../../reducers/listReducer/locationReducer'
 
 const ProfileDetail = () => {
   const navigate = useNavigate()
@@ -50,6 +52,18 @@ const ProfileDetail = () => {
     });
   };
 
+  const getAllCountries = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(LocationActions.getAllCountries({ param, resolve, reject }));
+    });
+  };
+
+  const generatedAddress = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(UserActions.generatedAddress({ param, resolve, reject }));
+    });
+  };
+
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
   const validateMessages = {
@@ -64,15 +78,22 @@ const ProfileDetail = () => {
   useEffect(() => {
     if (user) {
       const endpoint = location.pathname?.split('/').at(-1)
-      if (endpoint === 'languages-birthday') {
-        getAllLanguages({})
-      }
-      setformValues({
+      const valueForm = {
         ...user, birthdate: user.birthdate ? dayjs(user.birthdate) : dayjs(), languages:
           user?.languages?.map((lang) => {
             return lang.id
           })
-      })
+        }
+      setformValues(valueForm)
+      if (endpoint === 'languages-birthday') {
+        getAllLanguages({})
+      } else if (endpoint === 'located') {
+        Promise.all([
+          getAllCountries({}), generatedAddress({})
+        ]).then((res:any) => {
+          setformValues({...valueForm, ...res[1].data})
+        })
+      }
       setFileUploaded(user?.avatar)
     }
   }, [user])
@@ -89,6 +110,9 @@ const ProfileDetail = () => {
           break
         case 'languages-birthday':
           setPercent(80)
+          break
+        case 'located':
+          setPercent(90)
           break
         case 'email-verification':
           setPercent(100)
@@ -111,7 +135,6 @@ const ProfileDetail = () => {
         formData.append('avatar', fileUploaded)
         updateUser(formData).then((res) => {
           if (res?.data) {
-            setPercent(40)
             navigate('/new-freelancer/profile-detail/headline-summary')
           }
         })
@@ -120,17 +143,25 @@ const ProfileDetail = () => {
       case 60:
         updateUser(formData).then((res) => {
           if (res?.data) {
-            setPercent(50)
             navigate('/new-freelancer/profile-detail/languages-birthday')
           }
         })
         break
+
       case 80:
-        updateUser({...formData, birthdate: dayjs(values.birthdate)}).then((res: any) => {
+        updateUser(formData).then((res: any) => {
+          if (res?.data) {
+            // axios.get(`${BASE_URL}/user/email-verification?username=${res?.data?.username}&first_name=${res?.data?.first_name}`)
+            navigate('/new-freelancer/profile-detail/located')
+          }
+        })
+        break;
+
+      case 90:
+        updateUser(formData).then((res: any) => {
           if (!res?.data?.is_verified_account) {
             axios.get(`${BASE_URL}/user/email-verification?username=${res?.data?.username}&first_name=${res?.data?.first_name}`)
           }
-          setPercent(60)
           navigate('/new-freelancer/email-verification')
         })
     }
@@ -193,6 +224,7 @@ const ProfileDetail = () => {
                 />}
               {percent === 60 && <HeadlineAndSummary />}
               {percent === 80 && <LanguagesAndBirthday />}
+              {percent === 90 && <Located />}
               {percent === 100 && <EmailVerification />}
             </Form>
 
