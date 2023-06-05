@@ -14,6 +14,7 @@ import { SocketContext } from '../../../SocketContext';
 import { deleteCookie, getCookie } from '../../../utils/helper';
 const Signup = () => {
     const { id } = useParams()
+    const socket = useContext(SocketContext)
     let location = useLocation()
     let navigate = useNavigate()
     const account_type = [
@@ -100,9 +101,11 @@ const Signup = () => {
         const payloadApi = loginType === 'facebook' ? {...payload, account_type: 'facebook', ...userFbInfo} : {...payload}
         registerAccount(payloadApi).then((res) => {
             if (res.data) {
+                socket.emit('user_register', res.data?.id)
                 const payloadSignin = loginType === 'facebook' ?  {email: payloadApi.email, account_type: loginType } : { email: formValues.email, password: formValues.password, status: 'sign_up' }
-                signin(payloadSignin).then((response) => {
+                signin(payloadSignin).then((response:any) => {
                     if (response.code === 200) {
+                        // socket.emit('user_joined', response.data.data.id)
                         localStorage.setItem("access_token", response.data!.token)
                         navigate("/new-freelancer/skills")
                     }

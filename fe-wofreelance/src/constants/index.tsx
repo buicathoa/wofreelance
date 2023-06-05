@@ -4,12 +4,14 @@ export const HREF = 'http://localhost:3000/'
 export const apiUrl = {
     user: {
         signin: 'user/login',
+        signout: 'user/logout',
         checkExistUser: 'user/check',
         register: 'user/register',
         login: 'user/login',
         signinFacebook: 'user/auth/facebook',
         signinFacebookTK: 'user/login/fb',
         getUserInfo: "user/get-info",
+        getUserInfoDestination: "user/destination/get-info",
         updateUser: "user/update",
         getAllLanguages: "user/language/get-all",
         generatedAddress: "user/generated/address"

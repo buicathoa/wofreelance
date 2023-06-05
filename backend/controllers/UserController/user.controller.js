@@ -38,9 +38,31 @@ const userController = {
     }
   },
 
+  logoutUser : async (req, res) => {
+    try {
+      const result = await userService.logoutUser(req, res);
+      return handleSuccess(res, result);
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
   getUserInfo: async (req, res) => {
     try {
       const result = await userService.getUserInfo(req, res);
+      if (result === 1) {
+        return res.status(400).json({ message: "User not found." });
+      } else {
+        return handleSuccess(res, result);
+      }
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  getUserInfoDestination: async (req, res) => {
+    try {
+      const result = await userService.getUserInfoDestination(req, res);
       if (result === 1) {
         return res.status(400).json({ message: "User not found." });
       } else {

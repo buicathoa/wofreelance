@@ -5,7 +5,8 @@ const initialState: userReducerInterface = {
     user: {},
     user_skills: [],
     languages: [],
-    address_generated: {}
+    address_generated: {},
+    user_info: {}
 }
 
 const User = createSlice({
@@ -16,6 +17,7 @@ const User = createSlice({
         signinSuccess: (state, actions) => {
             state.user = actions.payload
         },
+        signout: (state, actions) => {},
         checkExistUser: (state, actions) => { },
         registerAccount: (state, actions) => { },
         signinFacebook: (state, actions) => { },
@@ -23,6 +25,10 @@ const User = createSlice({
         getUserInfo: (state, actions) => { },
         getUserInfoSuccess: (state, actions) => {
             state.user = actions.payload
+        },
+        getUserInfoDestination: (state, actions) => {},
+        getUserInforDestinationSuccess: (state, actions) => {
+            state.user_info = actions.payload
         },
         updateUser: (state, actions) => { },
         updateUserSuccess: (state, actions) => {

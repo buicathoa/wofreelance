@@ -26,8 +26,16 @@ const Layout = () => {
     });
   };
 
-  const user: UserInterface = useSelector((state: RootState) => state.user.user)
+  const getUserInfoDestination = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(UserActions.getUserInfoDestination({ param, resolve, reject }));
+    });
+  };
 
+  const user: UserInterface = useSelector((state: RootState) => state.user.user)
+  const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
+
+  console.log('user', user)
   useEffect(() => {
     const userTokenCookie: any = getCookie('access_token')
     if (userTokenCookie) {
@@ -40,7 +48,15 @@ const Layout = () => {
         navigate(`/signin?next=${nextLocation}`)
       } else if (location.pathname.includes('/u/')) {
         const username = location.pathname.split('/').at(-1)
-        getUserInfo({ username: username })
+        getUserInfo({}).then((res:any) => {
+          if(res.code === 200) {
+            if(res.data.username === username) {
+              dispatch(UserActions.getUserInforDestinationSuccess(res.data))
+            }else {
+              getUserInfoDestination({username: username})
+            }
+          }
+          })
           .catch((err) => {
             navigate('/not-found')
           })
@@ -48,7 +64,7 @@ const Layout = () => {
         getUserInfo({})
       }
     }
-  }, [])
+  }, [location])
 
 
   return (
@@ -101,7 +117,7 @@ const Layout = () => {
                 <div className="user-profile">
                   <img src={user?.avatar} alt="" />
                   <div className="name-balance">
-                    <div className="name">@buicathoa</div>
+                    <div className="name">@{user.username}</div>
                     <div className="balance">
                       $0.00USD
                     </div>

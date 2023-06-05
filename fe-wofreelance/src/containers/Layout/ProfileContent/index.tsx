@@ -1,11 +1,32 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import {useSelector} from 'react-redux'
 import './style.scss'
-import { Link } from 'react-router-dom'
-import { UserInterface } from '../../../interface'
+import { Link, useNavigate } from 'react-router-dom'
+import { ResponseFormatItem, UserInterface } from '../../../interface'
 import { RootState } from '../../../reducers/rootReducer'
+import { UserActions } from '../../../reducers/listReducer/userReducer'
+import { useDispatch } from 'react-redux'
+import { SocketContext } from '../../../SocketContext'
 
 const ProfileContent = ({user}:any) => {
+    const socket = useContext(SocketContext)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const signout = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(UserActions.signout({ param, resolve, reject }));
+        });
+    };
+
+    const handleSignout = () => {
+        signout({}).then((res) => {
+            socket.emit('user_signout', user.id)
+            localStorage.removeItem('access_token');
+                navigate('/signin')
+        })
+    }
+
     return (
         <div className="profile-content-wrapper">
             <div className="profile-content-item">
@@ -23,7 +44,7 @@ const ProfileContent = ({user}:any) => {
                     <ul>
                         <li><Link to="#">Support</Link></li>
                         <li><Link to="#">Invite Friends</Link></li>
-                        <li><Link to="#">Logout</Link></li>
+                        <li onClick={handleSignout}>Logout</li>
                     </ul>
                 </div>
             </div>

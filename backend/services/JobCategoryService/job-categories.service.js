@@ -209,6 +209,22 @@ const JobCategoryService = {
       throw err;
     }
   },
+
+  getAllSkillset: async (req, res) => {
+    try{
+      const skills = await JobSkillset.findAll({
+        attributes: ['id', 'name'],
+        where: {
+          name: req.body.skill ? {
+            [Op.like]: `%${req.body.skill}%`
+          } : {}
+        }
+      })
+      return skills
+    } catch (err) {
+      throw err
+    }
+  }
 };
 
 module.exports = JobCategoryService;

@@ -1,0 +1,24 @@
+@import "../../css/custom";
+
+.ant-alert{
+    font-family: $roboto;
+    padding: calc(8 / $fdf) * $rem calc(12 / $fdf) * $rem;
+    margin-bottom: calc(16 / $fdf) * $rem;
+    .ant-alert-icon{
+        font-size: calc(24 / $fdf) * $rem;
+    }
+    .ant-alert-content{
+        color: $textcolor;
+        .ant-alert-message{
+            font-weight: 700;
+            font-size:calc(20 / $fdf) * $rem ;
+        }
+        .ant-alert-description{
+            font-weight: 400;
+            font-size:  calc(16 / $fdf) * $rem;
+        }
+    }
+    .ant-alert-close-icon{
+        font-size: calc(18 / $fdf) * $rem;
+    }
+}

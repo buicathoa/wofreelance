@@ -82,7 +82,7 @@ db.user_educations = require("./userModel/user_education")(sequelize, DataTypes)
 //Post table
 db.posts = require("./Posts/post")(sequelize, DataTypes)
 
-
+db.user_loggedin = require("./UserLoggedIn/userloggedin")(sequelize, DataTypes)
 // =============================================================================== One to One Relationships =================================================================//
 
 db.userroles.hasOne(db.userprofile, {

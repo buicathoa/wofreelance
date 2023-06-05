@@ -14,7 +14,7 @@ import { RootState } from '../../../reducers/rootReducer'
 import { UserActions } from '../../../reducers/listReducer/userReducer';
 
 import { SocketContext } from '../../../SocketContext';
-
+import io from 'socket.io-client';
 import './style.scss'
 const EmailVerification = () => {
     const socket = useContext(SocketContext)
@@ -32,10 +32,9 @@ const EmailVerification = () => {
         getUserInfo({})
     }, [location])
 
-    console.log('user', user)
-
     useEffect(() => {
         const token = localStorage.getItem('access_token')
+        // const notAuthSocket = io('/')
         socket.emit('user_token', token);
         socket.on("user_info", (data) => {
             dispatch(UserActions.updateUserSuccess(data))

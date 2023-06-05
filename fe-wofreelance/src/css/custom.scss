@@ -151,7 +151,7 @@ canvas {
 }
 
 .form-select {
-  height: calc(40 / $fdf) * $rem;
+  // height: calc(40 / $fdf) * $rem;
   &.multiple{
     height: unset;
   }
@@ -177,6 +177,11 @@ canvas {
       color: #2c2c2c;
       // line-height: calc(40 / $fdf) * $rem;
     }
+    // .ant-select-selection-search{
+    //   input{
+    //     height: unset !important;
+    //   }
+    // }
   }
 
   &.multiple {
@@ -191,6 +196,7 @@ canvas {
             margin-top: 0;
             margin-bottom: 0;
             margin-inline-start: 0;
+            // height: unset;
           }
 
           .ant-select-selection-item {

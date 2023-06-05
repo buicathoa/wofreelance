@@ -105,6 +105,7 @@ const onConnection = (socket) => {
     userController.emailVerified(req, res, socket, io);
   });
   // userService.emailVerified(socket, io)
+  app.use("/v1/user", userRoute(socket, io));
 };
 
 io.on("connection", (socket) => {
@@ -121,7 +122,6 @@ app.use(
 );
 app.use(express.static(__dirname + "/public"));
 
-app.use("/v1/user", userRoute);
 app.use("/v1/job-categories", jobCategoriesRoute);
 app.use("/v1/posts", postsRoute);
 app.use("/v1/experience", experienceRoute);

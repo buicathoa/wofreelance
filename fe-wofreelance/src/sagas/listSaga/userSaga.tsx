@@ -11,11 +11,13 @@ import { ResponseFormatItem } from "../../interface";
 export function* UserTaskSaga(): Generator {
     // yield takeLatest(GeneralMenuActions.fetchAllGeneralMenu().type, fetchAllGeneralMenus)
     yield takeLatest(UserActions.signin({}).type, signIn)
+    yield takeLatest(UserActions.signout({}).type, signout)
     yield takeLatest(UserActions.checkExistUser({}).type, checkExistUser)
     yield takeLatest(UserActions.registerAccount({}).type, registerAccount)
     yield takeLatest(UserActions.signinFacebook({}).type, signinFacebook)
     yield takeLatest(UserActions.signinFacebookTK({}).type, signinFacebookTK)
     yield takeLatest(UserActions.getUserInfo({}).type, getUserInfo)
+    yield takeLatest(UserActions.getUserInfoDestination({}).type, getUserInfoDestination)
     yield takeLatest(UserActions.updateUser({}).type, updateUser)
     yield takeLatest(UserActions.getAllLanguages({}).type, getAllLanguages)
     yield takeLatest(UserActions.generatedAddress({}).type, generatedAddress)
@@ -36,6 +38,20 @@ function* signIn(action: AnyAction): Generator {
         if (reject) yield reject(err)
     }
 }
+
+function* signout(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response = yield apiRequest(apiUrl.user.signout, param, 'general')
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
 
 function* checkExistUser(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
@@ -96,6 +112,20 @@ function* getUserInfo(action: AnyAction): Generator {
     try {
         const response:any = yield apiRequest(apiUrl.user.getUserInfo, param, 'general')
         yield put(UserActions.getUserInfoSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
+function* getUserInfoDestination(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response:any = yield apiRequest(apiUrl.user.getUserInfoDestination, param, 'general')
+        yield put(UserActions.getUserInforDestinationSuccess((response as ResponseFormatItem).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

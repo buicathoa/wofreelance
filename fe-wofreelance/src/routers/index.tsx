@@ -8,6 +8,7 @@ import Located from '../containers/NewFreelancer/ProfileDetail/Located'
 import Dashboard from '../containers/Dashboard'
 import Lists from '../containers/Lists'
 import UserProfile from '../containers/User'
+import { Post } from '../containers/Project/Post'
 
 export const routerNotSidebar = [
     {
@@ -37,7 +38,12 @@ export const routerNotSidebar = [
     {
         element: <EmailVerification/>,
         path: '/new-freelancer/email-verification'
-    }
+    },
+    {
+        exact: true,
+        element: <Post/>,
+        path: '/post-project'
+    },
 ]
 
 export const routerSidebar = [

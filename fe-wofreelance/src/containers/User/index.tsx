@@ -31,6 +31,7 @@ import { EducationActions } from '../../reducers/listReducer/educationReducer';
 import { removeAccentsToLower } from '../../utils/helper';
 import { LocationActions } from '../../reducers/listReducer/locationReducer';
 import { SocketContext } from '../../SocketContext';
+import { io } from "socket.io-client";
 const UserProfile = () => {
     const dispatch = useDispatch()
     const [form] = Form.useForm()
@@ -45,6 +46,7 @@ const UserProfile = () => {
     const [formValues, setformValues] = useState({})
     const [isOpenModifyAvt, setIsOpenModifyAvt] = useState(false)
     const [fileUploaded, setFileUploaded] = useState<any>({})
+    const [userStatus, setUserStatus] = useState<any>({})
 
     const validateMessages = {
         required: 'This field is required'
@@ -74,6 +76,8 @@ const UserProfile = () => {
     }
 
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
+    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
+    console.log('user_info', user_info)
     const user_skills: Array<SkillsetInterface> = useSelector((state: RootState) => state.category.user_skills)
     const countries: Array<CountryInterface> = useSelector((state: RootState) => state.location.countries)
 
@@ -106,14 +110,9 @@ const UserProfile = () => {
     }, [formValues])
 
     useEffect(() => {
-        // socket.emit('user_token', token);
-        // socket.on("user_info", (data) => {
-        //     dispatch(UserActions.updateUserSuccess(data))
-        // });
-
         Promise.all([
-            getAllExperience({ user_id: user.id }),
-            getAllSkillsetForUser({ user_id: user.id })
+            getAllExperience({ user_id: user_info.id }),
+            getAllSkillsetForUser({ user_id: user_info.id })
         ])
 
         const handleScroll = () => {
@@ -134,12 +133,19 @@ const UserProfile = () => {
     }, [])
 
     useEffect(() => {
-        if (user) {
+        if (Object.values(user_info).length > 0) {
+            socket.emit('user_status', user_info.id)
+            socket.on("user_status_result", (data) => {
+                debugger
+                const userInfo = data.find((x:any) => x.user_id === user_info.id)
+                setUserStatus(userInfo)
+            });
+
             setFileUploaded({
-                ...fileUploaded, preview: user?.avatar_cropped
+                ...fileUploaded, preview: user_info?.avatar_cropped
             })
         }
-    }, [user])
+    }, [user_info])
 
     const handleMoveToDiv = (ref: any) => {
         const yCoordinate = ref.current.getBoundingClientRect().top + window.pageYOffset;
@@ -149,7 +155,7 @@ const UserProfile = () => {
 
     const handleEditProfile = () => {
         setIsEditProfile(true)
-        const defaultFormValues = { hourly_rate: user?.hourly_rate, title: user?.title, describe: user?.describe, country_id: user?.country?.id }
+        const defaultFormValues = { hourly_rate: user_info?.hourly_rate, title: user_info?.title, describe: user_info?.describe, country_id: user_info?.country?.id }
         setformValues(defaultFormValues)
         getAllCountries({})
     }
@@ -176,7 +182,7 @@ const UserProfile = () => {
 
     const handleOpenAvatarPopover = () => {
         setIsOpenModifyAvt(true)
-        setFileUploaded({ ...fileUploaded, base64: user?.avatar })
+        setFileUploaded({ ...fileUploaded, base64: user_info?.avatar })
     }
 
 
@@ -190,7 +196,7 @@ const UserProfile = () => {
                             <img src={fileUploaded?.preview} alt="" />
                         </div>
                         <div className="name-reviews">
-                            <div className="name">{user?.first_name} {user?.last_name}</div>
+                            <div className="name">{user_info?.first_name} {user_info?.last_name}</div>
                             <div className="reviews">
                                 <Rate defaultValue={0} style={{ fontSize: 12 }} />
                                 <span className="rating-budget-number"> 0.0 (0 reviews)</span>
@@ -282,24 +288,24 @@ const UserProfile = () => {
                                                 </> :
                                                 <div className="general-info-left">
                                                     <div className="general-info-left-item">
-                                                        <div className="icon-active"></div>
-                                                        <div className="content status">I'm Online!</div>
+                                                        <div className="icon-active" style={{background: userStatus?.status === 'online' ? '#5dc26a' : 'rgb(247, 71, 32)'}}></div>
+                                                        <div className="content status"><span style={{color: userStatus?.status === 'online' ? '#5dc26a' : 'rgb(247, 71, 32)'}}>I'm {userStatus?.status}!</span></div>
                                                     </div>
                                                     <div className="general-info-left-item">
                                                         <PoundCircleFilled className="money" />
-                                                        {user?.hourly_rate && <div className="content money">${user?.hourly_rate} USD / hour</div>}
+                                                        {user_info?.hourly_rate && <div className="content money">${user_info?.hourly_rate} USD / hour</div>}
                                                     </div>
                                                     <div className="general-info-left-item">
                                                         <EnvironmentFilled className='country' />
-                                                        <span className="country content"><img src={`http://flags.fmcdn.net/data/flags/mini/${(user?.country?.country_name)?.toLowerCase()}.png`} /> {user?.country?.country_official_name}</span>
+                                                        <span className="country content"><img src={`http://flags.fmcdn.net/data/flags/mini/${(user_info?.country?.country_name)?.toLowerCase()}.png`} /> {user_info?.country?.country_official_name}</span>
                                                     </div>
                                                     <div className="general-info-left-item">
                                                         <ClockCircleFilled />
-                                                        <div className="content">It's currently {user?.current_time && user?.current_time!.split(',')[1].trim()} here</div>
+                                                        <div className="content">It's currently {user_info?.current_time && user_info?.current_time!.split(',')[1].trim()} here</div>
                                                     </div>
                                                     <div className="general-info-left-item">
                                                         <FlagFilled />
-                                                        <div className="content">Joined {dayjs(user?.createdAt).format("MMMM DD YYYY")}</div>
+                                                        <div className="content">Joined {dayjs(user_info?.createdAt).format("MMMM DD YYYY")}</div>
                                                     </div>
                                                     <div className="general-info-left-item">
                                                         <LikeFilled />
@@ -309,7 +315,7 @@ const UserProfile = () => {
                                         </Col>
                                         <Col span={16} className="left-right">
                                             <div className="user-info-right-header">
-                                                <div className="user-profile-name">{user?.first_name} {user?.last_name} <span className="email">{user?.email}</span></div>
+                                                <div className="user-profile-name">{user_info?.first_name} {user_info?.last_name} <span className="email">{user_info?.email}</span></div>
                                                 <div className={`edit-profile-button ${isEditProfile && 'none'}`} onClick={handleEditProfile}>
                                                     <span>Edit Profile</span>
                                                 </div>
@@ -318,7 +324,7 @@ const UserProfile = () => {
                                             <div className="user-info-right-content">
                                                 {isEditProfile ? <Form.Item name="title" className="custom-form-item" rules={validateSchema.title} label="Professional Headline">
                                                     <Input placeholder='Professional Headline' className='form-input' />
-                                                </Form.Item> : <div className="position">{user?.title}</div>}
+                                                </Form.Item> : <div className="position">{user_info?.title}</div>}
                                                 {!isEditProfile && <div className="rating-budget">
                                                     <div className="rating">
                                                         <Rate defaultValue={0} />
@@ -349,7 +355,7 @@ const UserProfile = () => {
                                                 </div>}
                                                 {isEditProfile ? <Form.Item name="describe" label="Summary" className="custom-form-item" rules={validateSchema.describe}>
                                                     <Input.TextArea rows={4} placeholder='Summary' className='form-input textarea' />
-                                                </Form.Item> : <div className="personal-describe">{user?.describe}</div>}
+                                                </Form.Item> : <div className="personal-describe">{user_info?.describe}</div>}
                                             </div>
 
                                             <div className={`list-button ${!isEditProfile && 'none'}`}>

@@ -1,3 +1,4 @@
+import { AlertProps } from 'antd';
 import dayjs from 'dayjs';
 export interface ResponseFormatItem {
     message?: string,
@@ -5,10 +6,12 @@ export interface ResponseFormatItem {
         data?: any,
         token?: any,
         avatar?: string,
-        list_skills?: Array<SkillsetInterface>
+        list_skills?: Array<SkillsetInterface>,
+        id?: number
     },
     code?: number,
-    token?: string
+    token?: string,
+    status?: number
 }
 
 
@@ -50,6 +53,12 @@ export interface SkillselectedComponentInterface {
     skillsetSelected?: Array<SkillsetInterface>,
     setSkillsetSelected?:  React.Dispatch<React.SetStateAction<Array<SkillsetInterface>>>,
     setPercent?: React.Dispatch<React.SetStateAction<number>>,
+}
+
+export interface AlertBannerComponentInterface {
+    title?: string,
+    description?: string,
+    type: any,
 }
 
 export interface ModalConfirmInterface {
@@ -223,7 +232,8 @@ export interface userReducerInterface {
     user: UserInterface,
     user_skills: Array<SkillsetInterface>,
     languages: Array<LanguagesInterface>,
-    address_generated: AddressGeneratedInterface
+    address_generated: AddressGeneratedInterface,
+    user_info: UserInterface
 }
 
 export interface categoryReducerInterface {

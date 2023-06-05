@@ -26,11 +26,13 @@ const Languages = db.languages;
 const User_Languages = db.user_languages;
 const Experience = db.experiences;
 const Countries = db.countries;
+const UserLoggedIn = db.user_loggedin;
 
-const io = require("./../../server");
 const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
+const onConnection = require("../../wsHandler/socket.connection");
+const { io } = require("../../server");
 
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
@@ -132,6 +134,16 @@ const userService = {
           }
         );
         if (account_type === "facebook") {
+          await UserProfile.update(
+            {
+              token: accesstoken,
+            },
+            {
+              where: {
+                id: user.id,
+              },
+            }
+          )
           return {
             message: "Login success.",
             data: user,
@@ -159,11 +171,22 @@ const userService = {
                 expiresIn: "24h",
               }
             );
+            await UserProfile.update(
+              {
+                token: accesstoken,
+              },
+              {
+                where: {
+                  id: user.id,
+                },
+              }
+            )
             const {
               password,
               ip_address,
               role_id,
               is_verified_account,
+              token,
               ...others
             } = user.dataValues;
 
@@ -178,6 +201,28 @@ const userService = {
         return 1;
       }
     } catch (err) {
+      throw err;
+    }
+  },
+
+  logoutUser: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    let transaction = await sequelize.transaction();
+    try {
+      await UserProfile.update(
+        {
+          token: null
+        },
+        {
+          where: {
+            id: decoded.id
+          }
+        }
+      )
+      transaction.commit()
+      return true;
+    } catch (err) {
+      transaction.rollback()
       throw err;
     }
   },
@@ -250,6 +295,7 @@ const userService = {
           ip_address,
           role_id,
           is_verified_account,
+          token,
           ...others
         } = userFound.dataValues;
         let list_skills = [];
@@ -277,12 +323,130 @@ const userService = {
 
         if (req.body.id) {
           if (decoded.role.id <= user.role.id) {
-            return timeResponse ? { ...user, current_time: timeResponse } : {...user};
+            return timeResponse
+              ? { ...user, current_time: timeResponse }
+              : { ...user };
           } else {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
-          return timeResponse  ? { ...others, current_time: timeResponse } : {...others};
+          return timeResponse
+            ? { ...others, current_time: timeResponse }
+            : { ...others };
+        }
+      } else {
+        return 1;
+      }
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getUserInfoDestination: async (req, res) => {
+    const decoded = jwt_decode(req.headers.authorization);
+    let user;
+    try {
+      const searchField = ["username", "email"];
+      let searchCond = {};
+      if (Object.keys(req.body).length > 0) {
+        for (let i of Object.keys(req.body)) {
+          if (req.body[i] !== null && searchField.includes(i)) {
+            searchCond = Object.assign({ [i]: req.body[i] });
+          }
+        }
+      }
+
+      const userFound = await UserProfile.findOne({
+        where: {
+          ...searchCond,
+        },
+        attributes: {
+          exclude: ["referer_code"],
+        },
+        include: [
+          {
+            model: Skillset,
+            as: "list_skills",
+            attributes: [
+              "id",
+              "name",
+              [
+                sequelize.literal(
+                  "(select count(wofreelance.post_skillsets.id) from wofreelance.post_skillsets where skillset_id = wofreelance.list_skills.id)"
+                ),
+                "job_matching_count",
+              ],
+            ],
+            through: {},
+          },
+          {
+            model: Countries,
+            as: "country",
+            attributes: ["id", "country_name", "country_official_name"],
+          },
+          {
+            model: UserRole,
+            as: "role",
+          },
+          // {
+          //   model: Post,
+          // },
+          {
+            model: Languages,
+            as: "languages",
+            through: {},
+          },
+          // {
+          //   model: Experience,
+          //   as: "list_experiences",
+          //   through: {},
+          // },
+        ],
+      });
+      if (userFound !== null) {
+        const {
+          password,
+          ip_address,
+          role_id,
+          is_verified_account,
+          token,
+          ...others
+        } = userFound.dataValues;
+        let list_skills = [];
+        if (others?.list_skills.length > 0) {
+          list_skills = others.list_skills.map((skill) => {
+            return {
+              job_matching_count: skill.dataValues.job_matching_count,
+              id: skill.dataValues.id,
+              name: skill.dataValues.name,
+            };
+          });
+        }
+        user = { ...others, list_skills: list_skills };
+        let timeResponse = null;
+        if (userFound.ip_address) {
+          const decoded = jwt_decode(userFound.ip_address);
+          const user_info = await axios.get(
+            `https://api.ipdata.co/${decoded.ip_address}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
+          );
+          const timeConvert =
+            new Date(user_info.data.time_zone.current_time).getTime() -
+            new Date().getTimezoneOffset() * 60 * 1000;
+          timeResponse = new Date(timeConvert).toLocaleString("en-US");
+        }
+
+        if (req.body.id) {
+          if (decoded.role.id <= user.role.id) {
+            return timeResponse
+              ? { ...user, current_time: timeResponse }
+              : { ...user };
+          } else {
+            throw new ClientError("You're not allowed to do this action", 404);
+          }
+        } else {
+          return timeResponse
+            ? { ...others, current_time: timeResponse }
+            : { ...others };
         }
       } else {
         return 1;
@@ -321,7 +485,7 @@ const userService = {
       });
 
       response = result.map((res) => {
-        const { password, is_verified_account, role, ...others } =
+        const { password, is_verified_account, role, token, ...others } =
           res.dataValues;
         return others;
       });
@@ -468,7 +632,7 @@ const userService = {
     }
   },
 
-  loginFacebook: (user_id = null, res, req) => {
+  loginFacebook: (user_id = null, res, req, io, socket) => {
     const urlSplit = req.url.split("=")[1];
     const moveNextRoute =
       urlSplit && urlSplit?.includes("%252") ? `?next=${urlSplit}` : "";
@@ -519,10 +683,31 @@ const userService = {
                     expiresIn: "24h",
                   }
                 );
-
+                await UserLoggedIn.update(
+                  {
+                    user_id: userFound.id,
+                    socket_id: socket.id,
+                    status: "online",
+                  },
+                  {
+                    where: {
+                      user_id: userFound.id,
+                    },
+                  }
+                );
                 await res.cookie("access_token", accesstoken, {
                   maxAge: 900000,
                 });
+                await UserProfile.update(
+                  {
+                    token: accesstoken
+                  },
+                  {
+                    where: {
+                      id: userFound.id
+                    }
+                  }
+                )
                 return cb(userFound, true);
               } else {
                 const imageUrl = await cloudinary.uploader.upload(

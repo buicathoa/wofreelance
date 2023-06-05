@@ -82,8 +82,17 @@ const jobCategoriesController = {
         catch(err){
             return handleError(res, err)
         } 
+    },
+
+    getAllSkillset: async(req, res) => {
+        try{
+            const listSkills = await JobCategoryService.getAllSkillset(req, res)
+            return handleSuccess(res, listSkills, {message: "Success"})
+        }
+        catch(err){
+            return handleError(res, err)
+        } 
     }
-    
     //Sub-child category
     // createSubChildCategory: async (req, res) => {
     //     try{

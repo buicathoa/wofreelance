@@ -122,6 +122,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     ip_address: {
       type: DataTypes.STRING
+    },
+    token: {
+      type: DataTypes.STRING
     }
   }, {
     sequelize,

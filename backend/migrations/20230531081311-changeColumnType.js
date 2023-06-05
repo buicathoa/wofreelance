@@ -3,7 +3,13 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface.changeColumn('userprofiles', 'ip_address', { type: Sequelize.STRING })
+    return queryInterface.addColumn(
+      'userloggedins',
+      'status',
+      {
+        type: Sequelize.STRING
+      }
+    );
   },
 
   async down (queryInterface, Sequelize) {

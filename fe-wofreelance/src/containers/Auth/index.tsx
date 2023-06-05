@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react'
+import React, { Component, useContext, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
 import { freelancer_logo, facebook_icon_white } from './../../assets'
@@ -12,10 +12,11 @@ import { openError } from '../../components/Notifications';
 import axios from 'axios';
 import { getCookie } from '../../utils/helper';
 import { LeftOutlined } from '@ant-design/icons'
+import { SocketContext } from '../../SocketContext';
 
 const Auth = () => {
   let location = useLocation()
-  // const history = useHistory()
+  const socket = useContext(SocketContext)
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
@@ -62,6 +63,10 @@ const Auth = () => {
     dispatch(AppActions.openLoading(true))
     signin(values).then((res: any) => {
       if (res.code === 200) {
+        socket.emit('user_signin', res.data.data.id);
+        // socket.on("user_info", (data) => {
+        //     dispatch(UserActions.updateUserSuccess(data))
+        // });
         localStorage.setItem('access_token', res.data.token)
         navigate('/')
       } else {
