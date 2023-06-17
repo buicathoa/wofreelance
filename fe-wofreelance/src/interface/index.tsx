@@ -90,7 +90,7 @@ export interface UserInterface {
     education?: string,
     birthdate?: string,
     title?: string,
-    describe?: string,
+    description?: string,
     personal_website?: string,
     yoe?: Float32Array,
     cv_uploaded?: string,
@@ -119,6 +119,25 @@ export interface UserInterface {
         country_official_name?: string
     },
     current_time?: string
+}
+
+export interface CurrencyInterface {
+    id: number,
+    name: string,
+    createdAt: Date,
+    updatedAt: Date,
+    short_name: string
+}
+
+export interface BudgetInterface {
+    id: number,
+    currency: CurrencyInterface,
+    minimum: number,
+    maximum?: number,
+    name: string,
+    project_type: string,
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 export interface LanguagesInterface {

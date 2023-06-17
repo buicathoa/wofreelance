@@ -18,6 +18,14 @@ import rating_empty from "./images/rating_empty.jpg";
 import delete_icon from "./images/delete_icon.png";
 import international_located from "./images/international_located.svg";
 
+import excelIcon from "./images/excel-icon.png";
+import jpgIcon from "./images/jpg-icon.png";
+import mp3Icon from "./images/mp3-icon.png";
+import mp4Icon from "./images/mp4-icon.png";
+import pdfIcon from "./images/pdf-icon.png";
+import pngIcon from "./images/png-icon.png";
+import svgIcon from "./images/svg-icon.png";
+import wordIcon from "./images/word-icon.png";
 
 export {
   freelancer_logo,
@@ -38,5 +46,13 @@ export {
   portfolio,
   rating_empty,
   delete_icon,
-  international_located
+  international_located,
+  excelIcon,
+  jpgIcon,
+  mp3Icon,
+  mp4Icon,
+  pdfIcon,
+  pngIcon,
+  svgIcon,
+  wordIcon,
 };

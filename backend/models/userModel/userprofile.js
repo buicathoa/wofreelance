@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
     education: DataTypes.STRING,
     birthdate: DataTypes.DATE,
     title: DataTypes.STRING,
-    describe: DataTypes.STRING,
+    description: DataTypes.STRING,
     personal_website: {
       type: DataTypes.STRING,
       validate: {

@@ -5,7 +5,6 @@ import { useAppSelector } from '../../reducers/hook'
 
 const Loading = () => {
     const loading = useAppSelector((state) => state.app.isLoading)
-    console.log('loading', loading)
     return (
         <div className={ClassNames('loading-content', !loading && 'hiden')}>
             <div className="wrap">

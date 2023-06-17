@@ -39,8 +39,6 @@ const SkillSelection = ({
         setValueSearch(event.target.value)
     }
 
-    console.log('skillsetSelected', skillsetSelected)
-
     return (
         <div className="new-freelancer-content">
             <div className="new-freelancer-content-header">

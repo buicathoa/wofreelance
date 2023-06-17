@@ -3,7 +3,6 @@ const router = require('express').Router()
 const experienceController = require('../../controllers/ExperienceController/experience.controller');
 const jobCategoriesController = require("../../controllers/JobCategoryController/job-categories.controller");
 const authorize = require('../../middlewares/authorize');
-const { uploadImage } = require('../../utils/helper');
 
 
 router.post("/create", authorize(['director', 'admin', 'user']) , experienceController.createExperience)

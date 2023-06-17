@@ -15,6 +15,8 @@ const experienceRoute = require("./routes/ExperienceRoute/experience.route");
 const educationRoute = require("./routes/EducationRoute/education.route");
 const countryRoute = require("./routes/CountryRoute/country.route");
 const qualificationRoute = require("./routes/Qualifications/qualifications.route")
+const currencyRoute = require("./routes/CurrencyRoute/currency.route")
+const budgetRoute = require("./routes/BudgetsRoute/budget.route")
 
 const puppeteer = require("puppeteer");
 
@@ -128,7 +130,8 @@ app.use("/v1/experience", experienceRoute);
 app.use("/v1/education", educationRoute);
 app.use("/v1/country", countryRoute);
 app.use("/v1/qualification", qualificationRoute);
-
+app.use("/v1/currency", currencyRoute)
+app.use("/v1/budgets", budgetRoute)
 
 //crawl data for universities
 // function delay(time) {

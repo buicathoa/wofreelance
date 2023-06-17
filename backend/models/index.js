@@ -54,6 +54,9 @@ db.experiences = require("./Experience/experiences")(sequelize,DataTypes)
 db.qualifications = require("./Qualifications/qualifications")(sequelize,DataTypes)
 db.countries = require("./Country/country")(sequelize,DataTypes)
 db.universities = require("./Universities/universities")(sequelize,DataTypes)
+db.currencies = require("./Currency/currency")(sequelize,DataTypes)
+db.budgets = require("./Budgets/budgets")(sequelize, DataTypes)
+db.portfolio = require("./Portfolio/portfolio")(sequelize, DataTypes)
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 
@@ -138,14 +141,38 @@ db.universities.belongsTo(db.countries, {
 
 
 
-// db.userprofile.hasMany(db.qualifications, {
-//   foreignKey: 'user_id',
-//   as: 'qualifications'
+db.currencies.hasMany(db.budgets, {
+  foreignKey: 'currency_id',
+  as: 'budgets'
+})
+db.budgets.belongsTo(db.currencies, {
+  foreignKey: 'currency_id',
+  as: 'currency'
+})
+
+
+
+// db.portfolio.hasMany(db.jobskillset, {
+//   foreignKey: 'id',
+//   as: 'list_skills'
 // })
-// db.qualifications.belongsTo(db.userprofile, {
-//   foreignKey: 'user_id',
-//   as: 'user'
+// db.jobskillset.belongsTo(db.portfolio, {
+//   foreignKey: 'skillset_id'
 // })
+
+
+
+
+db.userprofile.hasMany(db.portfolio, {
+  foreignKey: 'user_id',
+  as: 'portfolios'
+})
+db.portfolio.belongsTo(db.userprofile, {
+  foreignKey: 'user_id'
+})
+
+
+
 
 
 // ========================================================================================== End ==========================================================================================//

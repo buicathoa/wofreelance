@@ -108,7 +108,6 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
                 canvas.toBlob((blob) => {
                     if (blob) {
                         const url = URL.createObjectURL(blob);
-                        console.log('url', url)
                         resolve({ blob, url });
                     }
                 }, "image/jpeg");

@@ -4,7 +4,6 @@ const educationnController = require('../../controllers/EducationController/educ
 const experienceController = require('../../controllers/ExperienceController/experience.controller');
 const jobCategoriesController = require("../../controllers/JobCategoryController/job-categories.controller");
 const authorize = require('../../middlewares/authorize');
-const { uploadImage } = require('../../utils/helper');
 
 
 router.post("/user/create", authorize(['director', 'admin', 'user']) , educationnController.createEducationUser)

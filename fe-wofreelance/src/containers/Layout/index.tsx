@@ -16,6 +16,13 @@ import NotificationContent from "./NotificationContent";
 import MessagesContent from "./MessagesContent";
 import ProfileContent from "./ProfileContent";
 import { checkLocalStorage, deleteCookie, getCookie } from "../../utils/helper";
+import { ExperienceActions } from "../../reducers/listReducer/experienceReducer";
+import { CategoryActions } from "../../reducers/listReducer/categoryReducer";
+import { EducationActions } from "../../reducers/listReducer/educationReducer";
+import { QualifycationActions } from "../../reducers/listReducer/qualificationReducer";
+import Footer from "../Footer";
+
+
 const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -32,10 +39,33 @@ const Layout = () => {
     });
   };
 
+  const getAllExperience = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(ExperienceActions.getAllExperience({ param, resolve, reject }));
+    });
+  };
+
+  const getAllSkillsetForUser = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(CategoryActions.getAllSkillsetForUser({ param, resolve, reject }));
+    });
+  };
+
+  const getAllEducationUser = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(EducationActions.getAllEducationUser({ param, resolve, reject }));
+    });
+  };
+  const getAllQualification = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(QualifycationActions.getAllQualification({ param, resolve, reject }));
+    });
+  };
+
+
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
   const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
 
-  console.log('user', user)
   useEffect(() => {
     const userTokenCookie: any = getCookie('access_token')
     if (userTokenCookie) {
@@ -48,15 +78,29 @@ const Layout = () => {
         navigate(`/signin?next=${nextLocation}`)
       } else if (location.pathname.includes('/u/')) {
         const username = location.pathname.split('/').at(-1)
-        getUserInfo({}).then((res:any) => {
-          if(res.code === 200) {
-            if(res.data.username === username) {
+        getUserInfo({}).then((res: any) => {
+          // debugger
+          if (res.code === 200) {
+            if (res.data.username === username) {
+              Promise.all([
+                getAllExperience({ user_id: res?.data?.id }),
+                getAllSkillsetForUser({ user_id: res?.data?.id }),
+                getAllEducationUser({ user_id: res?.data?.id }),
+                getAllQualification({ user_id: res?.data?.id })
+              ])
               dispatch(UserActions.getUserInforDestinationSuccess(res.data))
-            }else {
-              getUserInfoDestination({username: username})
+            } else {
+              getUserInfoDestination({ username: username }).then((res) => {
+                Promise.all([
+                  getAllExperience({ user_id: res?.data?.id }),
+                  getAllSkillsetForUser({ user_id: res?.data?.id }),
+                  getAllEducationUser({ user_id: res?.data?.id }),
+                  getAllQualification({ user_id: res?.data?.id })
+                ])
+              })
             }
           }
-          })
+        })
           .catch((err) => {
             navigate('/not-found')
           })
@@ -71,7 +115,7 @@ const Layout = () => {
     <div>
       {/* A "layout route" is a good place to put markup you want to
             share across all the pages on your site, like navigation. */}
-      <nav className="nav-bar">
+      <nav className="nav-bar top">
         <div className="nav-bar-top">
           <div className="nav-menu-left">
             <div className="logo">
@@ -132,7 +176,7 @@ const Layout = () => {
       {/* An <Outlet> renders whatever child route is currently active,
             so you can think about this <Outlet> as a placeholder for
             the child routes we defined above. */}
-      <Outlet />
+      {/* <Outlet /> */}
     </div>
   );
 }

@@ -135,7 +135,10 @@ const JobCategoryService = {
         include: [
           {
             model: JobSkillset,
-            as: 'list_skills'
+            as: 'list_skills',
+            through: {
+              attributes: []
+            }
           },
         ]
       });
@@ -214,11 +217,16 @@ const JobCategoryService = {
     try{
       const skills = await JobSkillset.findAll({
         attributes: ['id', 'name'],
-        where: {
-          name: req.body.skill ? {
-            [Op.like]: `%${req.body.skill}%`
-          } : {}
-        }
+        where: req.body.skill ? {
+          name: {
+                [Op.like]: `%${req.body.skill}%`
+              }
+        } : {}
+        // where: {
+        //   name: req.body.skill ? {
+        //     [Op.like]: `%${req.body.skill}%`
+        //   } : {}
+        // }
       })
       return skills
     } catch (err) {

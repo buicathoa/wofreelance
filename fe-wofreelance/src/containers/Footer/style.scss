@@ -1,0 +1,90 @@
+@import "../../css/custom";
+@import "../../css/variable";
+
+.footer-wrapper {
+    font-family: $roboto;
+    background-color: #161e2c;
+    color: #ffffff;
+    height: calc(392 / $fdf) * $rem;
+
+    .footer-container {
+        max-width: calc(1400 / $fdf) * $rem;
+        margin: 0 auto;
+        height: 100%;
+        .footer-top {
+            padding: calc(32 / $fdf) * $rem calc(12 / $fdf) * $rem;
+            display: flex;
+            justify-content: space-between;
+
+            .footer-top-item {
+                width: 33%;
+
+                .quantity {
+                    font-size: calc(24 / $fdf) * $rem;
+                    line-height: 1.33;
+                    font-weight: 700;
+                    margin-bottom: calc(4 / $fdf) * $rem;
+                }
+
+                .content {
+                    text-transform: uppercase;
+                    color: #BEC0C2;
+                    font-size: calc(18 / $fdf) * $rem;
+                    font-weight: 400;
+                }
+                &.logo{
+                    display: flex;
+                    img{
+                        width: calc(135 / $fdf) * $rem;
+                        height: calc(40 / $fdf) * $rem;
+                    }
+                }
+            }
+        }
+
+        .footer-mid {
+            padding: 0 calc(12 / $fdf) * $rem;
+            display: flex;
+            .footer-mid-item {
+                width: 23%;
+
+                &:last-child {
+                    width: unset;
+                }
+
+                .title {
+                    font-size: calc(16 / $fdf) * $rem;
+                    line-height: 1.5;
+                    color: #ffffff;
+                    font-weight: 700;
+                    margin-bottom: calc(16 / $fdf) * $rem;
+                }
+
+                ul {
+                    margin-left: 0;
+                    list-style-type: none;
+                    padding-left: 0;
+
+                    li {
+                        margin-bottom: calc(4 / $fdf) * $rem;
+
+                        &.nlink {
+                            font-size: .875rem;
+                            line-height: 1.43;
+                            color: #BEC0C2;
+                            margin: calc(16 / $fdf) * $rem 0 0;
+                            width: 80%;
+                        }
+
+                        a {
+                            font-size: calc(14 / $fdf) * $rem;
+                            color: #BEC0C2;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

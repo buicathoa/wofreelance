@@ -1,0 +1,8 @@
+@import "../../css/custom";
+// @import "../../css/variable;
+
+.dashboard-container{
+    background-color: #F0F0F0;
+    font-family: $roboto;
+    min-height: calc(100vh - 31.125rem);
+}

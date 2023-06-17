@@ -1,4 +1,6 @@
 
+import { excelIcon, jpgIcon, mp3Icon, mp4Icon, pdfIcon, pngIcon, svgIcon, wordIcon } from './../assets'
+
 export const getBase64 = (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -54,8 +56,50 @@ export const deleteCookie = (name: string) => {
 }
 
 export const checkLocalStorage = (key: string) => {
-  if (localStorage.getItem(key) && localStorage.getItem(key) !== 'null' && localStorage.getItem(key) !== undefined ) {
+  if (localStorage.getItem(key) && localStorage.getItem(key) !== 'null' && localStorage.getItem(key) !== undefined) {
     return true;
   }
   return false;
+}
+
+export const renderFileIcon = (fileType: string) => {
+  let icon
+  switch (fileType) {
+    case 'pdf':
+      icon = pdfIcon;
+      break;
+    case 'jpg' || 'jpeg':
+      icon = jpgIcon;
+      break
+    case  'mp3':
+      icon = mp3Icon
+      break
+    case 'mp4':
+      icon = mp4Icon
+      break
+    case 'xlsx':
+      icon = excelIcon
+      break
+    case 'png':
+      icon = pngIcon
+      break
+    case 'svg':
+      icon = svgIcon
+      break
+    case 'docx' || 'txt':
+      icon = wordIcon
+      break
+  }
+  return icon
+}
+
+export const renderFileType = (fileType: string) => {
+  switch (fileType) {
+    case 'video':
+      return `https://cdn2.f-cdn.com/img/profile-portfolio-video.gif?v=ce5df7fa2dcba940285f1267a3bf441a&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
+    case 'article':
+      return `https://cdn2.f-cdn.com/img/profile-portfolio-article.gif?v=051c69ab89c6ba83097ba9cd42721147&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
+    case 'audio':
+      return `https://cdn3.f-cdn.com/img/profile-portfolio-audio.gif?v=f5325ffbf3d30381a64b23afbd6afbc8&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
+  }
 }

@@ -76,7 +76,6 @@ const Auth = () => {
   }
 
   const handleLoginWithFacebook = () => {
-    console.log(location.search)
     window.open(`http://localhost:1203/v1/user/auth/facebook/callback${location.search}`, '_self')
   }
 

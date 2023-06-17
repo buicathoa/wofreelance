@@ -11,16 +11,16 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const uploadImage = () => {
+const uploadFiles = (folder) => {
     const storage = new CloudinaryStorage({
       cloudinary,
-      allowedFormats: ["jpg", "png"],
-      // params: {
-      //   folder: type === "avatar" ? "wofreelance/avatar" : "wofreelance/post",
-      // },
+      allowedFormats: ["jpg", "png", "pdf", "docx", "mp3", "mp4", "gif", "flv", "avi", "xlsx"],
       filename: function (req, file, cb) {
         cb(null, file.originalname);
       },
+      params: {
+        folder: folder
+      }
     });
     return multer({
       storage: storage,
@@ -128,7 +128,7 @@ const emailTemplate = (mailTo, user_id, image) => {
 // }
 
 module.exports = {
-  uploadImage,
+  uploadFiles,
   removeVietnameseTones,
   findWithMultipleQuery,
   checkRole,

@@ -15,9 +15,11 @@ import { certifications } from '../../../assets';
 import { QualifycationActions } from '../../../reducers/listReducer/qualificationReducer';
 import dayjs from 'dayjs';
 
+interface Qualifications {
+    modify: boolean
+}
 
-
-const Qualifications = () => {
+const Qualifications = ({modify}: Qualifications) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [form] = Form.useForm()
@@ -27,12 +29,6 @@ const Qualifications = () => {
     const [formValues, setformValues] = useState<QualificationInterface>({})
 
     const qualifications: Array<QualificationInterface> = useSelector((state: RootState) => state.qualification.qualifications)
-
-    const getAllQualification = (param: any): Promise<ResponseFormatItem> => {
-        return new Promise((resolve, reject) => {
-            dispatch(QualifycationActions.getAllQualification({ param, resolve, reject }));
-        });
-    };
 
     const createQualification = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
@@ -46,9 +42,6 @@ const Qualifications = () => {
         });
     };
 
-    useEffect(() => {
-        getAllQualification({})
-    }, [])
 
     useEffect(() => {
         form.resetFields()
@@ -78,7 +71,6 @@ const Qualifications = () => {
     }
 
     const handleEditQualification = (qual:QualificationInterface) => {
-        console.log(dayjs(qual.start_year))
         setformValues({...qual, start_year: dayjs(qual?.start_year)})
         setModifyStatus('edit')
    }
@@ -140,11 +132,12 @@ const Qualifications = () => {
                 return (
                     <div className="list-item">
                         {qualifications && qualifications.length > 0 && qualifications.map((qual:QualificationInterface, index) => {
+                            const summary = (qual.summary!).replace(/\n/g, '<br>') || ''
                             return (
                                 <div className="qualification-item">
                                     <div className="qualification-item-header">
                                         <div className="title">{qual.certificate_name}</div>
-                                        <div className="modify-qualification">
+                                        {modify && <div className="modify-qualification">
                                             <Popover
                                                 content={
                                                     <ul className="qualification-popover">
@@ -155,16 +148,14 @@ const Qualifications = () => {
                                                 trigger="hover" placement='bottom'>
                                                 <EllipsisOutlined />
                                             </Popover>
-                                        </div>
+                                        </div>}
                                     </div>
                                     <div className="qualification-item-content">
                                         <div className="company-name">{qual.organization_name}</div>
                                         <div className="working-process-time">
                                             <div className="from">{dayjs(qual.start_year).format('YYYY')} </div>
                                         </div>
-                                        <div className="working-qualification-desc">
-                                            {qual.summary}
-                                        </div>
+                                        <div className="working-qualification-desc" dangerouslySetInnerHTML={{ __html: summary }}></div>
                                     </div>
                                 </div>
                             )
@@ -176,7 +167,7 @@ const Qualifications = () => {
     }
 
     return (
-        <Card size="small" title="Qualifications" className="card-qualification" extra={<Button onClick={() => handleAddQualifications()}>Add Qualification</Button>}>
+        <Card size="small" title="Qualifications" className={`card-qualification ${(!modify && qualifications.length === 0) && 'none'}`} extra={<Button onClick={() => handleAddQualifications()}>Add Qualification</Button>}>
             {renderCardContent()}
             {/* <div className="card-content no-data">
                 <span className="card-text">No portfolio items have been added yet.</span>

@@ -6,6 +6,8 @@ import { ExperienceSaga } from './listSaga/experienceSaga'
 import { EducationSaga } from './listSaga/educationSaga'
 import { QualificationSaga } from './listSaga/qualificationSaga'
 import { LocationSaga } from './listSaga/locationSaga'
+import { AppSaga } from './listSaga/appSaga'
+import { PostSaga } from './listSaga/postSaga'
 
 export default function* rootSaga(){
     yield all([
@@ -14,6 +16,8 @@ export default function* rootSaga(){
         ExperienceSaga(),
         EducationSaga(),
         QualificationSaga(),
-        LocationSaga()
+        LocationSaga(),
+        AppSaga(),
+        PostSaga()
     ])
 }

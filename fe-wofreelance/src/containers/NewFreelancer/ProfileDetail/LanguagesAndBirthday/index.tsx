@@ -12,7 +12,6 @@ const LanguagesAndBirthday = () => {
     const { Option } = Select
 
     const languages: LanguagesInterface[] = useSelector((state: RootState) => state.user.languages)
-    console.log('languages', languages)
     const validateSchema = {
         title: [
             {

@@ -137,7 +137,7 @@ const ExperienceService = {
       //   const {user_experiences, ...other} = exp.dataValues 
       //   return other
       // })
-      return user_experiences?.list_experiences;
+    return user_experiences?.list_experiences;
     } catch (err) {
       throw err;
     }

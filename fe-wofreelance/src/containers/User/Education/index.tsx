@@ -19,7 +19,11 @@ import { AppActions } from '../../../reducers/listReducer/appReducer';
 import { ModalConfirm } from '../../../components/ModalConfirm';
 import { LocationActions } from '../../../reducers/listReducer/locationReducer';
 
-const Education = () => {
+interface Education {
+    modify: boolean
+}
+
+const Education = ({ modify }: Education) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [form] = Form.useForm()
@@ -67,10 +71,6 @@ const Education = () => {
     }
 
     useEffect(() => {
-        getAllEducationUser({})
-    }, [])
-
-    useEffect(() => {
         form.resetFields()
     }, [formValues])
 
@@ -104,63 +104,66 @@ const Education = () => {
         });
     };
 
-    const getAllEducationUser = (param: any): Promise<ResponseFormatItem> => {
-        return new Promise((resolve, reject) => {
-            dispatch(EducationActions.getAllEducationUser({ param, resolve, reject }));
-        });
-    };
-
     const handleSelectCountry = (e: any) => {
         getAllEducation({ country_id: e })
     }
 
     const onSubmitForm = (values: any) => {
         dispatch(AppActions.openLoading(true))
-        if(modifyStatus === 'add'){
+        if (modifyStatus === 'add') {
             createEducation(values).then((res) => {
                 setModifyStatus('')
                 setformValues({})
             })
         } else {
-            updateEducation({...values, id: recordSelected.id}).then((res) => {
+            updateEducation({ ...values, id: recordSelected.id }).then((res) => {
                 setModifyStatus('')
                 setformValues({})
             })
         }
     }
 
-    const handleModifyEducation = (action:string) => {
+    const handleModifyEducation = (action: string) => {
         setModifyStatus(action)
         getAllCountries({})
     }
 
-    const handleEditEducation = async(edu: UserEducationInterface) => {
+    const handleEditEducation = async (edu: UserEducationInterface) => {
         setModifyStatus('edit')
         setrecordSelected(edu)
         getAllCountries({}).then((resCountry) => {
-            if(resCountry) {
-                getAllEducation({country_id: edu.country_id}).then((resEdu) => {
-                    if(resEdu) {
-                        setformValues({...edu, start_year: dayjs(edu.start_year), end_year: dayjs(edu.end_year)})
+            if (resCountry) {
+                getAllEducation({ country_id: edu.country_id }).then((resEdu) => {
+                    if (resEdu) {
+                        setformValues({ ...edu, start_year: dayjs(edu.start_year), end_year: dayjs(edu.end_year) })
                     }
                 })
             }
         })
     }
 
-    const handleDeleteEducation = (edu:EducationInterface) => {
+    const handleDeleteEducation = (edu: EducationInterface) => {
         setrecordSelected(edu)
         setIsOpenModalConfirm(true)
     }
 
     const onConfirm = () => {
         dispatch(AppActions.openLoading(true))
-        deleteEducation({id: recordSelected.id}).then((res) => {
-            if(res) {
+        deleteEducation({ id: recordSelected.id }).then((res) => {
+            if (res) {
                 setrecordSelected({})
                 setIsOpenModalConfirm(false)
             }
         })
+    }
+
+    const handleCloseForm = () => {
+        setModifyStatus('')
+    }
+    
+    const handleAddEducation = () => {
+        setformValues({})
+        setModifyStatus('add')
     }
 
     const renderCardContent = () => {
@@ -238,18 +241,18 @@ const Education = () => {
                             </Col>
                             <Col span={8}>
                                 <Form.Item name="start_year" className="custom-form-item" label="Start year" rules={validateSchema.start_year}>
-                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY"/>
+                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY" />
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
                                 <Form.Item name="end_year" className="custom-form-item" label="End year" rules={validateSchema.end_year}>
-                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY"/>
+                                    <DatePicker placeholder='Select year' picker="year" className='form-date' format="YYYY" />
                                 </Form.Item>
                             </Col>
                         </Row>
                     </Form>
                     <div className="list-button user">
-                        <Button onClick={() => setModifyStatus('')} className="back">Cancel</Button>
+                        <Button onClick={() => handleCloseForm()} className="back">Cancel</Button>
                         <Button form="education_form" key="submit" htmlType="submit" className="next">Save</Button>
                     </div>
                 </div>
@@ -266,30 +269,30 @@ const Education = () => {
                     <div className="list-item">
                         {user_educations && user_educations?.length > 0 && user_educations.map((edu, index) => {
                             return (
-                                <div className="education-item">
-                            <div className="education-item-header">
-                                <div className="title">{edu.degree}</div>
-                                <div className="modify-education">
-                                    <Popover
-                                        content={
-                                            <ul className="education-popover">
-                                                <li onClick={() => handleEditEducation(edu)}>Edit</li>
-                                                <li onClick={() => handleDeleteEducation(edu)}>Delete</li>
-                                            </ul>
-                                        }
-                                        trigger="hover" placement='bottom'>
-                                        <EllipsisOutlined />
-                                    </Popover>
+                                <div className="education-item" key={index}>
+                                    <div className="education-item-header">
+                                        <div className="title">{edu.degree}</div>
+                                        {modify && <div className="modify-education">
+                                            <Popover
+                                                content={
+                                                    <ul className="education-popover">
+                                                        <li onClick={() => handleEditEducation(edu)}>Edit</li>
+                                                        <li onClick={() => handleDeleteEducation(edu)}>Delete</li>
+                                                    </ul>
+                                                }
+                                                trigger="hover" placement='bottom'>
+                                                <EllipsisOutlined />
+                                            </Popover>
+                                        </div>}
+                                    </div>
+                                    <div className="education-item-content">
+                                        <div className="company-name">{edu?.university_name}</div>
+                                        <div className="working-process-time">
+                                            <div className="from">{dayjs(edu.start_year).format("MMMM YYYY")} - </div>
+                                            <div className="to">&nbsp;{!edu.end_year ? 'Present' : dayjs(edu.end_year).format("MMMM YYYY")}</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="education-item-content">
-                                <div className="company-name">{edu?.university_name}</div>
-                                <div className="working-process-time">
-                                    <div className="from">{dayjs(edu.start_year).format("MMMM YYYY")} - </div>
-                                    <div className="to">&nbsp;{!edu.end_year ? 'Present' : dayjs(edu.end_year).format("MMMM YYYY")}</div>
-                                </div>
-                            </div>
-                        </div>
                             )
                         })}
                     </div>
@@ -299,7 +302,7 @@ const Education = () => {
     }
 
     return (
-        <Card size="small" title="Education" className="card-education" extra={<Button onClick={() => handleModifyEducation('add')}>Add education</Button>}>
+        <Card size="small" title="Education" className={`card-education ${(!modify && user_educations.length === 0) && 'none'}`} extra={<Button onClick={() => handleAddEducation()}>Add education</Button>}>
             {renderCardContent()}
             <ModalConfirm
                 title={'Confirm'}

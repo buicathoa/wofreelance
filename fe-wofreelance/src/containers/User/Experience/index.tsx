@@ -18,18 +18,21 @@ import { ModalConfirm } from '../../../components/ModalConfirm';
 import { AppActions } from '../../../reducers/listReducer/appReducer';
 import { ExperienceActions } from '../../../reducers/listReducer/experienceReducer';
 
+interface componentInterface{
+    modify: boolean
+}
 
-const Experience = () => {
+const Experience = ({modify}: componentInterface) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [form] = Form.useForm()
 
     const [modifyStatus, setModifyStatus] = useState<string>('')
-    const [formValues, setformValues] = useState({})
     const [itemSelected, setItemSelected] = useState<ExperiencesInterface>({})
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
     const [isStillWorking, setIsStillWorking] = useState(false)
     const [dateEnd, setDateEnd] = useState<any>()
+    const [formValues, setformValues] = useState({})
 
     const validateMessages = {
         required: 'This field is required'
@@ -91,14 +94,15 @@ const Experience = () => {
         });
     };
 
-    // useEffect(() => {
-    //     form.resetFields()
-    // }, [formValues])
+    useEffect(() => {
+        form.resetFields()
+    }, [modifyStatus])
 
     const handleChangeWorkingTime = (e:any) => {
         setIsStillWorking(e.target.checked)
         if(e.target.checked) {
-            form.setFieldsValue({date_end: ''})
+            setformValues({date_end: ''})
+            // form.setFieldsValue({date_end: ''})
         }
     }
 
@@ -134,7 +138,9 @@ const Experience = () => {
             setIsStillWorking(false)
             setDateEnd(dayjs(exp.date_end))
         }
-        form.setFieldsValue({ ...exp, date_start: dayjs(exp.date_start), date_end: dayjs(exp.date_end) })
+
+        if(exp.date_end === null) setIsStillWorking(true)
+        setformValues({ ...exp, date_start: dayjs(exp.date_start), date_end: dayjs(exp.date_end) })
     }
 
     const onConfirm = () => {
@@ -151,8 +157,13 @@ const Experience = () => {
     }
 
     const handleAddExperience = () => {
-        form.setFieldsValue({})
         setModifyStatus('add')
+    }
+
+    const handleCloseForm = () => {
+        setformValues({})
+        setModifyStatus('')
+        setIsStillWorking(false)
     }
 
     const renderCardContent = () => {
@@ -165,7 +176,7 @@ const Experience = () => {
                         layout="vertical"
                         name="experience_form"
                         onFinish={onSubmitForm}
-                        // initialValues={formValues}
+                        initialValues={formValues}
                         scrollToFirstError
                         validateMessages={validateMessages}
                         requiredMark={false}
@@ -221,7 +232,7 @@ const Experience = () => {
                         </Row>
                     </Form>
                     <div className="list-button user">
-                        <Button onClick={() => setModifyStatus('')} className="back">Cancel</Button>
+                        <Button onClick={() => handleCloseForm()} className="back">Cancel</Button>
                         <Button form="experience_form" key="submit" htmlType="submit" className="next">Save</Button>
                     </div>
                 </div>
@@ -237,11 +248,12 @@ const Experience = () => {
                 return (
                     <div className="list-item">
                         {experiences && experiences.length > 0 && experiences.map((exp, index) => {
+                            const summary = (exp.summary!).replace(/\n/g, '<br>') || ''
                             return (
                                 <div className="experience-item" key={index}>
                                     <div className="experience-item-header">
                                         <div className="title">{exp.title}</div>
-                                        <div className="modify-experience">
+                                        {modify && <div className="modify-experience">
                                             <Popover
                                                 content={
                                                     <ul className="experience-popover">
@@ -252,7 +264,7 @@ const Experience = () => {
                                                 trigger="hover" placement='bottom'>
                                                 <EllipsisOutlined />
                                             </Popover>
-                                        </div>
+                                        </div>}
                                     </div>
                                     <div className="experience-item-content">
                                         <div className="company-name">{exp.company}</div>
@@ -260,8 +272,7 @@ const Experience = () => {
                                             <div className="from">{dayjs(exp.date_start).format("MMMM YYYY")} - </div>
                                             <div className="to">&nbsp;{!exp.date_end ? 'Present' : dayjs(exp.date_end).format("MMMM YYYY")}</div>
                                         </div>
-                                        <div className="working-experience-desc">
-                                            {exp.summary}
+                                        <div className="working-experience-desc"  dangerouslySetInnerHTML={{ __html: summary }}>                                            
                                         </div>
                                     </div>
                                 </div>
@@ -275,7 +286,7 @@ const Experience = () => {
 
     return (
         <>
-            <Card size="small" title="Experience" className="card-experience" extra={<Button onClick={() => handleAddExperience()}>Add Experience</Button>}>
+            <Card size="small" title="Experience" className={`card-experience ${(!modify && experiences.length === 0) && 'none'}`} extra={modify && <Button onClick={() => handleAddExperience()}>Add Experience</Button>}>
                 {renderCardContent()}
             </Card>
             <ModalConfirm

@@ -2,6 +2,14 @@ export const BASE_URL = 'http://localhost:1203/v1'
 export const BACKEND_URL = 'http://localhost:1203'
 export const HREF = 'http://localhost:3000/'
 export const apiUrl = {
+    app: {
+        currency:{
+            getAll: 'currency/get-all'
+        },
+        budgets: {
+            getAll: 'budgets/get-all'
+        }
+    },
     user: {
         signin: 'user/login',
         signout: 'user/logout',
@@ -19,7 +27,7 @@ export const apiUrl = {
     categories: {
         getAll: 'job-categories/get-all',
         getAllSubcategories: 'job-categories/subcate/get-all',
-        getAllSkillsets: 'job-categories/skillset-user/get-all',
+        getAllSkillsets: 'job-categories/skillset/get-all',
         getAllSkillsetForNewFreelance: 'job-categories/skillset-new-freelance/get-all',
         skillset: {
             getAll: 'job-categories/skillset/user/get-all',
@@ -47,5 +55,8 @@ export const apiUrl = {
     },
     country: {
         getAll: 'country/get'
+    },
+    post: {
+        create: 'posts/create'
     }
 }

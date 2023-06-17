@@ -10,6 +10,8 @@ const { ClientError } = require("../../errors");
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const { validateRole } = require("../../utils/validateRole");
 const QueryParameter = require("../../utils/QueryParameter");
+const { cloudinary } = require("../../utils/helper");
+const dayjs = require("dayjs");
 const Post = db.posts;
 const JobSubCategories = db.jobsubcategories;
 const Posts_skillsets = db.post_skillsets;
@@ -26,37 +28,43 @@ const PostService = {
     const {
       title,
       project_detail,
-      project_paid_unit,
       project_budget,
       avg_bid_unit,
-      bidding_time_start,
-      bidding_time_end,
       project_paid_type,
       list_skills,
+      post_type
     } = req.body;
     // const transaction = await sequelize.transaction();
     try {
       const checkRole = await validateRole.create(decoded, req.body.user_id, UserProfiles);
       await sequelize.transaction(async (t) => {
         if (checkRole === 1) {
+          // const files = await cloudinary.uploader.upload(
+          //   profile?.photos[0]?.value,
+          //   { folder: "avatar" }
+          // );
+
           const newPost = await Post.create(
             {
               title: title,
               project_detail: project_detail,
-              project_paid_unit: project_paid_unit,
-              project_budget: project_budget,
-              avg_bid_unit: avg_bid_unit,
-              bidding_time_start: bidding_time_start,
-              bidding_time_end: bidding_time_end,
+              project_budget: parseInt(project_budget),
+              // avg_bid_unit: avg_bid_unit,
+              bidding_time_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+              bidding_time_end: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
               project_paid_type: project_paid_type,
               post_status: "pending",
+              post_type: post_type,
               user_id: req.body.user_id ? req.body.user_id : decoded.id,
+              file: req.files.length > 0 ? req.files.map((file) => {
+                return file.path
+              }).join(', ') : null
             },
             { transaction: t }
           );
           if (newPost) {
             let promises = [];
-            for (let skill of list_skills) {
+            for (let skill of JSON.parse(list_skills)) {
               promises.push(
                 Posts_skillsets.create(
                   {

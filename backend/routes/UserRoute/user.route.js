@@ -4,7 +4,7 @@ const userController = require("../../controllers/UserController/user.controller
 const db = require("../../models");
 const authorize = require("../../middlewares/authorize");
 const userService = require("../../services/UserService/user.service");
-const { uploadImage } = require("../../utils/helper");
+const { uploadFiles } = require("../../utils/helper");
 const {io} = require("../../server")
 const jwt = require("jsonwebtoken");
 const store = require('store');
@@ -35,7 +35,7 @@ module.exports = function(socket, io) {
   router.post(
     "/update",
     authorize(["director", "admin", "user"]),
-    uploadImage().array('avatar', 2),
+    uploadFiles('avatar').array('avatar', 2),
     // userController.updateUser
      async (req, res) => {
       userController.updateUser(req, res)

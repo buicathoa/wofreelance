@@ -12,7 +12,9 @@ import axios from 'axios'
 import LayoutBottomGeneral from "../../components/LayoutBottom/LayoutBottomGeneral";
 import { BASE_URL } from "../../constants";
 import { getCookie } from "../../utils/helper";
-const Layout = () => {
+
+import './style.scss'
+const Dashboard = () => {
   const dispatch = useDispatch()
   const location = useLocation()
   const navigate = useNavigate()
@@ -22,9 +24,11 @@ const Layout = () => {
   return (
       <div>
         <LayoutBottomGeneral />
-        
+        <div className="dashboard-container">
+
+        </div>
       </div>
   );
 }
 
-export default Layout
+export default Dashboard

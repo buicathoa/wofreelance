@@ -3,7 +3,11 @@
 
 .nav-bar {
     font-family: 'Roboto';
-
+    &.top{
+        box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+        transition: transform .15s ease-in-out;
+        height: calc(56 / $fdf) * $rem;
+    }
     .nav-bar-top {
         max-width: calc(1200 / $fdf) * $rem;
         margin: 0 auto;
@@ -11,7 +15,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-
+        height: 100%;
         .nav-menu-left {
             display: flex;
             align-items: center;

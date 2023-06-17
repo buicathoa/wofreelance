@@ -5,6 +5,7 @@
     background-color: #f7f7f7;
     padding-bottom: calc(96 / $fdf) * $rem;
     font-family: $roboto;
+    min-height: calc(100vh - 28rem);
     .form-textarea{
         font-size: calc(16 / $fdf) * $rem;
     }
@@ -12,7 +13,7 @@
         // height: calc(64 / $fdf) * $rem;
         background-color: #ffffff;
         padding: 0 calc(8 / $fdf) * $rem;
-
+        box-shadow: 0 0 4px #3d4a5d14, 0 2px 4px #3d4a5d1f;
         &.display {
             z-index: 1000;
             position: fixed;

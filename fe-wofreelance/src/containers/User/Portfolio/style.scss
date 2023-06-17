@@ -1,0 +1,376 @@
+@import "../../../css/custom";
+@import "../../../css/variable";
+
+.portfolio-wrapper {
+    background-color: #F0F0F0;
+    font-family: $roboto;
+    min-height: calc(100vh - 28rem);
+
+    .portfolio-container {
+        padding: calc(30 / $fdf) * $rem 0 calc(220 / $fdf) * $rem;
+        width: calc(960 / $fdf) * $rem;
+        margin: 0 auto;
+
+        .portfolio-showing {
+            .portfolio-header {
+                padding: calc(30 / $fdf) * $rem 0;
+                border-bottom: 2px solid $bordercolor;
+                display: flex;
+                justify-content: space-between;
+                font-size: calc(16 / $fdf) * $rem;
+
+                .button-add {
+                    padding: calc(8 / $fdf) * $rem calc(18 / $fdf) * $rem;
+                    border-radius: 2px;
+                    color: #ffffff;
+                    font-weight: 500;
+                    background: #007fed;
+                    border: 1px solid #007fed;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #084377;
+                    }
+                }
+
+                .button-goback {
+                    padding: calc(8 / $fdf) * $rem calc(18 / $fdf) * $rem;
+                    border-radius: 2px;
+                    font-weight: 500;
+                    border: 1px solid #2e2d2d;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #8f8a8a;
+                    }
+                }
+            }
+
+            .portfolio-content {
+                padding: calc(30 / $fdf) * $rem 0;
+
+                .list-portfolio {
+                    display: flex;
+
+                    .portfolio-item {
+                        padding: calc(24 / $fdf) * $rem;
+                        width: calc(220 / $fdf) * $rem;
+                        height: calc(170 / $fdf) * $rem;
+                        border-radius: 2px;
+                        cursor: pointer;
+
+                        &:not(:first-child) {
+                            margin-left: calc(64 / $fdf) * $rem;
+                            margin-bottom: calc(40 / $fdf) * $rem;
+                        }
+
+                        &.add-new-portfolio {
+                            position: relative;
+                            background-color: #ffffff;
+                            border: 1px dashed #aaa;
+
+                            &:hover {
+                                border: 1px dashed #505050;
+
+                                span {
+                                    background-color: #3a3a3a;
+                                }
+                            }
+
+                            span {
+                                font-weight: 400;
+                                font-size: calc(14 / $fdf) * $rem;
+                                display: block;
+                                position: absolute;
+                                left: 50%;
+                                top: 50%;
+                                width: 80%;
+                                transform: translate(-50%, -50%);
+                                padding: calc(8 / $fdf) * $rem calc(18 / $fdf) * $rem;
+                                background-color: #888;
+                                border-radius: 2px;
+                                color: #ffffff;
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .portfolio-modify {
+            padding: calc(30 / $fdf) * $rem 0;
+
+            .portfolio-modify-header {
+                display: flex;
+                justify-content: space-between;
+
+                .title {
+                    font-size: calc(30 / $fdf) * $rem;
+                    color: $textcolor;
+                    font-weight: 700;
+                }
+
+                .portfolio-added {
+                    span {
+                        display: block;
+                        font-size: calc(24 / $fdf) * $rem;
+                        color: $textcolor;
+                        font-weight: 500;
+
+                        &:nth-child(2) {
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+
+            .portfolio-modify-form {
+                margin-top: calc(16 / $fdf) * $rem;
+                padding: calc(40 / $fdf) * $rem;
+                background-color: #ffffff;
+                border: 1px solid #DEDEDE;
+
+                .portfolio-modify-form-title {
+                    font-size: calc(18 / $fdf) * $rem;
+                    margin-bottom: calc(15 / $fdf) * $rem;
+                    font-weight: 700;
+                }
+
+                .ant-form {
+                    .title-summary{
+                        display: flex;
+                        span{
+                            &:nth-child(2){
+                                margin-left: calc(8 / $fdf) * $rem;
+                                width: calc(20 / $fdf) * $rem;
+                                height: calc(20 / $fdf) * $rem;
+                                border-radius: 50%;
+                                background-color: rgb(195, 190, 190);
+                                color: #777474;
+                                font-weight: 600;
+                                font-size: calc(14 / $fdf) * $rem;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            }
+                        }
+                    }
+                    .ant-radio-group {
+                        display: flex;
+                        margin-bottom: calc(24 / $fdf) * $rem;
+                        .wrap {
+                            label {
+                                span {
+                                    &:nth-child(2) {
+                                        font-size: calc(16 / $fdf) * $rem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .upload-file {
+                        padding: calc(30 / $fdf) * $rem 0;
+                        border-bottom: 4px dotted #E1E1E1;
+
+                        .title {
+                            padding: calc(10 / $fdf) * $rem calc(5 / $fdf) * $rem;
+                            font-size: calc(16 / $fdf) * $rem;
+                            color: $textcolor;
+                            font-weight: 700;
+
+                            span {
+                                color: #888;
+                                font-weight: 400;
+                            }
+                        }
+
+                        .files-selected{
+                            margin-top: calc(16 / $fdf) * $rem;
+                            display: flex;
+                            .file-item{
+                                width: calc(85 / $fdf) * $rem;
+                                padding-top: calc(24 / $fdf) * $rem;
+                                margin-right: calc(16 / $fdf) * $rem;
+                                position: relative;
+                                img{
+                                    width: calc(85 / $fdf) * $rem;
+                                    height: calc(85 / $fdf) * $rem;
+                                    object-fit: cover;
+                                    border-radius: 2px;
+                                    border: 1px solid #CCC;
+                                    margin-bottom: 4px;
+                                }
+                                .title{
+                                    font-size: calc(16 / $fdf) * $rem;
+                                    color: #2c2c2c;
+                                    font-weight: 400;
+                                }
+                                .delete{
+                                    position: absolute;
+                                    top: calc(12 / $fdf) * $rem;
+                                    right: 0;
+                                    display: block;
+                                    font-size: calc(12 / $fdf) * $rem;
+                                    width: calc(24 / $fdf) * $rem;
+                                    height: calc(24 / $fdf) * $rem;
+                                    text-align: center;
+                                    color: #ffffff;
+                                    background-color: #707070;
+                                    border-radius: 50%;
+                                    cursor: pointer;
+                                    &:hover{
+                                        background-color: #2c2c2c;
+                                    }
+                                }
+                            }
+                        }
+
+                        label {
+                            .attached-file {
+                                cursor: pointer;
+                                width: 100%;
+                                background: linear-gradient(to bottom, #fbfbfb 0, #ebebeb 51%, #e1e1e1 52%, #cecdcd 100%);
+                                padding: calc(5 / $fdf) * $rem;
+                                text-align: center;
+                                color: $textcolor;
+                                font-weight: 500;
+                                box-shadow: inset 0 1px 0 0 #FFF;
+                                border: #BBB 1px solid;
+                                border-radius: 2px;
+
+                                &:hover {
+                                    background: linear-gradient(to bottom, #fff 0, #f8f8f8 51%, #f3f3f3 52%, #ebebeb 100%);
+                                }
+                            }
+                        }
+
+                        input {
+                            display: none;
+                        }
+                    }
+
+                    .portfolio-skills {
+                        padding-top: calc(15 / $fdf) * $rem;
+                        margin-bottom: calc(30 / $fdf) * $rem;
+
+                        .title {
+                            color: $textcolor;
+                            font-weight: 700;
+                            font-size: calc(16 / $fdf) * $rem;
+                            margin-bottom: calc(10 / $fdf) * $rem;
+
+                            span {
+                                color: #888;
+                                font-weight: 400;
+
+                                &.quantity {
+                                    color: rgb(176, 100, 100);
+                                }
+                            }
+                        }
+
+                        .portfolio-skills-content {
+                            display: flex;
+
+                            .portfolio-skills-list {
+                                width: 30%;
+                                margin-right: calc(20 / $fdf) * $rem;
+
+                                .ant-card {
+                                    margin-top: 0;
+                                    border-radius: 2px !important;
+                                    border: 1px solid $bordercolor;
+
+                                    .ant-card-head {
+                                        padding: 0;
+
+                                        input {
+                                            font-size: calc(16 / $fdf) * $rem;
+                                            border: unset;
+                                        }
+                                    }
+
+                                    .ant-card-body {
+                                        position: relative;
+                                        .ant-spin{
+                                            position: absolute;
+                                            left: 50%;
+                                            top:50%;
+                                            transform: translate(-50%, -50%);
+                                        }
+                                        .skills-list {
+                                            .skill-item-container{
+                                                display: flex;
+                                                justify-content: space-between;
+                                                align-items: center;
+                                                &:hover {
+                                                    background-color: $hovercolor;
+                                                    cursor: pointer;
+                                                }
+                                                .skill-item {
+                                                    font-size: calc(16 / $fdf) * $rem;
+                                                    color: $textcolor;
+    
+                                                }
+                                                .anticon{
+                                                    color: green;
+                                                    font-size: calc(12 / $fdf) * $rem;
+                                                    &.anticon-plus{
+                                                        color: rgb(228, 49, 49);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            .portfolio-skills-selected {
+                                width: 70%;
+
+                                .skill-selected {
+                                    display: flex;
+                                    flex-wrap: wrap;
+
+                                    .ant-tag {
+                                        cursor: pointer;
+                                        background-color: #f50;
+
+                                        &.skill-selected-item {
+                                            border-color: #f50;
+                                        }
+
+                                        &:hover {
+                                            background-color: rgb(218, 131, 88) !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .portfolio-buttons {
+                    button {
+                        border-radius: 3px;
+                        background-color: $maincolor;
+                        font-weight: calc(18 / $fdf) * $rem;
+
+                        &:nth-child(1) {
+                            color: #ffffff;
+                            font-weight: 600;
+                            margin-right: calc(8 / $fdf) * $rem;
+                        }
+
+                        &:nth-child(2) {
+                            background-color: #ffffff;
+                            color: $maincolor
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

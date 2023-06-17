@@ -3,6 +3,9 @@
 
 .card-education{
     font-family: $roboto;
+    &.none{
+        display: none;
+    }
     .no-data{
         .card-text{
             font-style: italic;
@@ -47,12 +50,13 @@
         }
     }
     .list-item{
-        max-height: calc(400 / $fdf) * $rem;
-        overflow-y: auto;
         .education-item{
-            margin-bottom: calc(24 / $fdf) * $rem;
+            padding: calc(12 / $fdf) * $rem 0;
+            padding-right: calc(24 / $fdf) * $rem;
+            border-bottom: 1px solid $bordercolor;
             &:last-child{
-                margin-bottom: unset;
+                padding-bottom: 0;
+                border-bottom: unset !important;
             }
             .education-item-header{
                 display: flex;

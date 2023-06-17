@@ -38,7 +38,6 @@ const LinkAccounts = () => {
     }, [])
 
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
-    console.log('user', user)
     const handleLinkWithFacebook = (type: string) => {
         window.open(`http://localhost:1203/v1/user/auth/facebook/callback?user_id=${user.id}`, '_self')
     }
