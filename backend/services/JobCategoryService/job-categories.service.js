@@ -127,21 +127,21 @@ const JobCategoryService = {
   getAllSkillsetForUser: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     try {
-      const result = await UserProfile.findOne({
-        attributes: [],
-        where: {
-          id: req.body.user_id ?? decoded.id,
+      const result = await JobSkillset.findAll({
+        attributes: {
+          exclude: ['updatedAt', 'createdAt', 'category_id']
         },
         include: [
           {
-            model: JobSkillset,
-            as: 'list_skills',
-            through: {
-              attributes: []
-            }
-          },
+            model: UserProfile,
+            where: {
+              id: req.body.user_id ?? decoded.id,
+            },
+            as: 'user',
+            attributes: []
+          }
         ]
-      });
+      })
       return result;
     } catch (err) {
       throw err;

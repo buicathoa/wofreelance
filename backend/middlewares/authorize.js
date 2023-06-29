@@ -44,7 +44,7 @@ const authorize = (roles = []) => {
         return res.status(401).json({ message: "You are not authenticated." });
       }
     } catch (err) {
-      return res.status(401).json({ message: "You are not authenticated." });
+      throw err
     }
   };
 };

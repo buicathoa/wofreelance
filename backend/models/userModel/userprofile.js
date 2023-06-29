@@ -45,14 +45,11 @@ module.exports = (sequelize, DataTypes) => {
     linkedin: DataTypes.BOOLEAN,
     avatar: {
       type: DataTypes.STRING,
-      validate: {
-        isUrl: true
-      }
     },
     education: DataTypes.STRING,
     birthdate: DataTypes.DATE,
     title: DataTypes.STRING,
-    description: DataTypes.STRING,
+    description: DataTypes.STRING(5000),
     personal_website: {
       type: DataTypes.STRING,
       validate: {
@@ -124,7 +121,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     token: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING(1000)
+    },
+    noti_count: {
+      type: DataTypes.INTEGER
     }
   }, {
     sequelize,

@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         model: 'userprofiles',
         key: 'id'
       }
-    }
+    },
   }, {
     sequelize,
     modelName: 'user_skillset',

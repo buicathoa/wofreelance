@@ -27,13 +27,13 @@ const User_Languages = db.user_languages;
 const Experience = db.experiences;
 const Countries = db.countries;
 const UserLoggedIn = db.user_loggedin;
-
+const Notifications = db.notifications;
 const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
 const onConnection = require("../../wsHandler/socket.connection");
 const { io } = require("../../server");
-
+let SocketId_UserID = require("../../globalVariable");
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
@@ -80,8 +80,8 @@ const userService = {
     }
   },
 
-  loginUser: async (req, res) => {
-    const { email, password, account_type } = req;
+  loginUser: async (req, res, socket, io) => {
+    const { email, password, account_type } = req.body;
 
     try {
       //second solution
@@ -143,14 +143,16 @@ const userService = {
                 id: user.id,
               },
             }
-          )
+          );
+          SocketId_UserID.push({ user_id: user.id, socket_id: socket.id });
+          console.log('SocketId_UserID', SocketId_UserID)
           return {
             message: "Login success.",
             data: user,
             token: accesstoken,
           };
         } else {
-          const { status } = req;
+          const { status } = req.body;
           if (
             !bcrypt.compareSync(password, user.password) ||
             (!user.is_verified_account && status !== "sign_up")
@@ -180,7 +182,7 @@ const userService = {
                   id: user.id,
                 },
               }
-            )
+            );
             const {
               password,
               ip_address,
@@ -190,6 +192,8 @@ const userService = {
               ...others
             } = user.dataValues;
 
+            SocketId_UserID.push({ user_id: user.id, socket_id: socket.id });
+            console.log('SocketId_UserID', SocketId_UserID)
             return {
               message: "Login success.",
               data: others,
@@ -211,23 +215,26 @@ const userService = {
     try {
       await UserProfile.update(
         {
-          token: null
+          token: null,
         },
         {
           where: {
-            id: decoded.id
-          }
+            id: decoded.id,
+          },
         }
-      )
-      transaction.commit()
+      );
+      const array = SocketId_UserID.filter((a) => a.user_id !== decoded.id);
+      SocketId_UserID = array;
+      console.log('SocketId_UserID', SocketId_UserID)
+      transaction.commit();
       return true;
     } catch (err) {
-      transaction.rollback()
+      transaction.rollback();
       throw err;
     }
   },
 
-  getUserInfo: async (req, res, status = null) => {
+  getUserInfo: async (req, res, socket, io) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
@@ -342,7 +349,7 @@ const userService = {
     }
   },
 
-  getUserInfoDestination: async (req, res) => {
+  getUserInfoDestination: async (req, res, socket, io) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
@@ -534,20 +541,9 @@ const userService = {
           }
         }
         const { list_skills, languages, ...objUpdate } = req.body;
-        let upload_avt;
-        if (req.files.length === 1) {
-          upload_avt = { avatar_cropped: req.files[0].path };
-        } else {
-          if (req.files.length > 1) {
-            upload_avt = {
-              avatar_cropped: req.files[0].path,
-              avatar: req.files[1].path,
-            };
-          }
-        }
 
         await UserProfile.update(
-          { ...objUpdate, ...upload_avt },
+          { ...objUpdate },
           {
             where: {
               id: checkRole === 1 ? decoded.id : req.body.id,
@@ -683,31 +679,36 @@ const userService = {
                     expiresIn: "24h",
                   }
                 );
-                await UserLoggedIn.update(
-                  {
-                    user_id: userFound.id,
-                    socket_id: socket.id,
-                    status: "online",
-                  },
-                  {
-                    where: {
-                      user_id: userFound.id,
-                    },
-                  }
-                );
+
+                SocketId_UserID.push({
+                  user_id: userFound.id,
+                  socket_id: socket.id,
+                });
+                // await UserLoggedIn.update(
+                //   {
+                //     user_id: userFound.id,
+                //     socket_id: socket.id,
+                //     status: "online",
+                //   },
+                //   {
+                //     where: {
+                //       user_id: userFound.id,
+                //     },
+                //   }
+                // );
                 await res.cookie("access_token", accesstoken, {
                   maxAge: 900000,
                 });
                 await UserProfile.update(
                   {
-                    token: accesstoken
+                    token: accesstoken,
                   },
                   {
                     where: {
-                      id: userFound.id
-                    }
+                      id: userFound.id,
+                    },
                   }
-                )
+                );
                 return cb(userFound, true);
               } else {
                 const imageUrl = await cloudinary.uploader.upload(
@@ -1005,6 +1006,51 @@ const userService = {
           // current_time: timeResponse,
         };
       }
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getUserLoggedIn: async (req, res) => {
+    try {
+      const decoded = jwt_decode(req.headers.authorization);
+      const result = await UserProfile.findAll({
+        attributes: ["id", "email"],
+        // where: {
+        //   id: {
+        //     [Op.ne]: 46,
+        //   },
+        // },
+        include: [
+          {
+            model: UserLoggedIn,
+            as: "user_info",
+            where: {
+              status: "online",
+            },
+            attributes: ["socket_id"],
+          },
+          {
+            model: Notifications,
+            as: "notifications",
+            through: {
+              attributes: [],
+            },
+            where: {
+              noti_status: "not_received",
+            },
+          },
+          // {
+          //   attributes: ["id", "name"],
+          //   model: Skillset,
+          //   as: "list_skills",
+          //   through: {
+          //     attributes: [],
+          //   },
+          // },
+        ],
+      });
       return result;
     } catch (err) {
       throw err;

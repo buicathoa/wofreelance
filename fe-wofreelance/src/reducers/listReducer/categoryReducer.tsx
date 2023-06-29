@@ -24,11 +24,11 @@ const Category = createSlice({
 
         getAllSkillsetForUser: (state, actions) => {},
         getAllSkillsetForUserSuccess: (state, actions) => {
-            state.user_skills = actions.payload.list_skills
+            state.user_skills = actions.payload
         },
         createDeleteSkillsetForUser: (state, actions) => {},
         createDeleteSkillsetForUserSuccess: (state, actions) => {
-            state.user_skills = actions.payload.list_skills
+            state.user_skills = actions.payload
         }
     })
 })

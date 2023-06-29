@@ -21,7 +21,6 @@ const ProfileContent = ({user}:any) => {
 
     const handleSignout = () => {
         signout({}).then((res) => {
-            socket.emit('user_signout', user.id)
             localStorage.removeItem('access_token');
                 navigate('/signin')
         })

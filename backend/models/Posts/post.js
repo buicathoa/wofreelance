@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
+    post_url: {
+      type: DataTypes.STRING,
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {

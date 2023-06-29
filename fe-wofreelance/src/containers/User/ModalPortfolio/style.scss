@@ -1,0 +1,194 @@
+@import "../../../css/custom";
+
+.modal-portfolio-container {
+    width: calc(1100 / $fdf) * $rem !important;
+    font-family: $roboto;
+    min-height: calc(400 / $fdf) * $rem;
+
+    .ant-modal-content {
+        padding: 0 !important;
+
+        .ant-modal-footer {
+            display: none;
+        }
+
+        .modal-portfolio-content-container {
+            .ant-row {
+                .ant-col {
+                    &:nth-child(1) {
+                        padding: calc(24 / $fdf) * $rem calc(16 / $fdf) * $rem;
+                        border-right: 1px solid $bordercolor;
+                    }
+
+                    &:nth-child(2) {
+                        padding: calc(24 / $fdf) * $rem calc(16 / $fdf) * $rem;
+                    }
+
+                    .portfolio-title {
+                        font-size: calc(32 / $fdf) * $rem;
+                        font-weight: 700;
+                        color: #2c2c2c;
+                        margin-bottom: calc(24 / $fdf) * $rem;
+                    }
+
+                    .portfolio-context {
+                        font-size: calc(16 / $fdf) * $rem;
+                        color: #2c2c2c;
+                        font-weight: 400;
+                        margin-bottom: calc(24 / $fdf) * $rem;
+
+                        &.code {
+                            width: 100%;
+                            background-color: #232a35;
+                            min-height: calc(250 / $fdf) * $rem;
+                            padding: calc(16 / $fdf) * $rem;
+                            overflow: auto;
+                            color: #ffffff;
+                            font-weight: 600;
+                        }
+                    }
+
+                    .list-images {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+
+                        img {
+                            width: 100%;
+                            margin-bottom: calc(16 / $fdf) * $rem;
+                        }
+                    }
+
+                    .list-files{
+                        display: flex;
+                        flex-direction: column;
+                        .file-item{
+                            margin-bottom: calc(10 / $fdf) * $rem;
+                            display: flex;
+                            align-items: center;
+                            img{
+                                margin-right: calc(10 / $fdf) * $rem;
+                            }
+                            .file-content{
+                                color: #2c2c2c;
+                                font-size: calc(16 / $fdf) * $rem;
+                                font-weight: 600;
+                                cursor: pointer;
+                                &:hover{
+                                    font-weight: 800;
+                                }
+                            }
+                        }
+                    }
+
+                    .portfolio-modal-right-header {
+                        display: flex;
+                        .avatar {
+                            position: relative;
+                            width: fit-content;
+                            margin-right: calc(12 / $fdf) * $rem;
+                            img {
+                                width: calc(64 / $fdf) * $rem;
+                                height: calc(64 / $fdf) * $rem;
+                                border-radius: 5px;
+                                object-fit: cover;
+                            }
+                            span{
+                                display: block;
+                                width: calc(10 / $fdf) * $rem;
+                                height: calc(10 / $fdf) * $rem;
+                                background-color: greenyellow;
+                                border-radius: 50%;
+                                position: absolute;
+                                bottom: calc(2 / $fdf) * $rem;
+                                right:0
+                            }
+                        }
+                        .general-info{
+                            display: flex;
+                            .flag{
+                                margin-right: calc(8 / $fdf) * $rem;
+                            }
+                            .name{
+                                font-weight: 600;
+                                color: #2c2c2c;
+                                font-size: calc(16 / $fdf) * $rem;
+                            }
+                        }
+                    }
+
+                    .portfolio-modal-reviews{
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: calc(16 / $fdf) * $rem;
+                        .rating-budget-number{
+                            font-size: calc(16 / $fdf) * $rem;
+                            font-weight: 400;
+                            color: #2c2c2c;
+                            margin-left: calc(8 / $fdf) * $rem;
+                            display: block;
+                        }
+                    }
+                    .portfolio-modal-paid{
+                        color: #2c2c2c;
+                        font-weight: 700;
+                        font-size: calc(16 / $fdf) * $rem;
+                        line-height: 1.5;
+                        margin-bottom: calc(16 / $fdf) * $rem;
+                    }
+                    .portfolio-modal-description{
+                        margin-bottom: calc(16 / $fdf) * $rem;
+                        .title{
+                            color: #2c2c2c;
+                            font-weight: 700;
+                            font-size: calc(14 / $fdf) * $rem;
+                            line-height: 1.5;
+                            margin-bottom: calc(16 / $fdf) * $rem;
+                        }
+                        .desc {
+                            color: #2c2c2c;
+                            font-weight: 400;
+                            font-size: calc(14 / $fdf) * $rem;
+                            line-height: 1.5;
+                        }
+                    }
+                    .portfolio-modal-skills{
+                        .title{
+                            text-transform: uppercase;
+                            color: #2c2c2c;
+                            font-weight: 700;
+                            font-size: calc(14 / $fdf) * $rem;
+                            line-height: 1.5;
+                            margin-bottom: calc(16 / $fdf) * $rem;
+                        }
+                        .skills{
+                            .list-skills{
+                                display: flex;
+                                flex-wrap: wrap;
+                                .skill-item{
+                                    height: fit-content;
+                                    padding: calc(2 / $fdf) * $rem calc(12 / $fdf) * $rem;
+                                    font-size: calc(13 / $fdf) * $rem;
+                                    cursor: pointer;
+                                    line-height: 1.2;
+                                    color: #2c2c2c;
+                                    font-weight: 600;
+                                    border: 1px solid #5c6f8c;
+                                    border-radius: 2px;
+                                    margin-right: calc(12 / $fdf) * $rem;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    margin-bottom: calc(10 / $fdf) * $rem;
+                                    &:hover{
+                                        font-weight: 800;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

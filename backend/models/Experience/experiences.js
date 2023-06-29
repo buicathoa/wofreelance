@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     summary: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING(1000)
     }
   }, {
     sequelize,

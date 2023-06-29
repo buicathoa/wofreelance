@@ -57,6 +57,8 @@ db.universities = require("./Universities/universities")(sequelize,DataTypes)
 db.currencies = require("./Currency/currency")(sequelize,DataTypes)
 db.budgets = require("./Budgets/budgets")(sequelize, DataTypes)
 db.portfolio = require("./Portfolio/portfolio")(sequelize, DataTypes)
+db.notifications = require("./Notifications/notifications")(sequelize, DataTypes)
+
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 
@@ -78,6 +80,13 @@ db.user_experiences = require("./userModel/user_experiences")(sequelize, DataTyp
 
 // Junction table exp of user 
 db.user_educations = require("./userModel/user_education")(sequelize, DataTypes)
+
+
+// Junction table skillset and portfolio
+db.portfolio_skillset = require("./Portfolio/portfolio_skillset")(sequelize, DataTypes)
+
+// Junction table between notifications and user
+db.user_notifications = require("./Notifications/user_notifications")(sequelize, DataTypes)
 
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
@@ -109,6 +118,15 @@ db.userprofile.belongsTo(db.countries, {
 })
 
 
+
+db.userprofile.hasOne(db.user_loggedin, {
+  foreignKey: 'user_id',
+  as: 'user_info'
+})
+db.user_loggedin.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'user_info'
+})
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
 //Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
@@ -151,30 +169,6 @@ db.budgets.belongsTo(db.currencies, {
 })
 
 
-
-// db.portfolio.hasMany(db.jobskillset, {
-//   foreignKey: 'id',
-//   as: 'list_skills'
-// })
-// db.jobskillset.belongsTo(db.portfolio, {
-//   foreignKey: 'skillset_id'
-// })
-
-
-
-
-db.userprofile.hasMany(db.portfolio, {
-  foreignKey: 'user_id',
-  as: 'portfolios'
-})
-db.portfolio.belongsTo(db.userprofile, {
-  foreignKey: 'user_id'
-})
-
-
-
-
-
 // ========================================================================================== End ==========================================================================================//
 
 
@@ -210,13 +204,12 @@ db.jobskillset.belongsToMany(db.posts, {
 db.userprofile.belongsToMany(db.jobskillset, {
   through: db.user_skillset,
   foreignKey: 'user_id',
-  otherKey: 'skillset_id',
   as: 'list_skills'
 })
 db.jobskillset.belongsToMany(db.userprofile, {
   through: db.user_skillset,
   foreignKey: 'skillset_id',
-  otherKey: 'user_id',
+  as: 'user'
 })
 
 
@@ -250,6 +243,7 @@ db.experiences.belongsToMany(db.userprofile, {
 
 
 
+
 db.userprofile.belongsToMany(db.universities, {
   through: db.user_educations,
   foreignKey: 'user_id',
@@ -259,6 +253,39 @@ db.universities.belongsToMany(db.userprofile, {
   through: db.user_educations,
   foreignKey: 'education_id',
   as: 'user'
+})
+
+
+
+
+db.portfolio.belongsToMany(db.jobskillset, {
+  through: db.portfolio_skillset,
+  foreignKey: 'portfolio_id',
+  otherKey: 'skillset_id',
+  as: 'skills'
+})
+db.jobskillset.belongsToMany(db.portfolio, {
+  through: db.user_educations,
+  foreignKey: 'skillset_id',
+  otherKey: 'portfolio_id',
+  as: 'portfolios'
+})
+
+
+
+
+
+db.notifications.belongsToMany(db.userprofile, {
+  through: db.user_notifications,
+  foreignKey: 'notification_id',
+  otherKey: 'user_id',
+  as: 'user'
+})
+db.userprofile.belongsToMany(db.notifications, {
+  through: db.user_notifications,
+  foreignKey: 'user_id',
+  otherKey: 'notification_id',
+  as: 'notifications'
 })
 
 // ========================================================================================== End ==========================================================================================//

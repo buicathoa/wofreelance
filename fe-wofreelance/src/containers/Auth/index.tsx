@@ -61,12 +61,8 @@ const Auth = () => {
 
   const onSubmitForm = (values: any) => {
     dispatch(AppActions.openLoading(true))
-    signin(values).then((res: any) => {
+    signin({...values, status: 'sign_up'}).then((res: any) => {
       if (res.code === 200) {
-        socket.emit('user_signin', res.data.data.id);
-        // socket.on("user_info", (data) => {
-        //     dispatch(UserActions.updateUserSuccess(data))
-        // });
         localStorage.setItem('access_token', res.data.token)
         navigate('/')
       } else {

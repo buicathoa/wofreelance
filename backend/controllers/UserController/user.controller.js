@@ -23,9 +23,9 @@ const userController = {
     }
   },
 
-  loginUser: async (req, res) => {
+  loginUser: async (req, res, socket, io) => {
     try {
-      const result = await userService.loginUser(req.body, res);
+      const result = await userService.loginUser(req, res, socket, io);
       if (result === 1) {
         return res.status(400).json({ message: "Invalid email, password or account status" });
       } else if (result === 2) {
@@ -38,9 +38,9 @@ const userController = {
     }
   },
 
-  logoutUser : async (req, res) => {
+  logoutUser : async (req, res, socket, io) => {
     try {
-      const result = await userService.logoutUser(req, res);
+      const result = await userService.logoutUser(req, res, socket, io);
       return handleSuccess(res, result);
     } catch (err) {
       return handleError(res, err);
@@ -60,9 +60,9 @@ const userController = {
     }
   },
 
-  getUserInfoDestination: async (req, res) => {
+  getUserInfoDestination: async (req, res, socket, io) => {
     try {
-      const result = await userService.getUserInfoDestination(req, res);
+      const result = await userService.getUserInfoDestination(req, res, socket, io);
       if (result === 1) {
         return res.status(400).json({ message: "User not found." });
       } else {
@@ -192,19 +192,15 @@ const userController = {
     } catch (err) {
       return handleError(res, err);
     }
-    // try{
-    //   const ipAddress = await axios.get("https://api.ipify.org?format=json")
-    //   if(ipAddress) {
-    //     const user_info = await axios.get(
-    //       `https://api.ipdata.co/${ipAddress.ip}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
-    //     )
-    //     if(user_info && req.body.status === 'modify') {
-    //       console.log(user_info)
-    //     }
-    //   }
-    // } catch (err) {
-    //   throw err
-    // }
+  },
+
+  getUserLoggedIn: async (req, res) => {
+    try {
+      const result = await userService.getUserLoggedIn(req, res);
+      return handleSuccess(res, result, { message: "Action successfully." });
+    } catch (err) {
+      return handleError(res, err);
+    }
   }
 };
 

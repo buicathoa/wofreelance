@@ -14,12 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Portfolio.init({
-    user_id: DataTypes.INTEGER,
     description: DataTypes.STRING,
     file: DataTypes.STRING,
     summary: DataTypes.STRING,
-    skillset_id: DataTypes.INTEGER,
-    title: DataTypes.STRING
+    title: DataTypes.STRING,
+    portfolio_type: {
+      type: DataTypes.STRING,
+      validate: {
+        isIn: [['image', 'article', 'code', 'video', 'audio', 'others']]
+      }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'userprofiles',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Portfolio',

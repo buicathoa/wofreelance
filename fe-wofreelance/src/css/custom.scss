@@ -134,6 +134,7 @@ canvas {
     padding: calc(8 / $fdf) * $rem calc(12 / $fdf) * $rem;
     textarea{
       font-size: calc(14 / $fdf) * $rem !important;
+      padding: 0;
     }
   }
 

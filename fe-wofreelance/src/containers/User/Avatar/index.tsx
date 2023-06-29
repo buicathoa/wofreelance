@@ -6,13 +6,14 @@ import {
 import ReactCrop from 'react-image-crop'
 import { AvatarUserInterface, ResponseFormatItem, UserInterface } from '../../../interface'
 import { RootState } from '../../../reducers/rootReducer';
-import { openSuccess } from '../../../components/Notifications';
+import { openError, openSuccess } from '../../../components/Notifications';
 import { getBase64 } from '../../../utils/helper';
 import { UserActions } from '../../../reducers/listReducer/userReducer';
 import { Spin } from 'antd';
 
 import 'react-image-crop/dist/ReactCrop.css'
 import './style.scss'
+import { AppActions } from '../../../reducers/listReducer/appReducer';
 
 export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setFileUploaded }: AvatarUserInterface) => {
     const dispatch = useDispatch()
@@ -40,6 +41,12 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
     const updateUser = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(UserActions.updateUser({ param, resolve, reject }));
+        });
+    };
+
+    const uploadFiles = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(AppActions.uploadFiles({ param, resolve, reject }));
         });
     };
 
@@ -117,18 +124,25 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
 
     const handleSetProfilePicture = () => {
         const formData = new FormData()
-        formData.append('avatar', fileUploaded.blob, fileUploaded.url)
+        formData.append('cropped_avatar', fileUploaded.blob, fileUploaded.url)
+        formData.append('content_type', 'image')
+        formData.append("service_type", 'cropped_avatar')
         if (fileUploaded?.file_payload) {
+            formData.append("service_type", 'avatar')
             formData.append('avatar', fileUploaded.file_payload)
         }
         setIsLoading(true)
         isMountedRef.current = false
-        updateUser(formData).then((user) => {
-            openSuccess('Change avatar success.')
-            setIsLoading(false)
-            setIsOpenModifyAvt(false)
-            setCrop({ ...crop, isDefault: true })
-            isMountedRef.current = false
+        uploadFiles(formData).then((res) => {
+            updateUser({avatar_cropped: res.url![0], avatar: res.url![1]}).then(() => {
+                openSuccess('Change avatar success.')
+                setIsLoading(false)
+                setIsOpenModifyAvt(false)
+                setCrop({ ...crop, isDefault: true })
+                isMountedRef.current = false
+            })
+        }).catch((err) => {
+            openError(err.response.data.message)
         })
     }
 
@@ -147,7 +161,9 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
                 <div className="description">Max. of 10MB. Recommended size: 840px x 840px</div>
                 <div className={`react-crop ${isLoading ? 'loading' : 'crop'}`}>
                     <ReactCrop
-                        src={fileUploaded?.base64 ? fileUploaded?.base64 : user.avatar!}
+                        // src={fileUploaded?.base64 ? fileUploaded?.base64 : user.avatar!}
+                        src={fileUploaded.base64 ?? user.avatar!}
+
                         crop={crop}
                         onImageLoaded={onImageLoaded}
                         onComplete={onComplete}

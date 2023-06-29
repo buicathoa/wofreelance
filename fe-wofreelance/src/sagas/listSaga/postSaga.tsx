@@ -18,7 +18,7 @@ export function* PostSaga(): Generator {
     function* createPost(action: AnyAction): Generator {
         const { param, resolve, reject } = action.payload
         try {
-            const response = yield apiRequest(apiUrl.post.create, param, 'form')
+            const response = yield apiRequest(apiUrl.post.create, param, 'general')
             // yield put(AppActions.getCurrenciesSuccess((response as ResponseFormatItem).data))
             yield put(AppActions.openLoading(false))
             if (resolve) yield resolve(response)

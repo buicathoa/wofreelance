@@ -101,5 +101,30 @@ export const renderFileType = (fileType: string) => {
       return `https://cdn2.f-cdn.com/img/profile-portfolio-article.gif?v=051c69ab89c6ba83097ba9cd42721147&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
     case 'audio':
       return `https://cdn3.f-cdn.com/img/profile-portfolio-audio.gif?v=f5325ffbf3d30381a64b23afbd6afbc8&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
+    case 'code': 
+      return `https://cdn5.f-cdn.com/img/profile-portfolio-code.gif?v=7d191b1a610559904733d57294d756c2&amp;m=6&amp;buildVersion=8daf52a3ea5ccb1830cc08bb3755b66668a124d2`
+    case 'others':
+      return `https://cdn2.f-cdn.com/img/profile-portfolio-file.gif?v=e066efaa9edd5c74656d0da961798cda&amp;m=6&amp;buildVersion=8daf52a3ea5ccb1830cc08bb3755b66668a124d2`
   }
+}
+
+
+export const renderTypeOfContent = (path: string) => {
+  const listImg = ['jpeg', 'png', 'gif']
+  const listVideo = ['mp4', 'flv', 'avi', 'mov']
+  const listAudio = ['mp3']
+  const listDocs = ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'docx', 'txt', 'pdf']
+  let contentType
+  if(listImg.includes(path)) {
+    contentType = 'image'
+  } else if(listVideo.includes('path')){
+    contentType = 'video'
+  } else if(listAudio.includes(path)){
+    contentType = 'audio'
+  } else if(listDocs.includes(path)){
+    contentType = 'article'
+  } else {
+    contentType = 'not_allowed'
+  }
+  return contentType
 }

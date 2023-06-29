@@ -1,19 +1,29 @@
 @import "../../css/custom";
 
-
+.slick-arrow.slick-prev {
+    background-color: red;
+    color: red;
+  }
+  .slick-arrow.slick-next {
+    background-color: red;
+    color: red;
+  }
 .user-profile-wrapper {
     background-color: #f7f7f7;
     padding-bottom: calc(96 / $fdf) * $rem;
     font-family: $roboto;
     min-height: calc(100vh - 28rem);
-    .form-textarea{
+
+    .form-textarea {
         font-size: calc(16 / $fdf) * $rem;
     }
+
     .nav-user {
         // height: calc(64 / $fdf) * $rem;
         background-color: #ffffff;
         padding: 0 calc(8 / $fdf) * $rem;
         box-shadow: 0 0 4px #3d4a5d14, 0 2px 4px #3d4a5d1f;
+
         &.display {
             z-index: 1000;
             position: fixed;
@@ -45,8 +55,8 @@
                     .hourly_rate {
                         margin-top: calc(16 / $fdf) * $rem;
                         text-align: center !important;
-                        input{
-                        }
+
+                        input {}
                     }
 
                     .name-reviews {
@@ -121,6 +131,119 @@
                 height: calc(157 / $fdf) * $rem;
             }
         }
+
+        .ant-row {
+            &.portfolio-wrapper-user {
+                padding: calc(24 / $fdf) * $rem;
+
+                .ant-col-8 {
+                    height: calc(200 / $fdf) * $rem;
+                    margin-bottom: calc(24 / $fdf) * $rem;
+                    position: relative;
+                    // width: calc(100% / 3);
+                    padding: 0 calc(12 / $fdf) * $rem;
+                    cursor: pointer;
+                    .ant-carousel {
+                        width: 100%;
+                        height: 100%;
+
+                        .slick-slider {
+                            width: 100%;
+                            height: 100%;
+                            .slick-next, .slick-prev{
+                                background-color: #12151b99 !important;
+                                border: unset !important;
+                                color: #ffffff !important;
+                            }
+                            img {
+                                height: calc(200 / $fdf) * $rem;
+                                width: 100%;
+                                object-fit: cover;
+                            }
+
+                            .slick-dots {
+                                display: none !important;
+                            }
+                        }
+                    }
+
+                    .portfolio-item {
+                        width: 100%;
+                        height: 100%;
+                        overflow-x: hidden;
+
+                        .portfolio-item-image {
+                            width: 100%;
+                            height: 100%;
+
+                            img {
+                                border-radius: 10px;
+                                border-bottom-left-radius: 0;
+                                border-bottom-right-radius: 0;
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                cursor: pointer;
+
+                            }
+                        }
+
+                        .file-format {
+                            width: 100%;
+                            height: 100%;
+                            background-color: #3d4a5d;
+                            border-radius: 10px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            border-bottom-left-radius: 0;
+                            border-bottom-right-radius: 0;
+                            cursor: pointer;
+
+                            .anticon {
+                                background-color: #3d4a5d;
+                                color: #ffffff;
+                                font-weight: 600;
+                                font-size: calc(50 / $fdf) * $rem;
+                            }
+                        }
+                    }
+
+                    .portfolio-title {
+                        transform: translateY(-100%);
+                        opacity: 0;
+                    }
+
+                    &:hover {
+                        .portfolio-title {
+                            transform: translateY(0);
+                            opacity: 1;
+                            transition: transform opacity ease-out 0.3s;
+                            position: absolute;
+                            bottom: 0;
+                            left: calc(12 / $fdf) * $rem;
+                            right: calc(12 / $fdf) * $rem;
+                            background-color: #ffffff;
+                            color: #2c2c2c;
+                            padding: calc(8 / $fdf) * $rem;
+                            font-weight: 600;
+                            font-size: calc(16 / $fdf) * $rem;
+                            border: 1px solid #d5d0d0;
+                        }
+
+                        .portfolio-item {
+                            overflow: hidden;
+
+                            img {
+                                -webkit-transform: scale(1.2, 1.2);
+                                transform: scale(1.2, 1.2);
+                                transition: transform ease-out 0.3s;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     .background-image {
@@ -162,16 +285,20 @@
                         padding: calc(16 / $fdf) * $rem;
                         box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
                         margin-bottom: calc(24 / $fdf) * $rem;
-                        &.edit{
+
+                        &.edit {
                             height: calc(550 / $fdf) * $rem;
-                            .ant-row{
+
+                            .ant-row {
                                 height: 100%;
                             }
                         }
+
                         .ant-col-8 {
                             .hourly_rate {
                                 margin-top: calc(16 / $fdf) * $rem;
-                                input{
+
+                                input {
                                     text-align: left;
                                 }
                             }
@@ -181,6 +308,7 @@
 
                                 .avatar {
                                     position: relative;
+
                                     // width: calc(256 / $fdf) * $rem;
                                     // height: calc(256 / $fdf) * $rem;
                                     img {
@@ -195,14 +323,15 @@
                                         position: absolute;
                                         top: calc(10 / $fdf) * $rem;
                                         right: calc(10 / $fdf) * $rem;
-                                        
+
                                         &.anticon {
                                             padding: calc(4 / $fdf) * $rem calc(12 / $fdf) * $rem;
                                             background-color: #ffffff;
                                             border-radius: 2px;
                                             font-size: calc(20 / $fdf) * $rem;
                                             cursor: pointer;
-                                            &:hover{
+
+                                            &:hover {
                                                 background-color: $hovercolor;
                                             }
                                         }
@@ -235,11 +364,13 @@
                                         font-size: calc(24 / $fdf) * $rem;
                                         color: #b1b0b0;
                                         font-weight: 600;
-                                        &.country{
+
+                                        &.country {
                                             color: rgb(247, 71, 32);
-                                            
+
                                         }
-                                        &.money{
+
+                                        &.money {
                                             color: rgb(14, 237, 14);
                                         }
                                     }
@@ -258,11 +389,13 @@
                                             font-weight: 600;
                                             color: $textcolor;
                                         }
+
                                         &.country {
                                             color: rgb(247, 71, 32);
                                             font-weight: 600;
                                             font-size: calc(18 / $fdf) * $rem;
-                                            img{
+
+                                            img {
                                                 width: calc(32 / $fdf) * $rem;
                                                 height: calc(22 / $fdf) * $rem;
                                                 margin-right: calc(8 / $fdf) * $rem;

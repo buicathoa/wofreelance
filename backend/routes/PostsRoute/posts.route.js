@@ -4,10 +4,9 @@ const db = require("../../models");
 const postsController = require("../../controllers/PostsController/posts.controller");
 const authorize = require('../../middlewares/authorize');
 const checkSecretKey = require('../../middlewares/checkSecretKey');
-const { uploadFiles } = require('../../utils/helper');
 
 
-router.post("/create", authorize(['director', 'admin', 'user']), uploadFiles('files').array('files'), 
+router.post("/create", authorize(['director', 'admin', 'user']), 
         postsController.createPosts
 )
 router.post("/get-all", postsController.getAllPosts)

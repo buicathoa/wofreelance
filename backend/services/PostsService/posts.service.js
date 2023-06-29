@@ -34,61 +34,71 @@ const PostService = {
       list_skills,
       post_type
     } = req.body;
-    // const transaction = await sequelize.transaction();
+    let transaction = await sequelize.transaction();
     try {
       const checkRole = await validateRole.create(decoded, req.body.user_id, UserProfiles);
-      await sequelize.transaction(async (t) => {
-        if (checkRole === 1) {
-          // const files = await cloudinary.uploader.upload(
-          //   profile?.photos[0]?.value,
-          //   { folder: "avatar" }
-          // );
+      let newPost
+      if (checkRole === 1) {
+        // const files = await cloudinary.uploader.upload(
+        //   profile?.photos[0]?.value,
+        //   { folder: "avatar" }
+        // );
 
-          const newPost = await Post.create(
-            {
-              title: title,
-              project_detail: project_detail,
-              project_budget: parseInt(project_budget),
-              // avg_bid_unit: avg_bid_unit,
-              bidding_time_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-              bidding_time_end: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
-              project_paid_type: project_paid_type,
-              post_status: "pending",
-              post_type: post_type,
-              user_id: req.body.user_id ? req.body.user_id : decoded.id,
-              file: req.files.length > 0 ? req.files.map((file) => {
-                return file.path
-              }).join(', ') : null
-            },
-            { transaction: t }
-          );
-          if (newPost) {
-            let promises = [];
-            for (let skill of JSON.parse(list_skills)) {
-              promises.push(
-                Posts_skillsets.create(
-                  {
-                    skillset_id: skill,
-                    post_id: newPost.id,
-                  },
-                  { transaction: t }
-                )
-              );
+        newPost = await Post.create(
+          {
+            title: title,
+            project_detail: project_detail,
+            project_budget: parseInt(project_budget),
+            // avg_bid_unit: avg_bid_unit,
+            bidding_time_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            bidding_time_end: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+            project_paid_type: project_paid_type,
+            post_status: "success",
+            post_type: post_type,
+            user_id: req.body.user_id ? req.body.user_id : decoded.id,
+            file: req.body.files.length > 0 ? req.body.files.map((file) => {
+              return file
+            }).join(', ') : null,
+          },
+        );
+        await Post.update(
+          {
+            post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`
+          },
+          {
+            where: {
+              id: newPost?.id
             }
-            await Promise.all(promises).then((res) => {
-              if (res) {
-                return true;
-              }
-            });
           }
-        } else if(checkRole === 0){
-          throw new ClientError("You're not allowed to do this action.", 403)
-        } else if(checkRole === 2){
-          throw new ClientError("Bad request.")
+        )
+        if (newPost) {
+          let promises = [];
+          for (let skill of list_skills) {
+            promises.push(
+              Posts_skillsets.create(
+                {
+                  skillset_id: skill,
+                  post_id: newPost.id,
+                },
+              )
+            );
+          }
+          await Promise.all(promises).then((res) => {
+            if (res) {
+              return true;
+            }
+          });
         }
-      });
+      } else if(checkRole === 0){
+        throw new ClientError("You're not allowed to do this action.", 403)
+      } else if(checkRole === 2){
+        throw new ClientError("Bad request.")
+      }
+      await transaction.commit()
+      return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
       // return result
     } catch (err) {
+      await transaction.rollback()
       throw err;
     }
   },

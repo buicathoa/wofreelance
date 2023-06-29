@@ -17,9 +17,9 @@ const countryRoute = require("./routes/CountryRoute/country.route");
 const qualificationRoute = require("./routes/Qualifications/qualifications.route")
 const currencyRoute = require("./routes/CurrencyRoute/currency.route")
 const budgetRoute = require("./routes/BudgetsRoute/budget.route")
-
+const portfolioRoute = require("./routes/PortfolioRoute/portfolio.route")
+const generalRoute = require("./routes/GeneralRoute/general.route")
 const puppeteer = require("puppeteer");
-
 // const JunctionRoute = require("./routes/JunctionRoute/junction.route");
 const { sequelize } = require("./models");
 const userService = require("./services/UserService/user.service");
@@ -33,6 +33,9 @@ const Countries = db.countries;
 const Universities = db.universities;
 const UserProfile = db.userprofile;
 const jwt_decode = require("jwt-decode");
+const multer = require('multer');
+const notificationSocket = require("./wsHandler/notificationSocket");
+const upload = multer();
 // const verifiedEmailSuccess = require("./services/UserService/user.service");
 // const returnDataSocket = require("./wsHandler/returnDataSocket");
 // import userRoute from "./routes/userRoute"
@@ -55,7 +58,6 @@ dbConnection.connect((err) => {
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
-
 // app.use(session({
 //   secret: 'your_secret_here',
 //   resave: false,
@@ -103,6 +105,7 @@ const onConnection = (socket) => {
   //   socket.emit(USER_INFO, {user: user})
   // })
   userSocket(socket, io);
+  notificationSocket(socket, io)
   app.get("/v1/user/email-verified", (req, res) => {
     userController.emailVerified(req, res, socket, io);
   });
@@ -117,9 +120,7 @@ io.on("connection", (socket) => {
 app.use(bodyParser.json({ limit: "50mb" })); // for parsing application/json
 app.use(
   bodyParser.urlencoded({
-    limit: "50mb",
     extended: true,
-    parameterLimit: 50000,
   })
 );
 app.use(express.static(__dirname + "/public"));
@@ -132,7 +133,8 @@ app.use("/v1/country", countryRoute);
 app.use("/v1/qualification", qualificationRoute);
 app.use("/v1/currency", currencyRoute)
 app.use("/v1/budgets", budgetRoute)
-
+app.use("/v1/portfolio", portfolioRoute)
+app.use("/v1", generalRoute)
 //crawl data for universities
 // function delay(time) {
 //   return new Promise(function (resolve) {

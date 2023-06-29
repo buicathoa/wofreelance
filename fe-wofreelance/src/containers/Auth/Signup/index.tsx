@@ -13,7 +13,6 @@ import { openError, openWarning } from '../../../components/Notifications';
 import { SocketContext } from '../../../SocketContext';
 import { deleteCookie, getCookie } from '../../../utils/helper';
 const Signup = () => {
-    const { id } = useParams()
     const socket = useContext(SocketContext)
     let location = useLocation()
     let navigate = useNavigate()
@@ -101,7 +100,7 @@ const Signup = () => {
         const payloadApi = loginType === 'facebook' ? {...payload, account_type: 'facebook', ...userFbInfo} : {...payload}
         registerAccount(payloadApi).then((res) => {
             if (res.data) {
-                socket.emit('user_register', res.data?.id)
+                // socket.emit('user_register', res.data?.id)
                 const payloadSignin = loginType === 'facebook' ?  {email: payloadApi.email, account_type: loginType } : { email: formValues.email, password: formValues.password, status: 'sign_up' }
                 signin(payloadSignin).then((response:any) => {
                     if (response.code === 200) {

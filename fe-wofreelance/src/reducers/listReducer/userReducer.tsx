@@ -32,7 +32,7 @@ const User = createSlice({
         },
         updateUser: (state, actions) => { },
         updateUserSuccess: (state, actions) => {
-            state.user = actions.payload
+            state.user_info = actions.payload
         },
         getAllLanguages: (state, actions) => { },
         getAllLanguagesSuccess: (state, actions) => {

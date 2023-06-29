@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { freelancer_logo } from '../../../assets'
 import './style.scss'
 import { Alert, AutoComplete, Button, Col, DatePicker, Form, Input, Row, Select } from 'antd'
-import { removeAccentsToLower, renderFileIcon } from '../../../utils/helper'
+import { removeAccentsToLower, renderFileIcon, renderTypeOfContent } from '../../../utils/helper'
 import { DefaultOptionType } from 'antd/es/select'
 
 import { GoldTwoTone, IdcardTwoTone, UploadOutlined, ClockCircleTwoTone, DollarTwoTone, SmileTwoTone } from '@ant-design/icons'
 import { AlertBanner } from '../../../components/AlertBanner'
 import { useDispatch } from 'react-redux'
 import { AppActions } from '../../../reducers/listReducer/appReducer'
-import { BudgetInterface, CurrencyInterface, ResponseFormatList } from '../../../interface'
+import { BudgetInterface, CurrencyInterface, ResponseFormatItem, ResponseFormatList } from '../../../interface'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../reducers/rootReducer'
 import { CategoryActions } from '../../../reducers/listReducer/categoryReducer'
 import { PostActions } from '../../../reducers/listReducer/postReducer'
+import { openError } from '../../../components/Notifications'
+import { SocketContext } from '../../../SocketContext'
 export const Post = () => {
+    const socket = useContext(SocketContext)
+
     const dispatch = useDispatch()
     const [form] = Form.useForm()
 
@@ -22,17 +26,14 @@ export const Post = () => {
 
     const [formValues, setformValues] = useState<any>({})
     const [listSkills, setlistSkills] = useState<Array<DefaultOptionType>>([])
-    const [listPrice, setListPrice] = useState({ name: 'Standard', from: 15, to: 25 })
-    const [budgetOption, setBudgetOption] = useState([])
 
     const [paidTypeSelected, setPaidTypeSelected] = useState('')
     const [currencySelected, setCurrencySelected] = useState(1)
     const [budgetSelected, setBudgetSelected] = useState<any>()
     const [postPurposeSelected, setPostPurposeSelected] = useState('')
-    const [projectTypeSelected, setProjectTypeSelected] = useState('')
     const [listSkillSelected, setListSkillsSelected] = useState([])
     const [isComplete, setIsComplete] = useState(false)
-    const [listFilesSelected, setListFilesSelected] = useState([])
+    const [listFilesSelected, setListFilesSelected] = useState<Array<string>>([])
 
     const postPurpose = [
         { icon: <IdcardTwoTone />, title: 'Post a project', description: 'Receive free quotes, best for when you have a specific idea, the project is not visual in nature or the project is complex.', is_recommend: true, value: 'project' },
@@ -42,11 +43,6 @@ export const Post = () => {
     const paidTypes = [
         { icon: <ClockCircleTwoTone />, title: 'Pay by the hour', description: 'Hire based on an hourly rate and pay for hours billed. Best for ongoing work.', value: 'hourly' },
         { icon: <DollarTwoTone />, title: 'Pay fixed price', description: 'Agree on a price and release payment when the job is done. Best for one-off tasks.', value: 'fixed' }
-    ]
-
-    const projectType = [
-        { icon: <IdcardTwoTone />, title: 'Standard project', description: 'Free to post, your project will go live instantly and start receiving bids within seconds.', is_recommend: true, value: 'standard' },
-        { icon: <SmileTwoTone />, title: 'Recruiter project', description: "You'll get connected to one of our expert staff right away to help find the perfect freelancer.", is_recommend: false, value: 'recruiter' }
     ]
 
     const currencies: Array<CurrencyInterface> = useSelector((state: RootState) => state.app.currencies)
@@ -70,41 +66,40 @@ export const Post = () => {
         });
     };
 
-    const createPost = (param: any): Promise<ResponseFormatList> => {
+    const createPost = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(PostActions.createPost({ param, resolve, reject }));
         });
     };
 
+    const uploadFiles = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(AppActions.uploadFiles({ param, resolve, reject }));
+        });
+    };
+
+    useEffect(() => {
+        getCurrencies({})
+    }, [])
+
     const onSubmitForm = (values: any) => {
-        const formData = new FormData()
         switch (step) {
             case 1:
                 setStep(2)
                 break;
-            case 2:                
+            case 2:
                 setStep(3)
                 break;
             case 5:
-                Object.keys(values).forEach((key) => {
-                    formData.append(key, values[key])
+                const payload = {...values, post_type: postPurposeSelected, project_paid_type: paidTypeSelected, project_budget: budgetSelected, list_skills: listSkillSelected.length > 0 ? listSkillSelected.map((skill: any) => {
+                    return skill.value
+                }) : [], files: listFilesSelected}
+                createPost(payload).then((res) => {
+                    // debugger
+                    const data = {skills: listSkillSelected, user_id: res.data!?.user_id, post_id: res.data!.id, noti_type: 'post',
+                     noti_title: res?.data?.title, noti_content: res?.data?.project_detail, noti_url: `posts/${(res?.data?.title).toLowerCase().replaceAll(' ', '-')}-${res?.data?.id}`}
+                    socket.emit('new_post_notify', data)
                 })
-                formData.append('post_type', postPurposeSelected)
-                formData.append('project_paid_type', paidTypeSelected)
-                formData.append('project_budget', budgetSelected)
-                if (listFilesSelected.length > 0) {
-                    listFilesSelected.forEach(element => {
-                        formData.append('files', element)
-                    });
-                }
-                if (listSkillSelected.length > 0) {
-                    const skills = listSkillSelected.map((skill: any) => {
-                        return skill.value
-                    })
-                    formData.append('list_skills', JSON.stringify(skills))
-                }
-                // debugger
-                createPost(formData)
                 break;
         }
     }
@@ -130,10 +125,26 @@ export const Post = () => {
             }
         ]
     }
-
+    
     const onSubmitFile = (e: any) => {
-        let files: any = [...listFilesSelected, e.target.files[0]]
-        setListFilesSelected(files)
+        
+        const file = e.target.files[0]
+        const listFile: Array<string> = [...listFilesSelected]
+        const formData = new FormData()
+        formData.append('files', e.target.files[0])
+        const contentType: string = renderTypeOfContent(file.type.split('/')[1])
+        if(contentType === 'not_allowed') {
+            openError(`Type of ${file.type} is not allowed`)
+            return false
+        }
+        formData.append("content_type", contentType)
+        formData.append("service_type", 'files')
+        uploadFiles(formData).then((res) => {
+            listFile.push(res.url![0])
+            setListFilesSelected(listFile)
+        }).catch(err => {
+            openError(err.response.data.message)
+        })
     }
 
     const handleSearch = (text: string) => {
@@ -200,7 +211,7 @@ export const Post = () => {
     }
 
     const handleRemoveFile = (file: any) => {
-        const files = listFilesSelected.filter((a: File) => file.name !== a.name)
+        const files = listFilesSelected.filter((a: string) => file !== a)
         setListFilesSelected(files)
     }
 
@@ -289,10 +300,9 @@ export const Post = () => {
                                         return (
                                             <div className="file-item" key={index}>
                                                 <div className="file-item-left">
-                                                    <img src={renderFileIcon(file.name.split('.').at(-1))} />
-                                                    <span className="file-name">{file.name}</span>
+                                                    <img src={renderFileIcon(file.split('.').at(-1))} />
+                                                    <span className="file-name">{file.split('/').at(-1)}</span>
                                                 </div>
-                                                <div className="file-item-mid">{(file.size / 1024).toFixed(2)} KB</div>
                                                 <div className="file-item-right" onClick={() => handleRemoveFile(file)}>X</div>
                                             </div>
                                         )

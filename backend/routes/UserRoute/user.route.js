@@ -4,7 +4,6 @@ const userController = require("../../controllers/UserController/user.controller
 const db = require("../../models");
 const authorize = require("../../middlewares/authorize");
 const userService = require("../../services/UserService/user.service");
-const { uploadFiles } = require("../../utils/helper");
 const {io} = require("../../server")
 const jwt = require("jsonwebtoken");
 const store = require('store');
@@ -14,8 +13,12 @@ const { Socket } = require("socket.io");
 const UserLoggedIn = db.user_loggedin
 module.exports = function(socket, io) {
   router.post("/register", userController.registerAccount);
-  router.post("/login", userController.loginUser);
-  router.post("/logout", userController.logoutUser);
+  router.post("/login", (req, res) => {
+    userController.loginUser(req, res, socket, io)
+  });
+  router.post("/logout", (req, res) => {
+    userController.logoutUser(req, res, socket, io)
+  });
 
   router.post(
     "/get-info",
@@ -24,8 +27,10 @@ module.exports = function(socket, io) {
   );
   router.post(
     "/destination/get-info",
-    // authorize(["director", "admin", "user"]),
-    userController.getUserInfoDestination
+    authorize(["director", "admin", "user"]),
+    (req, res) => {
+      userController.getUserInfoDestination(req, res, socket, io)
+    }
   );
   router.post(
     "/get-all",
@@ -35,7 +40,6 @@ module.exports = function(socket, io) {
   router.post(
     "/update",
     authorize(["director", "admin", "user"]),
-    uploadFiles('avatar').array('avatar', 2),
     // userController.updateUser
      async (req, res) => {
       userController.updateUser(req, res)
@@ -97,6 +101,9 @@ module.exports = function(socket, io) {
   
   
   router.get("/email-verification", userController.verificationEmail);
+
+  router.post("/user-loggedin", userController.getUserLoggedIn);
+
 
   return router
 }

@@ -138,7 +138,7 @@ function* getUserInfoDestination(action: AnyAction): Generator {
 function* updateUser(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
-        const response = yield apiRequest(apiUrl.user.updateUser, param, 'form')
+        const response = yield apiRequest(apiUrl.user.updateUser, param, 'general')
         if (response) {
             yield put(UserActions.updateUserSuccess((response as ResponseFormatItem).data))
         }

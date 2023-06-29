@@ -18,7 +18,8 @@ const App = createSlice({
         getBudgets: (state, actions) => {},
         getBudgetsSuccess: (state, actions) => {
             state.budgets = actions.payload
-        }
+        },
+        uploadFiles: (state, acctions) => {}
         // addToCart: (state, actions) => {}
     })
 })

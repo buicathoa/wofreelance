@@ -1,17 +1,12 @@
 import { AlertProps } from 'antd';
 import dayjs from 'dayjs';
 export interface ResponseFormatItem {
-    message?: string,
-    data?: {
-        data?: any,
-        token?: any,
-        avatar?: string,
-        list_skills?: Array<SkillsetInterface>,
-        id?: number
-    },
+    message: string | undefined,
+    data?: any,
     code?: number,
     token?: string,
-    status?: number
+    status?: number,
+    url?: Array<any>
 }
 
 
@@ -28,6 +23,36 @@ export interface SkillsetInterface {
     job_matching_count?: number,
     createdAt?: Date,
     updatedAt?: Date
+}
+
+
+export interface ResponsePostInterface {
+    id: number,
+    title: string,
+    project_detail: string,
+    project_budget: number,
+    bidding_time_start: Date,
+    bidding_time_end: Date,
+    project_paid_type: string,
+    post_status?: string,
+    file?: string,
+    post_type: string,
+    user_id: number,
+    createdAt: Date,
+    updatedAt: Date,
+    list_skills: Array<SkillsetInterface>
+}
+
+export interface PortfolioInterface {
+    id: number,
+    description: string,
+    file?: string,
+    summary?: string,
+    title: string,
+    createdAt: Date,
+    updatedAt: Date,
+    skills: Array<SkillsetInterface>,
+    portfolio_type: string
 }
 
 export interface CategoryInterface {
@@ -69,6 +94,12 @@ export interface ModalConfirmInterface {
     visible?: boolean,
     setVisible: React.Dispatch<React.SetStateAction<boolean>>,
     onConfirm: any
+}
+
+export interface ModalPortfolioInterface {
+    visible: boolean,
+    setVisible: React.Dispatch<React.SetStateAction<boolean>>,
+    portfolioItem: PortfolioInterface
 }
 
 export interface LinkAccountsComponentInterface {
@@ -169,6 +200,18 @@ export interface ExperiencesInterface {
     updatedAt?: Date
 }
 
+export interface PortfolioInterface {
+    id: number,
+    user_id: number,
+    description: string,
+    file?: string,
+    summary?: string,
+    skillset_id: number,
+    createdAt: Date,
+    updatedAt: Date,
+    title: string
+}
+
 export interface EducationInterface {
     id?: number,
     university_name?: string,
@@ -262,6 +305,10 @@ export interface categoryReducerInterface {
 
 export interface experienceReducerInterface {
     experiences: Array<ExperiencesInterface> 
+}
+
+export interface portfolioReducerInterface {
+    portfolios: Array<PortfolioInterface> 
 }
 
 export interface qualificationReducerInterface {

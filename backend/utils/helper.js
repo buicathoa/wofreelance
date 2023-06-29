@@ -1,34 +1,16 @@
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { ClientError } = require("../errors");
-const path = require('path');
+const path = require("path");
 // const { Province, District, Ward } = require("./models/LocationModel");
 // const { Province, District, Ward } = require("./models/location");
 const cloudinary = require("cloudinary").v2;
-require('dotenv').config();
+require("dotenv").config();
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const uploadFiles = (folder) => {
-    const storage = new CloudinaryStorage({
-      cloudinary,
-      allowedFormats: ["jpg", "png", "pdf", "docx", "mp3", "mp4", "gif", "flv", "avi", "xlsx"],
-      filename: function (req, file, cb) {
-        cb(null, file.originalname);
-      },
-      params: {
-        folder: folder
-      }
-    });
-    return multer({
-      storage: storage,
-      limits: {
-        fileSize: 4 * 1024 * 1024,
-      },
-    });
-};
 
 const removeVietnameseTones = (str) => {
   str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -87,8 +69,8 @@ const checkRole = (currentRole, destRole) => {
 };
 
 const returnApiGetTimeAndLocation = (ip) => {
-  return `https://api.ipdata.co/${ip}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
-}
+  return `https://api.ipdata.co/${ip}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`;
+};
 
 const emailTemplate = (mailTo, user_id, image) => {
   return `<div className="wrapper" style="padding: 20px; background-color: #f7f7f7; border-radius: 5px;">
@@ -101,8 +83,8 @@ const emailTemplate = (mailTo, user_id, image) => {
       <a href="${process.env.URL_HOST}/v1/user/email-verified?id=${user_id}" style="background-color: #0ab2a8; color: white; padding: 10px; border-radius: 10px; text-decoration: none;">Verify your email</a>
       <h3>Regards,</h3><span>The World of Freelance Team.</span>
   </div>
-</div>`
-}
+</div>`;
+};
 
 // const genLocation = async (address_detail, province_id, district_id, ward_id) => {
 //   let provinceName;
@@ -128,11 +110,10 @@ const emailTemplate = (mailTo, user_id, image) => {
 // }
 
 module.exports = {
-  uploadFiles,
   removeVietnameseTones,
   findWithMultipleQuery,
   checkRole,
   emailTemplate,
   returnApiGetTimeAndLocation,
-  cloudinary
+  cloudinary,
 };

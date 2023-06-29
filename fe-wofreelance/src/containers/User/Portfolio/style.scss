@@ -51,46 +51,147 @@
 
                 .list-portfolio {
                     display: flex;
+                    position: relative;
+                    flex-wrap: wrap;
 
-                    .portfolio-item {
-                        padding: calc(24 / $fdf) * $rem;
-                        width: calc(220 / $fdf) * $rem;
-                        height: calc(170 / $fdf) * $rem;
-                        border-radius: 2px;
-                        cursor: pointer;
-
-                        &:not(:first-child) {
-                            margin-left: calc(64 / $fdf) * $rem;
-                            margin-bottom: calc(40 / $fdf) * $rem;
-                        }
-
-                        &.add-new-portfolio {
+                    .ant-row {
+                        .ant-col-6 {
+                            padding: calc(16 / $fdf) * $rem;
+                            padding-top: calc(24 / $fdf) * $rem;
+                            width: calc(350 / $fdf) * $rem;
+                            height: calc(250 / $fdf) * $rem;
                             position: relative;
-                            background-color: #ffffff;
-                            border: 1px dashed #aaa;
-
-                            &:hover {
-                                border: 1px dashed #505050;
+                            margin-bottom: calc(16 / $fdf) * $rem;
+                            .portfolio-modify {
+                                position: absolute;
+                                top: calc(-12 / $fdf) * $rem;
+                                right: calc(16 / $fdf) * $rem;
 
                                 span {
-                                    background-color: #3a3a3a;
+                                    color: #2c2c2c;
+                                    font-size: calc(16 / $fdf) * $rem;
+                                    font-weight: 400;
+                                    cursor: pointer;
+                                    &:hover {
+                                        font-weight: 600;
+                                    }
                                 }
                             }
+                            .portfolio-item {
+                                background-color: #ffffff;
+                                border: 1px solid #aaa;
+                                position: relative;
+                                cursor: pointer;
+                                width: 100%;
+                                height: 100%;
+                                // &:not(:first-child) {
+                                //     margin-left: calc(64 / $fdf) * $rem;
+                                //     margin-bottom: calc(40 / $fdf) * $rem;
+                                // }
 
-                            span {
-                                font-weight: 400;
-                                font-size: calc(14 / $fdf) * $rem;
-                                display: block;
-                                position: absolute;
-                                left: 50%;
-                                top: 50%;
-                                width: 80%;
-                                transform: translate(-50%, -50%);
-                                padding: calc(8 / $fdf) * $rem calc(18 / $fdf) * $rem;
-                                background-color: #888;
-                                border-radius: 2px;
-                                color: #ffffff;
-                                text-align: center;
+                                &.add-new-portfolio {
+                                    background-color: #ffffff;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    position: relative;
+                                    border: 1px dashed #aaa;
+
+                                    span {
+                                        font-weight: 400;
+                                        font-size: calc(14 / $fdf) * $rem;
+                                        display: block;
+                                        position: absolute;
+                                        left: 50%;
+                                        top: 50%;
+                                        width: 80%;
+                                        transform: translate(-50%, -50%);
+                                        padding: calc(8 / $fdf) * $rem calc(18 / $fdf) * $rem;
+                                        background-color: #888;
+                                        border-radius: 2px;
+                                        color: #ffffff;
+                                        text-align: center;
+                                    }
+
+                                    &:hover {
+                                        span {
+                                            background-color: #4b4949;
+                                        }
+                                    }
+                                }
+
+                                .portfolio-item-header {
+                                    width: 100%;
+                                    height: 100%;
+
+                                    img {
+                                        width: 100%;
+                                        object-fit: cover;
+                                        height: 100%;
+                                    }
+                                }
+
+                                .portfolio-item-title {
+                                    position: absolute;
+                                    bottom: 0;
+                                    width: 100%;
+                                    height: 25%;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    border-top: 1px solid #aaa;
+                                    background-color: #ffffff;
+
+                                    span {
+                                        font-weight: 600;
+                                        color: #2c2c2c;
+                                        padding: calc(8 / $fdf) * $rem;
+                                        width: 100%;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                    }
+                                }
+
+                                .portfolio-overlay {
+                                    display: none;
+                                }
+
+                                &:hover {
+                                    .portfolio-overlay {
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        right: 0;
+                                        bottom: 0;
+                                        display: block;
+                                        z-index: 99;
+                                        background-color: #ffffff;
+                                        padding: calc(16 / $fdf) * $rem;
+
+                                        .overlay-title {
+                                            white-space: nowrap;
+                                            width: 100%;
+                                            overflow: hidden;
+                                            text-overflow: ellipsis;
+                                            font-weight: 600;
+                                            font-size: calc(14 / $fdf) * $rem;
+                                            color: #2c2c2c;
+                                            margin-bottom: calc(16 / $fdf) * $rem;
+                                        }
+
+                                        .overlay-description {
+                                            font-weight: 400;
+                                            font-size: calc(14 / $fdf) * $rem;
+                                            color: #2c2c2c;
+                                            display: -webkit-box;
+                                            max-width: 100%;
+                                            -webkit-line-clamp: 4;
+                                            -webkit-box-orient: vertical;
+                                            overflow: hidden;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -99,8 +200,6 @@
         }
 
         .portfolio-modify {
-            padding: calc(30 / $fdf) * $rem 0;
-
             .portfolio-modify-header {
                 display: flex;
                 justify-content: space-between;
@@ -138,10 +237,11 @@
                 }
 
                 .ant-form {
-                    .title-summary{
+                    .title-summary {
                         display: flex;
-                        span{
-                            &:nth-child(2){
+
+                        span {
+                            &:nth-child(2) {
                                 margin-left: calc(8 / $fdf) * $rem;
                                 width: calc(20 / $fdf) * $rem;
                                 height: calc(20 / $fdf) * $rem;
@@ -156,9 +256,11 @@
                             }
                         }
                     }
+
                     .ant-radio-group {
                         display: flex;
                         margin-bottom: calc(24 / $fdf) * $rem;
+
                         .wrap {
                             label {
                                 span {
@@ -186,15 +288,17 @@
                             }
                         }
 
-                        .files-selected{
+                        .files-selected {
                             margin-top: calc(16 / $fdf) * $rem;
                             display: flex;
-                            .file-item{
+
+                            .file-item {
                                 width: calc(85 / $fdf) * $rem;
                                 padding-top: calc(24 / $fdf) * $rem;
                                 margin-right: calc(16 / $fdf) * $rem;
                                 position: relative;
-                                img{
+
+                                img {
                                     width: calc(85 / $fdf) * $rem;
                                     height: calc(85 / $fdf) * $rem;
                                     object-fit: cover;
@@ -202,12 +306,16 @@
                                     border: 1px solid #CCC;
                                     margin-bottom: 4px;
                                 }
-                                .title{
-                                    font-size: calc(16 / $fdf) * $rem;
+
+                                .title {
+                                    font-size: calc(12 / $fdf) * $rem;
                                     color: #2c2c2c;
                                     font-weight: 400;
+                                    text-align: left;
+                                    display: block;
                                 }
-                                .delete{
+
+                                .delete {
                                     position: absolute;
                                     top: calc(12 / $fdf) * $rem;
                                     right: 0;
@@ -220,7 +328,8 @@
                                     background-color: #707070;
                                     border-radius: 50%;
                                     cursor: pointer;
-                                    &:hover{
+
+                                    &:hover {
                                         background-color: #2c2c2c;
                                     }
                                 }
@@ -294,30 +403,36 @@
 
                                     .ant-card-body {
                                         position: relative;
-                                        .ant-spin{
+
+                                        .ant-spin {
                                             position: absolute;
                                             left: 50%;
-                                            top:50%;
+                                            top: 50%;
                                             transform: translate(-50%, -50%);
                                         }
+
                                         .skills-list {
-                                            .skill-item-container{
+                                            .skill-item-container {
                                                 display: flex;
                                                 justify-content: space-between;
                                                 align-items: center;
+
                                                 &:hover {
                                                     background-color: $hovercolor;
                                                     cursor: pointer;
                                                 }
+
                                                 .skill-item {
                                                     font-size: calc(16 / $fdf) * $rem;
                                                     color: $textcolor;
-    
+
                                                 }
-                                                .anticon{
+
+                                                .anticon {
                                                     color: green;
                                                     font-size: calc(12 / $fdf) * $rem;
-                                                    &.anticon-plus{
+
+                                                    &.anticon-plus {
                                                         color: rgb(228, 49, 49);
                                                     }
                                                 }

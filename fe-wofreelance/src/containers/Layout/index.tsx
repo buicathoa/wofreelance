@@ -3,7 +3,7 @@ import { freelancer_logo } from '../../assets'
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, TeamOutlined } from '@ant-design/icons'
 import { Badge, Button, Popover } from "antd";
 import './style.scss'
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { ResponseFormatItem, UserInterface } from "../../interface";
 import { UserActions } from "../../reducers/listReducer/userReducer";
@@ -21,12 +21,15 @@ import { CategoryActions } from "../../reducers/listReducer/categoryReducer";
 import { EducationActions } from "../../reducers/listReducer/educationReducer";
 import { QualifycationActions } from "../../reducers/listReducer/qualificationReducer";
 import Footer from "../Footer";
+import { PortfolioActions } from "../../reducers/listReducer/portfolioReducer";
+import { SocketContext } from "../../SocketContext";
 
 
 const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+  const socket = useContext(SocketContext)
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(UserActions.getUserInfo({ param, resolve, reject }));
@@ -56,9 +59,16 @@ const Layout = () => {
       dispatch(EducationActions.getAllEducationUser({ param, resolve, reject }));
     });
   };
+
   const getAllQualification = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(QualifycationActions.getAllQualification({ param, resolve, reject }));
+    });
+  };
+
+  const getPortfolios = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(PortfolioActions.getPortfolios({ param, resolve, reject }));
     });
   };
 
@@ -86,7 +96,8 @@ const Layout = () => {
                 getAllExperience({ user_id: res?.data?.id }),
                 getAllSkillsetForUser({ user_id: res?.data?.id }),
                 getAllEducationUser({ user_id: res?.data?.id }),
-                getAllQualification({ user_id: res?.data?.id })
+                getAllQualification({ user_id: res?.data?.id }),
+                getPortfolios({ user_id: res?.data?.id })
               ])
               dispatch(UserActions.getUserInforDestinationSuccess(res.data))
             } else {
@@ -95,7 +106,8 @@ const Layout = () => {
                   getAllExperience({ user_id: res?.data?.id }),
                   getAllSkillsetForUser({ user_id: res?.data?.id }),
                   getAllEducationUser({ user_id: res?.data?.id }),
-                  getAllQualification({ user_id: res?.data?.id })
+                  getAllQualification({ user_id: res?.data?.id }),
+                  getPortfolios({ user_id: res?.data?.id })
                 ])
               })
             }
@@ -109,6 +121,21 @@ const Layout = () => {
       }
     }
   }, [location])
+
+  useEffect(() => {
+    socket.on("new_post_notify_response", (data) => {
+      if(data) {
+        debugger
+      }
+    });
+    return () => {
+      socket.off('new_post_notify_response');
+    };
+  },[])
+
+  const handlePostProject = () => {
+    navigate('/post-project')
+  }
 
 
   return (
@@ -156,7 +183,7 @@ const Layout = () => {
               </Popover>
             </div>
             <div className="post-profile">
-              <Button>Post a Project</Button>
+              <Button onClick={handlePostProject}>Post a Project</Button>
               <Popover content={<ProfileContent user={user} />} trigger="hover" placement="bottom">
                 <div className="user-profile">
                   <img src={user?.avatar} alt="" />

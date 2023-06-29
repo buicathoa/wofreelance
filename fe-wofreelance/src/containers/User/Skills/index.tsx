@@ -49,7 +49,7 @@ const Skills = ({isOpen, setIsOpen}: SkillComponentInterface) => {
             getUserInfo({}).then(res => {
                 if (res.data) {
                     setSkillsetSelected(res?.data?.list_skills)
-                    const sum: any = res?.data?.list_skills?.reduce((accumulator, currentValue: SkillsetInterface) => {
+                    const sum: any = res?.data?.list_skills?.reduce((accumulator:any, currentValue: SkillsetInterface) => {
                         return accumulator + currentValue.job_matching_count!
                     }, 0)
                     setMatchJobs(sum)

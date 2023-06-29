@@ -1,42 +1,40 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from 'react'
-import './style.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { ExperiencesInterface, ResponseFormatItem, SkillsetInterface, UserInterface } from '../../../interface';
-import { UserActions } from '../../../reducers/listReducer/userReducer';
-import { RootState } from '../../../reducers/rootReducer';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import LayoutBottomProfile from '../../../components/LayoutBottom/LayoutBottomProfile';
-import { Button, Card, Col, Rate, Row, Form, Input, DatePicker, Checkbox, Popover, Radio, Tag, Tooltip, Spin } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, Col, Row, Form, Input, Radio, Tag, Tooltip } from 'antd';
 import {
-    CheckOutlined, PlusOutlined, LoadingOutlined
+    CheckOutlined, PlusOutlined
 } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import { delete_icon } from '../../../assets';
-import dayjs from 'dayjs';
+
+import { PortfolioInterface, ResponseFormatItem, SkillsetInterface, UserInterface } from '../../../interface';
+
+import { RootState } from '../../../reducers/rootReducer';
+import { AppActions } from '../../../reducers/listReducer/appReducer';
 
 import { ModalConfirm } from '../../../components/ModalConfirm';
-import { AppActions } from '../../../reducers/listReducer/appReducer';
-import { ExperienceActions } from '../../../reducers/listReducer/experienceReducer';
-import { CategoryActions } from '../../../reducers/listReducer/categoryReducer';
-import { openWarning } from '../../../components/Notifications';
-import { getBase64, renderFileType } from '../../../utils/helper';
+import { openError, openSuccess } from '../../../components/Notifications';
+import { renderFileType } from '../../../utils/helper';
+import { validImg } from '../../../constants';
 
-interface componentInterface {
-    modify: boolean
-}
+import './style.scss'
+import { PortfolioActions } from '../../../reducers/listReducer/portfolioReducer';
 
 const Portfolio = () => {
+
     const [form] = Form.useForm()
     const { TextArea } = Input;
+    const navigate = useNavigate()
     const [modifyPortfolio, setModifyPortfolio] = useState('')
-    const [formValues, setformValues] = useState({})
+    const [formValues, setformValues] = useState<PortfolioInterface | { id?: number }>({})
     const [contentTypeSelected, setContentTypeSelected] = useState('image')
     const [skillsSelected, setSkillsSelected] = useState<Array<SkillsetInterface>>([])
     const [listFilesSelected, setListFilesSelected] = useState<any>([])
+    const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
+    const [recordSelectedId, setrecordSelectedId] = useState<number>()
 
     const dispatch = useDispatch()
 
-    const { id } = useParams()
 
     const validateMessages = {
         required: 'This field is required'
@@ -48,17 +46,7 @@ const Portfolio = () => {
                 required: true
             }
         ],
-        company: [
-            {
-                required: true
-            }
-        ],
-        date_start: [
-            {
-                required: true
-            }
-        ],
-        date_end: [
+        description: [
             {
                 required: true
             }
@@ -67,40 +55,58 @@ const Portfolio = () => {
             {
                 required: true
             }
-        ]
+        ],
     }
+
+    useEffect(() => {
+        if (modifyPortfolio === '') {
+            getPortfolios({})
+        } else {
+            if (modifyPortfolio === 'edit') {
+                //goi api get portfolio item
+            } else {
+                setListFilesSelected([])
+                setformValues({})
+                setSkillsSelected([])
+            }
+        }
+    }, [modifyPortfolio])
 
     useEffect(() => {
         form.resetFields()
     }, [formValues])
 
-    const experiences: Array<ExperiencesInterface> = useSelector((state: RootState) => state.experience.experiences)
-    const user: UserInterface = useSelector((state: RootState) => state.user.user)
-    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
+    const portfolios: Array<PortfolioInterface> = useSelector((state: RootState) => state.portfolio.portfolios)
     const user_skills: Array<SkillsetInterface> = useSelector((state: RootState) => state.category.user_skills)
+    const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
-
-    const getAllSkillsetForUser = (param: any): Promise<ResponseFormatItem> => {
+    const uploadFiles = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(CategoryActions.getAllSkillsetForUser({ param, resolve, reject }));
+            dispatch(AppActions.uploadFiles({ param, resolve, reject }));
         });
     };
 
-    const deleteExperience = (param: any): Promise<ResponseFormatItem> => {
+    const deletePortfolio = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(ExperienceActions.deleteExperience({ param, resolve, reject }));
+            dispatch(PortfolioActions.deletePortfolio({ param, resolve, reject }));
         });
     };
 
-    const updateExperience = (param: any): Promise<ResponseFormatItem> => {
+    const getPortfolios = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(ExperienceActions.updateExperience({ param, resolve, reject }));
+            dispatch(PortfolioActions.getPortfolios({ param, resolve, reject }));
         });
     };
 
-    const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
+    const createPortfolio = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(UserActions.getUserInfo({ param, resolve, reject }));
+            dispatch(PortfolioActions.createPortfolio({ param, resolve, reject }));
+        });
+    };
+
+    const updatePortfolio = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(PortfolioActions.updatePortfolio({ param, resolve, reject }));
         });
     };
 
@@ -108,82 +114,58 @@ const Portfolio = () => {
         setModifyPortfolio('add')
     }
 
+    console.log('haha', listFilesSelected)
 
-    const handleCancel = () => { }
+
+    const handleCancel = () => {
+        setModifyPortfolio('')
+        getPortfolios({})
+    }
 
     const onSubmitForm = (values: any) => {
-        const formData = new FormData()
-        Object.keys(values).map((key) => {
-            formData.append(key, values[key])
-        })
-        if (listFilesSelected.length > 0) {
-            listFilesSelected.forEach((element:any) => {
-                formData.append('portfolios', element)
-            });
+        const payload = {
+            ...values, portfolio_type: contentTypeSelected, files: listFilesSelected, list_skills: skillsSelected.length > 0 ? skillsSelected.map((skill) => {
+                return skill.id
+            }) : []
         }
-        if (skillsSelected.length > 0) {
-            skillsSelected.forEach((skill:any) => {
-                formData.append('skillset_id', skill.id)
-            });
-        }
-        if(modifyPortfolio === 'add'){
-            //handle add => goi api
+        dispatch(AppActions.openLoading(true))
+        if (modifyPortfolio === 'add') {
+            createPortfolio(payload).then(res => {
+                openSuccess(res.message)
+                openSuccess('Create Port')
+                setModifyPortfolio('')
+                getPortfolios({})
+                setformValues({})
+            })
         } else {
-            //handle edit, truyen them id => goi api
+            updatePortfolio({ ...payload, id: formValues.id }).then((res) => {
+                openSuccess(res.message)
+                setModifyPortfolio('')
+                getPortfolios({})
+                setformValues({})
+            })
         }
-        
-        
+
+
     }
 
     const onSubmitFile = async (e: any) => {
+        const formData = new FormData()
         let file = e.target.files[0]
-        const fileType = (file.type).split('/')[1]
-        const fileSize = (file.size) / 1048576
-        const listFiles = [...listFilesSelected]
-        if (contentTypeSelected === 'image') {
-            if (fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') {
-                if (fileSize > 10) {
-                    openWarning('Your file is too large')
-                } else {
-                    const base64Ing: any = await getBase64(file)
-                    listFiles.push(Object.assign({ file }, { content_type: contentTypeSelected, preview: base64Ing }))
-                    setListFilesSelected(listFiles)
-                }
-            } else {
-                openWarning("This format is not allowed")
-            }
-        } else if (contentTypeSelected === "article" || contentTypeSelected === "others" || contentTypeSelected === "code") {
-            if (fileSize > 20) {
-                openWarning('Your file is too large')
-            } else {
-                const base64Ing: any = await getBase64(file)
-                listFiles.push(Object.assign({ file }, { content_type: contentTypeSelected, preview: (fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') ? base64Ing : null }))
-                setListFilesSelected(listFiles)
-            }
-        } else if (contentTypeSelected === "video") {
-            if (fileType === 'mp4' || fileType === 'flv' || fileType === 'avi' || fileType === 'mov') {
-                if (fileSize > 50) {
-                    openWarning('Your file is too large')
-                } else {
-                    listFiles.push(Object.assign({ file }, { content_type: contentTypeSelected, preview: null }))
-                    setListFilesSelected(listFiles)
-                }
-            } else {
-                openWarning("This format is not allowed")
-            }
-        } else if (contentTypeSelected === "audio") {
-            if (fileType === 'mp3') {
-                if (fileSize > 20) {
-                    openWarning('Your file is too large')
-                } else {
-                    listFiles.push(Object.assign({ file }, { content_type: contentTypeSelected, preview: null }))
-                    setListFilesSelected(listFiles)
-                }
-            } else {
-                openWarning("This format is not allowed")
-            }
+        // debugger
+        if (listFilesSelected.length === 3) {
+            openError("You are allowed to upload maximum three files at one Portfolio")
         } else {
-            openWarning('This format is not allowed')
+            const listFiles = [...listFilesSelected]
+            formData.append("content_type", contentTypeSelected)
+            formData.append("service_type", 'portfolios')
+            formData.append("portfolios", file)
+            uploadFiles(formData).then((res) => {
+                listFiles.push(res.url![0])
+                setListFilesSelected(listFiles)
+            }).catch((err) => {
+                openError(err.response.data.message)
+            })
         }
     }
 
@@ -233,28 +215,91 @@ const Portfolio = () => {
         setListFilesSelected(listFiles)
     }
 
+    const handleEditPortfolio = (port: PortfolioInterface) => {
+        const portfolioItem: any = portfolios.length > 0 && portfolios.find((portf) => portf.id === port.id)
+        setformValues(portfolioItem)
+        let listFileSelected = []
+        if (portfolioItem.file !== '' || portfolioItem.file !== null) {
+            listFileSelected = portfolioItem.file.split(',')
+        }
+        setSkillsSelected(portfolioItem.skills)
+        setListFilesSelected(listFileSelected)
+        setModifyPortfolio('edit')
+        setContentTypeSelected(port.portfolio_type)
+    }
+
+    const handleDeletePortfolio = (port: PortfolioInterface) => {
+        setrecordSelectedId(port.id)
+        setIsOpenModalConfirm(true)
+    }
+
+    const onConfirm = () => {
+        deletePortfolio({ id: recordSelectedId }).then((res) => {
+            setIsOpenModalConfirm(false)
+            getPortfolios({})
+            openSuccess(res.message)
+        })
+    }
+
+    const handleBackToProfile = () => {
+        const url = new URL(window.location.href);
+        url.search = '';
+        window.location.href = url.toString();
+    }
+
     return (
         <div className="portfolio-wrapper">
             <div className="portfolio-container">
                 {modifyPortfolio === '' ? <div className="portfolio-showing">
-                    <div className="portfolio-header">
-                        <div className="button-add">+ Add Portfolio Item</div>
-                        <div className="button-goback">Go back to Profile page</div>
-                    </div>
-                    <div className="portfolio-content">
-                        <div className="list-portfolio">
-                            <div className="portfolio-item add-new-portfolio" onClick={handleAddPortfolio}>
-                                <span>+ Add Portfolio Item</span>
+                    <div className="portfolio-item">
+                        <div className="portfolio-header">
+                            <div className="button-add">+ Add Portfolio Item</div>
+                            <div className="button-goback" onClick={handleBackToProfile}>Go back to Profile page</div>
+                        </div>
+                        <div className="portfolio-content">
+                            <div className="list-portfolio">
+                                <Row>
+                                    {portfolios.length > 0 && portfolios.map((port, idx) => {
+                                        const fileEndpoint: any = port.file !== '' ? port.file?.split(',')[0].split('.').at(-1) : null
+                                        const checkImg = fileEndpoint !== null ? validImg.includes(fileEndpoint) : false
+                                        const file = port.file?.split(',')[0]
+                                        return (
+                                            <Col span={6}>
+                                                <div className="portfolio-item" key={idx}>
+                                                    <div className="portfolio-item-header">
+                                                        <img src={checkImg ? file : renderFileType(port.portfolio_type)} />
+                                                    </div>
+                                                    <div className="portfolio-item-title">
+                                                        <span>{port.title}</span>
+                                                    </div>
+                                                    <div className="portfolio-overlay">
+                                                        <div className="overlay-title">{port.title}</div>
+                                                        <div className="overlay-description">{port.description}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="portfolio-modify">
+                                                    <span onClick={() => handleEditPortfolio(port)}>Edit |</span>
+                                                    <span onClick={() => handleDeletePortfolio(port)}> Delete</span>
+                                                </div>
+                                            </Col>
+                                        )
+                                    })}
+                                    <Col span={6}>
+                                        <div className="portfolio-item add-new-portfolio" onClick={handleAddPortfolio}>
+                                            <span>+ Add Portfolio Item</span>
+                                        </div>
+                                    </Col>
+                                </Row>
                             </div>
                         </div>
                     </div>
                 </div> :
                     <div className="portfolio-modify">
                         <div className="portfolio-modify-header">
-                            <span className="title">Portfolio Item Upload</span>
+                            <span className="title">{modifyPortfolio === 'edit' ? 'Update Portfolio' : 'Create Portfolio'}</span>
                             <div className="portfolio-added">
                                 <span>Added</span>
-                                <span>3</span>
+                                <span>{portfolios.length}</span>
                             </div>
                         </div>
                         <div className="portfolio-modify-form">
@@ -269,7 +314,7 @@ const Portfolio = () => {
                                 onFinish={onSubmitForm}
                                 initialValues={formValues}
                                 scrollToFirstError
-                                // validateMessages={validateMessages}
+                                validateMessages={validateMessages}
                                 requiredMark={false}
                             >
                                 <Radio.Group
@@ -308,10 +353,10 @@ const Portfolio = () => {
                                         </Radio>
                                     </div>
                                 </Radio.Group>
-                                <Form.Item name="title" label="Title" className="custom-form-item">
+                                <Form.Item name="title" label="Title" className="custom-form-item" rules={validateSchema.title}>
                                     <Input placeholder='password' className='form-input' showCount maxLength={60} />
                                 </Form.Item>
-                                <Form.Item name="description" label="Description" className="custom-form-item">
+                                <Form.Item name="description" label="Description" className="custom-form-item" rules={validateSchema.description}>
                                     <TextArea
                                         className="form-input text-area"
                                         autoSize={{ minRows: 3, maxRows: 10 }}
@@ -321,7 +366,7 @@ const Portfolio = () => {
                                         showCount
                                     />
                                 </Form.Item>
-                                {(contentTypeSelected === 'article' || contentTypeSelected === 'code') && <Form.Item name="summary" label={<div className="title-summary"><span>{contentTypeSelected === 'article' ? 'Text Preview' : 'Code Sample'}</span><span className="tooltip"><Tooltip placement='right' title={`Demonstrate your writing ${contentTypeSelected === 'code' ? 'coding skill' : 'skill'} by including a short passage from your article, such as the introduction.`}>?</Tooltip></span></div>} className="custom-form-item">
+                                {(contentTypeSelected === 'article' || contentTypeSelected === 'code') && <Form.Item rules={validateSchema.summary} name="summary" label={<div className="title-summary"><span>{contentTypeSelected === 'article' ? 'Text Preview' : 'Code Sample'}</span><span className="tooltip"><Tooltip placement='right' title={`Demonstrate your writing ${contentTypeSelected === 'code' ? 'coding skill' : 'skill'} by including a short passage from your article, such as the introduction.`}>?</Tooltip></span></div>} className="custom-form-item">
                                     <TextArea
                                         className="form-input text-area"
                                         autoSize={{ minRows: 3, maxRows: 10 }}
@@ -351,10 +396,11 @@ const Portfolio = () => {
                                     />
                                     <div className="files-selected">
                                         {listFilesSelected && listFilesSelected.length > 0 && listFilesSelected.map((file: any, index: number) => {
+                                            const isImg = validImg.includes(file.split('.').at(-1))
                                             return (
                                                 <div className="file-item" key={index} onClick={() => handleRemoveFile(file)}>
-                                                    <img src={contentTypeSelected === 'image' || file.preview !== null ? file.preview : renderFileType(contentTypeSelected)} />
-                                                    <span className="title">{file.name}</span>
+                                                    <img src={isImg ? file : renderFileType(contentTypeSelected)} />
+                                                    <span className="title">{file.split('/').at(-1)}</span>
                                                     <span className="delete">x</span>
                                                 </div>
                                             )
@@ -404,6 +450,12 @@ const Portfolio = () => {
                     </div>
                 }
             </div>
+            <ModalConfirm
+                title={'Confirm'}
+                visible={isOpenModalConfirm}
+                setVisible={setIsOpenModalConfirm}
+                onConfirm={onConfirm}
+            />
         </div>
     )
 }

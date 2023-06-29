@@ -1,6 +1,12 @@
 export const BASE_URL = 'http://localhost:1203/v1'
 export const BACKEND_URL = 'http://localhost:1203'
 export const HREF = 'http://localhost:3000/'
+
+// content_type: image,...
+// service_type: tên folder cloudinary
+
+export const validImg = ['png', 'jpg', 'jpeg', 'bmp', 'tiff']
+
 export const apiUrl = {
     app: {
         currency:{
@@ -8,6 +14,9 @@ export const apiUrl = {
         },
         budgets: {
             getAll: 'budgets/get-all'
+        },
+        files: {
+            upload: 'files/upload'
         }
     },
     user: {
@@ -58,5 +67,11 @@ export const apiUrl = {
     },
     post: {
         create: 'posts/create'
+    },
+    portfolio: {
+        create: 'portfolio/create',
+        getAll: 'portfolio/get-all',
+        update: 'portfolio/update',
+        delete: 'portfolio/delete'
     }
 }

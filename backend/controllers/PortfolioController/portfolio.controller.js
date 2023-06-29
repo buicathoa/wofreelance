@@ -16,7 +16,34 @@ const portfolioController = {
     } catch (err) {
       return handleError(res, err);
     }
-  }
+  },
+
+  getPortfolios: async ( req, res) => {
+    try {
+      const portfolios = await PortfolioService.getPortfolios(req, res);
+      return handleSuccess(res, portfolios, "Get portfolios successfully.")
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  deletePortfolios: async ( req, res) => {
+    try {
+      const portfolios = await PortfolioService.deletePortfolios(req, res);
+      return handleSuccess(res, portfolios, "Delete portfolios successfully.")
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
+  updatePortfolio: async ( req, res) => {
+    try {
+      const portfolios = await PortfolioService.updatePortfolio(req, res);
+      return handleSuccess(res, portfolios, "Update portfolios successfully.")
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
 };
 
 module.exports = portfolioController;

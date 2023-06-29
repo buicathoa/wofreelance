@@ -11,6 +11,7 @@ import EducationReducer from "./listReducer/educationReducer";
 import QualificationReducer from "./listReducer/qualificationReducer";
 import LocationReducer from "./listReducer/locationReducer";
 import PostReducer from "./listReducer/postReducer";
+import PortfolioReducer from "./listReducer/portfolioReducer";
 
 const rootReducer = combineReducers({
     app: AppReducer,
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
     education: EducationReducer,
     qualification: QualificationReducer,
     location: LocationReducer,
-    post: PostReducer
+    post: PostReducer,
+    portfolio: PortfolioReducer
 })
 
 const sagaMiddleware = createSagaMiddleware();
