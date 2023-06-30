@@ -7,6 +7,8 @@ import Lists from './containers/Lists';
 import Layout from "./containers/Layout";
 import Footer from "./containers/Footer";
 
+import { useContext, useEffect } from "react";
+import { SocketContext } from "./SocketContext";
 const BasicLayout = () => {
   return (
     <>
@@ -18,7 +20,6 @@ const BasicLayout = () => {
 }
 
 function App() {
-
 
   return (
     <Routes>

@@ -91,14 +91,16 @@ export const Post = () => {
                 setStep(3)
                 break;
             case 5:
-                const payload = {...values, post_type: postPurposeSelected, project_paid_type: paidTypeSelected, project_budget: budgetSelected, list_skills: listSkillSelected.length > 0 ? listSkillSelected.map((skill: any) => {
-                    return skill.value
-                }) : [], files: listFilesSelected}
+                const payload = {
+                    ...values, post_type: postPurposeSelected, project_paid_type: paidTypeSelected, project_budget: budgetSelected, list_skills: listSkillSelected.length > 0 ? listSkillSelected : [], files: listFilesSelected
+                }
                 createPost(payload).then((res) => {
                     // debugger
-                    const data = {skills: listSkillSelected, user_id: res.data!?.user_id, post_id: res.data!.id, noti_type: 'post',
-                     noti_title: res?.data?.title, noti_content: res?.data?.project_detail, noti_url: `posts/${(res?.data?.title).toLowerCase().replaceAll(' ', '-')}-${res?.data?.id}`}
-                    socket.emit('new_post_notify', data)
+                    // const data = {
+                    //     skills: listSkillSelected, user_id: res.data!?.user_id, post_id: res.data!.id, noti_type: 'post',
+                    //     noti_title: res?.data?.title, noti_content: res?.data?.project_detail, noti_url: `posts/${(res?.data?.title).toLowerCase().replaceAll(' ', '-')}-${res?.data?.id}`
+                    // }
+                    // socket.emit('new_post_notify', data)
                 })
                 break;
         }
@@ -125,15 +127,15 @@ export const Post = () => {
             }
         ]
     }
-    
+
     const onSubmitFile = (e: any) => {
-        
+
         const file = e.target.files[0]
         const listFile: Array<string> = [...listFilesSelected]
         const formData = new FormData()
         formData.append('files', e.target.files[0])
         const contentType: string = renderTypeOfContent(file.type.split('/')[1])
-        if(contentType === 'not_allowed') {
+        if (contentType === 'not_allowed') {
             openError(`Type of ${file.type} is not allowed`)
             return false
         }

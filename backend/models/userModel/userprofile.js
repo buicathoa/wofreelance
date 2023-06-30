@@ -123,9 +123,6 @@ module.exports = (sequelize, DataTypes) => {
     token: {
       type: DataTypes.STRING(1000)
     },
-    noti_count: {
-      type: DataTypes.INTEGER
-    }
   }, {
     sequelize,
     modelName: 'UserProfile',

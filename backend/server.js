@@ -14,11 +14,11 @@ const postsRoute = require("./routes/PostsRoute/posts.route");
 const experienceRoute = require("./routes/ExperienceRoute/experience.route");
 const educationRoute = require("./routes/EducationRoute/education.route");
 const countryRoute = require("./routes/CountryRoute/country.route");
-const qualificationRoute = require("./routes/Qualifications/qualifications.route")
-const currencyRoute = require("./routes/CurrencyRoute/currency.route")
-const budgetRoute = require("./routes/BudgetsRoute/budget.route")
-const portfolioRoute = require("./routes/PortfolioRoute/portfolio.route")
-const generalRoute = require("./routes/GeneralRoute/general.route")
+const qualificationRoute = require("./routes/Qualifications/qualifications.route");
+const currencyRoute = require("./routes/CurrencyRoute/currency.route");
+const budgetRoute = require("./routes/BudgetsRoute/budget.route");
+const portfolioRoute = require("./routes/PortfolioRoute/portfolio.route");
+const generalRoute = require("./routes/GeneralRoute/general.route");
 const puppeteer = require("puppeteer");
 // const JunctionRoute = require("./routes/JunctionRoute/junction.route");
 const { sequelize } = require("./models");
@@ -33,9 +33,10 @@ const Countries = db.countries;
 const Universities = db.universities;
 const UserProfile = db.userprofile;
 const jwt_decode = require("jwt-decode");
-const multer = require('multer');
+const multer = require("multer");
 const notificationSocket = require("./wsHandler/notificationSocket");
 const upload = multer();
+
 // const verifiedEmailSuccess = require("./services/UserService/user.service");
 // const returnDataSocket = require("./wsHandler/returnDataSocket");
 // import userRoute from "./routes/userRoute"
@@ -84,15 +85,6 @@ const io = require("socket.io")(server, {
   },
 });
 
-// io.on("connection", function (socket) {
-//   console.log("Client connected!.");
-//   socket.on("disconnect", function () {});
-//   socket.emit("connect success", { data: "You have successfully connected!", socket_id: socket.id });
-//   socket.on("Client-sent-data", function (data) {
-//     socket.emit("Server-sent-data", data);
-//   });
-// });
-
 const onConnection = (socket) => {
   // const {TOKEN, USER_INFO} = CONSTANT.WS_EVENT
   console.log("Client connected!.");
@@ -105,15 +97,29 @@ const onConnection = (socket) => {
   //   socket.emit(USER_INFO, {user: user})
   // })
   userSocket(socket, io);
-  notificationSocket(socket, io)
+  notificationSocket(socket, io);
   app.get("/v1/user/email-verified", (req, res) => {
     userController.emailVerified(req, res, socket, io);
   });
   // userService.emailVerified(socket, io)
-  app.use("/v1/user", userRoute(socket, io));
+  app.use("/v1/posts", postsRoute(socket, io));
 };
 
-io.on("connection", (socket) => {
+io
+.use((socket, next) => {  //  
+   if(socket?.handshake?.query?.access_token !== 'null') {
+      const decoded = jwt_decode(socket.handshake.query.access_token);
+      const user = UserProfile.findOne({
+        where: {
+          id: decoded.id
+        }
+      })
+      if(user) {
+        next()
+      }
+    }
+})
+.on("connection", (socket) => {
   onConnection(socket);
 });
 
@@ -126,15 +132,15 @@ app.use(
 app.use(express.static(__dirname + "/public"));
 
 app.use("/v1/job-categories", jobCategoriesRoute);
-app.use("/v1/posts", postsRoute);
 app.use("/v1/experience", experienceRoute);
 app.use("/v1/education", educationRoute);
 app.use("/v1/country", countryRoute);
 app.use("/v1/qualification", qualificationRoute);
-app.use("/v1/currency", currencyRoute)
-app.use("/v1/budgets", budgetRoute)
-app.use("/v1/portfolio", portfolioRoute)
-app.use("/v1", generalRoute)
+app.use("/v1/currency", currencyRoute);
+app.use("/v1/budgets", budgetRoute);
+app.use("/v1/portfolio", portfolioRoute);
+app.use("/v1", generalRoute);
+app.use("/v1/user", userRoute);
 //crawl data for universities
 // function delay(time) {
 //   return new Promise(function (resolve) {

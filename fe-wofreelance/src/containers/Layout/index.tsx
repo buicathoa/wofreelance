@@ -124,9 +124,7 @@ const Layout = () => {
 
   useEffect(() => {
     socket.on("new_post_notify_response", (data) => {
-      if(data) {
-        debugger
-      }
+      debugger
     });
     return () => {
       socket.off('new_post_notify_response');

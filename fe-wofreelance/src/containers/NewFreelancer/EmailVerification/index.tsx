@@ -32,14 +32,6 @@ const EmailVerification = () => {
         getUserInfo({})
     }, [location])
 
-    useEffect(() => {
-        const token = localStorage.getItem('access_token')
-        // const notAuthSocket = io('/')
-        socket.emit('user_token', token);
-        socket.on("user_info", (data) => {
-            dispatch(UserActions.updateUserSuccess(data))
-        });
-    }, []);
 
     const handleFinish = () => {
         navigate('/new-freelancer/profile-detail/photo-name')

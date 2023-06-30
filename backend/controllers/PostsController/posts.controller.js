@@ -2,9 +2,9 @@ const PostService = require("../../services/PostsService/posts.service")
 const { handleSuccess, handleError } = require("../../utils/handleResponse")
 
 const postsController = {
-    createPosts: async(req, res) => {
+    createPosts: async(req, res, socket, io) => {
         try{
-            const postCreated = await PostService.createPosts(req, res)
+            const postCreated = await PostService.createPosts(req, res, socket, io)
             return handleSuccess(res, postCreated, {message: "Your post is waiting verified."})
         }
         catch(err){

@@ -12,6 +12,8 @@ const { validateRole } = require("../../utils/validateRole");
 const QueryParameter = require("../../utils/QueryParameter");
 const { cloudinary } = require("../../utils/helper");
 const dayjs = require("dayjs");
+const CONSTANT = require("../../constants");
+const myEmitter = require("../../myEmitter");
 const Post = db.posts;
 const JobSubCategories = db.jobsubcategories;
 const Posts_skillsets = db.post_skillsets;
@@ -21,9 +23,8 @@ const JobSkillset = db.jobskillset;
 const sequelize = db.sequelize;
 // const sequelizeCategories = db.sequelizeCategories;
 // const sequelizeJunctionTable = db.sequelizeJunctionTable;
-
 const PostService = {
-  createPosts: async (req, res) => {
+  createPosts: async (req, res, socket, io) => {
     const decoded = jwt_decode(req.headers.authorization);
     const {
       title,
@@ -36,14 +37,10 @@ const PostService = {
     } = req.body;
     let transaction = await sequelize.transaction();
     try {
+      const { NEW_POST_NOTIFY } = CONSTANT.WS_EVENT;
       const checkRole = await validateRole.create(decoded, req.body.user_id, UserProfiles);
       let newPost
       if (checkRole === 1) {
-        // const files = await cloudinary.uploader.upload(
-        //   profile?.photos[0]?.value,
-        //   { folder: "avatar" }
-        // );
-
         newPost = await Post.create(
           {
             title: title,
@@ -77,7 +74,7 @@ const PostService = {
             promises.push(
               Posts_skillsets.create(
                 {
-                  skillset_id: skill,
+                  skillset_id: skill.value,
                   post_id: newPost.id,
                 },
               )
@@ -94,6 +91,9 @@ const PostService = {
       } else if(checkRole === 2){
         throw new ClientError("Bad request.")
       }
+      //send notification to client with socket
+      await myEmitter.emit(NEW_POST_NOTIFY, {...newPost.dataValues, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
+
       await transaction.commit()
       return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
       // return result

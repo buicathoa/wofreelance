@@ -31,9 +31,9 @@ const Notifications = db.notifications;
 const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
-const onConnection = require("../../wsHandler/socket.connection");
 const { io } = require("../../server");
-let SocketId_UserID = require("../../globalVariable");
+const { removeUserOnline } = require("../../globalVariable");
+const myEmitter = require("../../myEmitter");
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
@@ -80,9 +80,9 @@ const userService = {
     }
   },
 
-  loginUser: async (req, res, socket, io) => {
+  loginUser: async (req, res) => {
     const { email, password, account_type } = req.body;
-
+    const { USER_SIGNIN, USER_SIGNOUT } = CONSTANT.WS_EVENT;
     try {
       //second solution
       const user = await UserProfile.findOne({
@@ -144,8 +144,7 @@ const userService = {
               },
             }
           );
-          SocketId_UserID.push({ user_id: user.id, socket_id: socket.id });
-          console.log('SocketId_UserID', SocketId_UserID)
+          await myEmitter.emit(USER_SIGNIN, user.id)
           return {
             message: "Login success.",
             data: user,
@@ -192,8 +191,7 @@ const userService = {
               ...others
             } = user.dataValues;
 
-            SocketId_UserID.push({ user_id: user.id, socket_id: socket.id });
-            console.log('SocketId_UserID', SocketId_UserID)
+            myEmitter.emit(USER_SIGNIN, user.id)
             return {
               message: "Login success.",
               data: others,
@@ -211,6 +209,7 @@ const userService = {
 
   logoutUser: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
+    const { USER_SIGNIN, USER_SIGNOUT } = CONSTANT.WS_EVENT;
     let transaction = await sequelize.transaction();
     try {
       await UserProfile.update(
@@ -223,9 +222,7 @@ const userService = {
           },
         }
       );
-      const array = SocketId_UserID.filter((a) => a.user_id !== decoded.id);
-      SocketId_UserID = array;
-      console.log('SocketId_UserID', SocketId_UserID)
+      myEmitter.emit(USER_SIGNOUT, decoded.id)
       transaction.commit();
       return true;
     } catch (err) {
@@ -234,7 +231,7 @@ const userService = {
     }
   },
 
-  getUserInfo: async (req, res, socket, io) => {
+  getUserInfo: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
@@ -281,19 +278,18 @@ const userService = {
             model: UserRole,
             as: "role",
           },
-          // {
-          //   model: Post,
-          // },
           {
             model: Languages,
             as: "languages",
             through: {},
           },
-          // {
-          //   model: Experience,
-          //   as: "list_experiences",
-          //   through: {},
-          // },
+          {
+            model: Notifications,
+            as: "notifications",
+            through: {
+              attributes: []
+            },
+          },
         ],
       });
       if (userFound !== null) {
@@ -349,7 +345,7 @@ const userService = {
     }
   },
 
-  getUserInfoDestination: async (req, res, socket, io) => {
+  getUserInfoDestination: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
     try {
@@ -628,7 +624,7 @@ const userService = {
     }
   },
 
-  loginFacebook: (user_id = null, res, req, io, socket) => {
+  loginFacebook: (user_id = null, res, req) => {
     const urlSplit = req.url.split("=")[1];
     const moveNextRoute =
       urlSplit && urlSplit?.includes("%252") ? `?next=${urlSplit}` : "";
@@ -680,22 +676,7 @@ const userService = {
                   }
                 );
 
-                SocketId_UserID.push({
-                  user_id: userFound.id,
-                  socket_id: socket.id,
-                });
-                // await UserLoggedIn.update(
-                //   {
-                //     user_id: userFound.id,
-                //     socket_id: socket.id,
-                //     status: "online",
-                //   },
-                //   {
-                //     where: {
-                //       user_id: userFound.id,
-                //     },
-                //   }
-                // );
+                myEmitter.emit(USER_SIGNIN, userFound.id)
                 await res.cookie("access_token", accesstoken, {
                   maxAge: 900000,
                 });

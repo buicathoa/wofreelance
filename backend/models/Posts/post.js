@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     bidding_time_start: DataTypes.DATE,
     bidding_time_end: DataTypes.DATE,
     project_paid_type: DataTypes.STRING,
-    post_status: DataTypes.STRING,
+    post_status: DataTypes.STRING, //not_received: nhận được thông báo nhưng chưa bấm vào chuông, received: Nhận được thông báo và bấm vào chuông, seen
     file: DataTypes.STRING,
     post_type: DataTypes.STRING,
     user_id: {

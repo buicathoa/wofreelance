@@ -23,9 +23,9 @@ const userController = {
     }
   },
 
-  loginUser: async (req, res, socket, io) => {
+  loginUser: async (req, res) => {
     try {
-      const result = await userService.loginUser(req, res, socket, io);
+      const result = await userService.loginUser(req, res);
       if (result === 1) {
         return res.status(400).json({ message: "Invalid email, password or account status" });
       } else if (result === 2) {
@@ -38,9 +38,9 @@ const userController = {
     }
   },
 
-  logoutUser : async (req, res, socket, io) => {
+  logoutUser : async (req, res) => {
     try {
-      const result = await userService.logoutUser(req, res, socket, io);
+      const result = await userService.logoutUser(req, res);
       return handleSuccess(res, result);
     } catch (err) {
       return handleError(res, err);
@@ -60,9 +60,9 @@ const userController = {
     }
   },
 
-  getUserInfoDestination: async (req, res, socket, io) => {
+  getUserInfoDestination: async (req, res) => {
     try {
-      const result = await userService.getUserInfoDestination(req, res, socket, io);
+      const result = await userService.getUserInfoDestination(req, res);
       if (result === 1) {
         return res.status(400).json({ message: "User not found." });
       } else {
@@ -165,7 +165,7 @@ const userController = {
     }
   },
 
-  emailVerified: async (req, res, socket, io) => {
+  emailVerified: async (req, res) => {
     try {
       res.redirect(
         `${process.env.URL_FRONTEND}/new-freelancer/email-verification`
