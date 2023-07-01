@@ -3,6 +3,7 @@ let SocketId_UserID = []
 const pushUserOnline = (user_info) => {
     SocketId_UserID.push(user_info)
     console.log('SocketId_UserID', SocketId_UserID)
+    return SocketId_UserID
 }
 
 const removeUserOnline = (user_id) => {

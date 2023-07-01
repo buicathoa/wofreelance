@@ -15,9 +15,9 @@ import { RootState } from '../../../reducers/rootReducer'
 import { CategoryActions } from '../../../reducers/listReducer/categoryReducer'
 import { PostActions } from '../../../reducers/listReducer/postReducer'
 import { openError } from '../../../components/Notifications'
-import { SocketContext } from '../../../SocketContext'
+// import { SocketContext } from '../../../SocketContext'
 export const Post = () => {
-    const socket = useContext(SocketContext)
+    // const socket = useContext(SocketContext)
 
     const dispatch = useDispatch()
     const [form] = Form.useForm()

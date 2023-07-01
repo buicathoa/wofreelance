@@ -13,11 +13,11 @@ import { BASE_URL } from '../../../constants';
 import { RootState } from '../../../reducers/rootReducer'
 import { UserActions } from '../../../reducers/listReducer/userReducer';
 
-import { SocketContext } from '../../../SocketContext';
+// import { SocketContext } from '../../../SocketContext';
 import io from 'socket.io-client';
 import './style.scss'
 const EmailVerification = () => {
-    const socket = useContext(SocketContext)
+    // const socket = useContext(SocketContext)
     const dispatch = useDispatch()
     const location = useLocation()
     const navigate = useNavigate()

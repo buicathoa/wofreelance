@@ -23,9 +23,9 @@ const userController = {
     }
   },
 
-  loginUser: async (req, res) => {
+  loginUser: async (req, res, socket, io) => {
     try {
-      const result = await userService.loginUser(req, res);
+      const result = await userService.loginUser(req, res, socket, io);
       if (result === 1) {
         return res.status(400).json({ message: "Invalid email, password or account status" });
       } else if (result === 2) {

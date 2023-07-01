@@ -10,10 +10,10 @@ import { } from 'react-router-dom';
 import { UserActions } from '../../../reducers/listReducer/userReducer';
 import { ResponseFormatItem, SignupFormInterface, UserInterface } from '../../../interface';
 import { openError, openWarning } from '../../../components/Notifications';
-import { SocketContext } from '../../../SocketContext';
+// import { SocketContext } from '../../../SocketContext';
 import { deleteCookie, getCookie } from '../../../utils/helper';
 const Signup = () => {
-    const socket = useContext(SocketContext)
+    // const socket = useContext(SocketContext)
     let location = useLocation()
     let navigate = useNavigate()
     const account_type = [

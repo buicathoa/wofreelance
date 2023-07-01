@@ -2,7 +2,7 @@ const CONSTANT = require("../constants");
 const { findUser, getUserOnline, pushUserOnline, removeUserOnline } = require("../globalVariable");
 const db = require("../models");
 const jwt_decode = require("jwt-decode");
-const myEmitter = require("../myEmitter");
+const {myEmitter} = require("../myEmitter");
 
 const UserProfile = db.userprofile;
 const UserLoggedIn = db.user_loggedin;
@@ -17,7 +17,6 @@ module.exports = (socket, io) => {
     USER_SIGNIN,
     USER_SIGNOUT
   } = CONSTANT.WS_EVENT;
-
 
   myEmitter.on(TOKEN, async (token) => {
     const decoded = jwt_decode(token);
@@ -35,8 +34,8 @@ module.exports = (socket, io) => {
     socket.emit("user_status_result", user ? [{ ...user }] : []);
   }),
 
-  myEmitter.on(USER_SIGNIN, (user_id) => {
-    pushUserOnline({ user_id: user_id, socket_id: socket.id })
+  myEmitter.on(USER_SIGNIN, async(data) => {
+    pushUserOnline(data)
   })
 
   myEmitter.on(USER_SIGNOUT, (user_id) => {

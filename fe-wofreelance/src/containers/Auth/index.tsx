@@ -12,15 +12,17 @@ import { openError } from '../../components/Notifications';
 import axios from 'axios';
 import { getCookie } from '../../utils/helper';
 import { LeftOutlined } from '@ant-design/icons'
-import { SocketContext } from '../../SocketContext';
+import { io } from "socket.io-client";
+import { SocketContext, socket } from '../../SocketContext';
+
 
 const Auth = () => {
   let location = useLocation()
-  const socket = useContext(SocketContext)
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
   const {id} = useParams()
+  const socket = useContext(SocketContext)
   const [formValues, setformValues] = useState({})
   const [loginType, setLoginType] = useState('')
   const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
@@ -62,12 +64,15 @@ const Auth = () => {
   const onSubmitForm = (values: any) => {
     dispatch(AppActions.openLoading(true))
     signin({...values, status: 'sign_up'}).then((res: any) => {
-        socket.emit('user_token', res.data.token);
-        socket.on("user_info", (data) => {
-            dispatch(UserActions.updateUserSuccess(data))
-        });
       if (res.code === 200) {
         localStorage.setItem('access_token', res.data.token)
+        // debugger
+        // socket.emit('user_signin', res.data.data.id)
+      //   socket = io(SOCKET_URL, {
+      //     query: {
+      //         access_token: localStorage.getItem('access_token') as any
+      //     }
+      // })
         navigate('/')
       } else {
         openError(res.err.response.data.message)

@@ -22,14 +22,14 @@ import { EducationActions } from "../../reducers/listReducer/educationReducer";
 import { QualifycationActions } from "../../reducers/listReducer/qualificationReducer";
 import Footer from "../Footer";
 import { PortfolioActions } from "../../reducers/listReducer/portfolioReducer";
-import { SocketContext } from "../../SocketContext";
+// import { SocketContext } from "../../SocketContext";
 
 
 const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const socket = useContext(SocketContext)
+  // const socket = useContext(SocketContext)
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(UserActions.getUserInfo({ param, resolve, reject }));
@@ -122,14 +122,14 @@ const Layout = () => {
     }
   }, [location])
 
-  useEffect(() => {
-    socket.on("new_post_notify_response", (data) => {
-      debugger
-    });
-    return () => {
-      socket.off('new_post_notify_response');
-    };
-  },[])
+  // useEffect(() => {
+  //   socket.on("new_post_notify_response", (data) => {
+  //     debugger
+  //   });
+  //   return () => {
+  //     socket.off('new_post_notify_response');
+  //   };
+  // },[])
 
   const handlePostProject = () => {
     navigate('/post-project')

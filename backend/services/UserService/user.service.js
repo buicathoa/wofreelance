@@ -33,7 +33,7 @@ const store = require("store");
 const dayjs = require("dayjs");
 const { io } = require("../../server");
 const { removeUserOnline } = require("../../globalVariable");
-const myEmitter = require("../../myEmitter");
+const {myEmitter} = require("../../myEmitter");
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
@@ -80,7 +80,7 @@ const userService = {
     }
   },
 
-  loginUser: async (req, res) => {
+  loginUser: async (req, res, socket, io) => {
     const { email, password, account_type } = req.body;
     const { USER_SIGNIN, USER_SIGNOUT } = CONSTANT.WS_EVENT;
     try {
@@ -144,7 +144,7 @@ const userService = {
               },
             }
           );
-          await myEmitter.emit(USER_SIGNIN, user.id)
+          // await myEmitter.emit(USER_SIGNIN, user.id)
           return {
             message: "Login success.",
             data: user,
@@ -190,8 +190,7 @@ const userService = {
               token,
               ...others
             } = user.dataValues;
-
-            myEmitter.emit(USER_SIGNIN, user.id)
+            myEmitter.emit(USER_SIGNIN, {user_id:  user.id, socket_id: socket.id})
             return {
               message: "Login success.",
               data: others,
@@ -676,7 +675,7 @@ const userService = {
                   }
                 );
 
-                myEmitter.emit(USER_SIGNIN, userFound.id)
+                // myEmitter.emit(USER_SIGNIN, userFound.id)
                 await res.cookie("access_token", accesstoken, {
                   maxAge: 900000,
                 });

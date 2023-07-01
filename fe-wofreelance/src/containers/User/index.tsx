@@ -15,7 +15,7 @@ import { RootState } from '../../reducers/rootReducer';
 
 import { PortfolioInterface, ResponseFormatItem, SkillsetInterface, UserInterface } from '../../interface';
 import { certifications, portfolio, rating_empty } from '../../assets';
-import { SocketContext } from '../../SocketContext';
+// import { SocketContext } from '../../SocketContext';
 
 import LayoutBottomProfile from '../../components/LayoutBottom/LayoutBottomProfile';
 import { openWarning } from '../../components/Notifications';
@@ -41,7 +41,7 @@ const UserProfile = () => {
     const portfolioRef = useRef(null)
     const reviewsRef = useRef(null)
     const resumeRef = useRef(null)
-    const socket = useContext(SocketContext)
+    // const socket = useContext(SocketContext)
     const location = useLocation()
 
     const [isOpenSkillsModal, setIsOpenSkillsModal] = useState(false)
@@ -125,19 +125,19 @@ const UserProfile = () => {
         }
     }, [location])
 
-    useEffect(() => {
-        if (Object?.values(user_info).length > 0) {
-            socket.emit('user_status', user_info.id)
-            socket.on("user_status_result", (data) => {
-                const userInfo = data.find((x: any) => x.user_id === user_info.id)
-                setUserStatus(userInfo ? userInfo : {})
-            });
+    // useEffect(() => {
+    //     if (Object?.values(user_info).length > 0) {
+    //         socket.emit('user_status', user_info.id)
+    //         socket.on("user_status_result", (data) => {
+    //             const userInfo = data.find((x: any) => x.user_id === user_info.id)
+    //             setUserStatus(userInfo ? userInfo : {})
+    //         });
 
-            setFileUploaded({
-                ...fileUploaded, preview: user_info?.avatar_cropped
-            })
-        }
-    }, [user_info])
+    //         setFileUploaded({
+    //             ...fileUploaded, preview: user_info?.avatar_cropped
+    //         })
+    //     }
+    // }, [user_info])
 
 
     const handleMoveToDiv = (ref: any) => {

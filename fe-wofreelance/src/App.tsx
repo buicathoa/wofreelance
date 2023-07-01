@@ -8,13 +8,41 @@ import Layout from "./containers/Layout";
 import Footer from "./containers/Footer";
 
 import { useContext, useEffect } from "react";
-import { SocketContext } from "./SocketContext";
+import { io } from "socket.io-client";
+import { UserInterface } from "./interface";
+import { useSelector } from "react-redux";
+import { RootState } from "./reducers/rootReducer";
+
 const BasicLayout = () => {
+  // const SOCKET_URL = "http://localhost:1203";
+  // const user: UserInterface = useSelector((state: RootState) => state.user.user)
+  // useEffect(() => {
+  //     const socket = io(SOCKET_URL, {
+  //       query: {
+  //         access_token: localStorage.getItem('access_token') as any
+  //       }
+  //     });
+  //     const handleCheckSignIn = async () => {
+  //       if (user.id) {
+  //         socket.on('connect', () => {
+  //           console.log('Socket connected!');
+  //           socket.emit('user_signin', user.id);
+  //         });
+  //       }
+  //     };
+
+  //     handleCheckSignIn()
+  //     return () => {
+  //       socket.disconnect();
+  //     };
+  //   // }
+  // }, [])
+
   return (
     <>
-    <Layout />
-    <Outlet />
-    <Footer />
+      <Layout />
+      <Outlet />
+      <Footer />
     </>
   )
 }

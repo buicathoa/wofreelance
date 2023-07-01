@@ -6,10 +6,9 @@ import { ResponseFormatItem, UserInterface } from '../../../interface'
 import { RootState } from '../../../reducers/rootReducer'
 import { UserActions } from '../../../reducers/listReducer/userReducer'
 import { useDispatch } from 'react-redux'
-import { SocketContext } from '../../../SocketContext'
 
 const ProfileContent = ({user}:any) => {
-    const socket = useContext(SocketContext)
+    // const socket = useContext(SocketContext)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
