@@ -9,12 +9,9 @@ const jwt = require("jsonwebtoken");
 const store = require("store");
 const CONSTANT = require("../../constants");
 
-
-module.exports = function(socket, io) {
+module.exports = () => {
   router.post("/register", userController.registerAccount);
-  router.post("/login", (req, res) => {
-    userController.loginUser(req, res, socket, io)
-  });
+  router.post("/login", userController.loginUser);
   router.post("/logout", (req, res) => {
     userController.logoutUser(req, res);
   });
@@ -65,7 +62,7 @@ module.exports = function(socket, io) {
     },
     async function authenticateFacebook(req, res, next) {
       const user_id = await req.user_id;
-      await userService.loginFacebook(user_id, res, req, io, socket).authenticate(
+      await userService.loginFacebook(user_id, res, req).authenticate(
         "facebook",
         {
           failureRedirect: "/login",
@@ -120,9 +117,5 @@ module.exports = function(socket, io) {
   router.get("/email-verification", userController.verificationEmail);
   
   router.post("/user-loggedin", userController.getUserLoggedIn);
-
   return router
 }
-
-
-// module.exports = router;

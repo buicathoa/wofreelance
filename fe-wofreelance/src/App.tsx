@@ -14,29 +14,24 @@ import { useSelector } from "react-redux";
 import { RootState } from "./reducers/rootReducer";
 
 const BasicLayout = () => {
-  // const SOCKET_URL = "http://localhost:1203";
-  // const user: UserInterface = useSelector((state: RootState) => state.user.user)
   // useEffect(() => {
-  //     const socket = io(SOCKET_URL, {
-  //       query: {
-  //         access_token: localStorage.getItem('access_token') as any
-  //       }
-  //     });
-  //     const handleCheckSignIn = async () => {
-  //       if (user.id) {
-  //         socket.on('connect', () => {
-  //           console.log('Socket connected!');
-  //           socket.emit('user_signin', user.id);
-  //         });
-  //       }
-  //     };
+  //   const SOCKET_URL = "http://localhost:1203";
+  //   const socket = io(SOCKET_URL, {
+  //     extraHeaders: {
+  //       Authorization: localStorage.getItem('access_token') as any,
+  //     },
+  //   })
 
-  //     handleCheckSignIn()
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   // }
-  // }, [])
+  //   if (!socket.connected) {
+  //     socket.on('connect', () => {
+  //       console.log('connected', socket.connected)
+  //     });
+  //   }
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   return (
     <>

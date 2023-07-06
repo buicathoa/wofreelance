@@ -22,7 +22,6 @@ const Auth = () => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
   const {id} = useParams()
-  const socket = useContext(SocketContext)
   const [formValues, setformValues] = useState({})
   const [loginType, setLoginType] = useState('')
   const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
@@ -66,13 +65,7 @@ const Auth = () => {
     signin({...values, status: 'sign_up'}).then((res: any) => {
       if (res.code === 200) {
         localStorage.setItem('access_token', res.data.token)
-        // debugger
-        // socket.emit('user_signin', res.data.data.id)
-      //   socket = io(SOCKET_URL, {
-      //     query: {
-      //         access_token: localStorage.getItem('access_token') as any
-      //     }
-      // })
+        socket.emit("user_signin", res.data.data.id)
         navigate('/')
       } else {
         openError(res.err.response.data.message)

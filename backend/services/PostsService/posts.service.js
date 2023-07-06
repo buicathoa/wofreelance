@@ -19,7 +19,7 @@ const JobSubCategories = db.jobsubcategories;
 const Posts_skillsets = db.post_skillsets;
 const UserProfiles = db.userprofile;
 const JobSkillset = db.jobskillset;
-
+const Countries = db.countries
 const sequelize = db.sequelize;
 // const sequelizeCategories = db.sequelizeCategories;
 // const sequelizeJunctionTable = db.sequelizeJunctionTable;
@@ -48,9 +48,9 @@ const PostService = {
             project_budget: parseInt(project_budget),
             // avg_bid_unit: avg_bid_unit,
             bidding_time_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            bidding_time_end: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+            bidding_time_end: dayjs().add(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
             project_paid_type: project_paid_type,
-            post_status: "success",
+            post_status: "open",
             post_type: post_type,
             user_id: req.body.user_id ? req.body.user_id : decoded.id,
             file: req.body.files.length > 0 ? req.body.files.map((file) => {
@@ -92,7 +92,7 @@ const PostService = {
         throw new ClientError("Bad request.")
       }
       //send notification to client with socket
-      await myEmitter.emit(NEW_POST_NOTIFY, {...newPost.dataValues, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
+      myEmitter.emit(NEW_POST_NOTIFY, {...newPost.dataValues, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
 
       await transaction.commit()
       return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
@@ -109,7 +109,7 @@ const PostService = {
       const wherePost = QueryParameter.querySearch(search_list)
       const sortPost = QueryParameter.querySort(sort)
       const result = await Post.findAll({
-        where: { ...wherePost, post_status: 'success' },
+        where: { ...wherePost, post_status: 'open' },
         include: [
           {
             model: JobSkillset,
@@ -250,6 +250,41 @@ const PostService = {
       return updatedRecord
     } catch (err) {
       throw err
+    }
+  },
+
+  getPostById: async (req, res) => {
+    try{
+      const {post_id} = req.body;
+      const result = await Post.findOne({
+        where: {
+          id: post_id 
+        },
+        include: [
+          {
+            model: JobSkillset,
+            as: 'list_skills',
+            attributes: ['id', 'name'],
+            through: {
+              attributes: []
+            }
+          },
+          {
+            model: UserProfiles,
+            as: 'user',
+            attributes: ['joined', 'first_name', 'last_name', 'avatar_cropped', 'country_id'],
+            include: [
+              {
+                model: Countries,
+                as: 'country'
+              }
+            ]
+          }
+        ]
+      })
+      return result
+    } catch(err) {
+      throw err;
     }
   }
 };

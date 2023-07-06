@@ -63,7 +63,7 @@
                                 &:focus {
                                     border: unset;
                                     border-bottom: 1px solid $bordercolor;
-                                    box-shadow: unset;
+                                    box-shadow: $boxshadow;
                                 }
                             }
                         }
@@ -143,7 +143,7 @@
                             justify-content: space-between;
                             padding: calc(12 / $fdf) * $rem;
                             border-bottom: 1px solid $bordercolor;
-                            box-shadow: inset 0 -1px #eef0f4;
+                            box-shadow: $boxshadow;
                             align-items: center;
 
                             .file-item-left {
@@ -210,10 +210,10 @@
 
                                 &:hover {
                                     transition: background-color .1s ease-in-out;
-                                    box-shadow: 0 0 6px #12151b1f, 0 4px 10px #12151b1f;
+                                    box-shadow: $boxshadow;
                                 }
 
-                                box-shadow: 0 0 6px #12151b1f,
+                                box-shadow: $boxshadow,
                                 0 4px 10px #93a2c329;
                                 padding: calc(24 / $fdf) * $rem;
                                 border-radius: calc(5 / $fdf) * $rem;
@@ -265,7 +265,7 @@
                         display: flex;
                         background-color: #fff;
                         transition: background-color .1s ease-in-out;
-                        box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+                        box-shadow: $boxshadow;
 
                         .detail-left {
                             text-align: center;

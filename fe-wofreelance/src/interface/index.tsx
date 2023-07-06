@@ -149,7 +149,8 @@ export interface UserInterface {
         country_name?: string,
         country_official_name?: string
     },
-    current_time?: string
+    current_time?: string,
+    noti_count?: number
 }
 
 export interface CurrencyInterface {

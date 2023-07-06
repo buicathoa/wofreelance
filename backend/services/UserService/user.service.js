@@ -82,7 +82,7 @@ const userService = {
 
   loginUser: async (req, res, socket, io) => {
     const { email, password, account_type } = req.body;
-    const { USER_SIGNIN, USER_SIGNOUT } = CONSTANT.WS_EVENT;
+    const { USER_SIGNIN, USER_SIGNOUT, ADD_USER_INFO } = CONSTANT.WS_EVENT;
     try {
       //second solution
       const user = await UserProfile.findOne({
@@ -190,7 +190,7 @@ const userService = {
               token,
               ...others
             } = user.dataValues;
-            myEmitter.emit(USER_SIGNIN, {user_id:  user.id, socket_id: socket.id})
+            myEmitter.emit(USER_SIGNIN, {user_id:  user.id, socket_id: socket?.id})
             return {
               message: "Login success.",
               data: others,
@@ -233,6 +233,7 @@ const userService = {
   getUserInfo: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     let user;
+    const { ADD_USER_INFO } = CONSTANT.WS_EVENT;
     try {
       const searchField = ["username", "email"];
       let searchCond = {};
@@ -282,13 +283,6 @@ const userService = {
             as: "languages",
             through: {},
           },
-          {
-            model: Notifications,
-            as: "notifications",
-            through: {
-              attributes: []
-            },
-          },
         ],
       });
       if (userFound !== null) {
@@ -332,6 +326,7 @@ const userService = {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
+          myEmitter.emit(ADD_USER_INFO, userFound.id)
           return timeResponse
             ? { ...others, current_time: timeResponse }
             : { ...others };

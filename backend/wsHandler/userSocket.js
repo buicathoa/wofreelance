@@ -1,5 +1,5 @@
 const CONSTANT = require("../constants");
-const { findUser, getUserOnline, pushUserOnline, removeUserOnline } = require("../globalVariable");
+const { findUser, getUserOnline, pushUserOnline, removeUserOnline, addUserInfo } = require("../globalVariable");
 const db = require("../models");
 const jwt_decode = require("jwt-decode");
 const {myEmitter} = require("../myEmitter");
@@ -15,7 +15,9 @@ module.exports = (socket, io) => {
     USER_INFO,
     USER_STATUS,
     USER_SIGNIN,
-    USER_SIGNOUT
+    USER_SIGNOUT,
+    USER_RECONNECT,
+    ADD_USER_INFO
   } = CONSTANT.WS_EVENT;
 
   myEmitter.on(TOKEN, async (token) => {
@@ -29,17 +31,27 @@ module.exports = (socket, io) => {
     await io.to(`user_id_${user.id}`).emit(USER_INFO, user);
   });
 
-  myEmitter.on(USER_STATUS, async (user_id) => {
+  myEmitter.on(ADD_USER_INFO, async(user_id) => {
+    addUserInfo(user_id, socket.id)
+  })
+
+  socket.on(USER_STATUS, async (user_id) => {
     const user = findUser(user_id)
     socket.emit("user_status_result", user ? [{ ...user }] : []);
   }),
 
-  myEmitter.on(USER_SIGNIN, async(data) => {
-    pushUserOnline(data)
+  socket.on(USER_SIGNIN, async(user_id) => {
+    pushUserOnline({user_id: user_id, socket_id: socket.id })
   })
 
   myEmitter.on(USER_SIGNOUT, (user_id) => {
     removeUserOnline(user_id)
+  })
+
+  socket.on(USER_RECONNECT, (token) => {
+    const decoded = jwt_decode(token);
+    removeUserOnline(decoded.id)
+    pushUserOnline({user_id: decoded.id, socket_id: socket.id})
   })
 
   setInterval(() => {

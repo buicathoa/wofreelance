@@ -34,7 +34,7 @@
                 padding: calc(16 / $fdf) * $rem;
                 border-radius: 50%;
                 background-color: #ffffff;
-                box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+                box-shadow: $boxshadow;
             }
 
             .input-file {

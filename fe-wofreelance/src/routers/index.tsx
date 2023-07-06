@@ -9,6 +9,7 @@ import Dashboard from '../containers/Dashboard'
 import Lists from '../containers/Lists'
 import UserProfile from '../containers/User'
 import { Post } from '../containers/Project/Post'
+import { ProjectDetail } from '../containers/Project/ProjectDetail'
 
 export const routerNotSidebar = [
     {
@@ -52,4 +53,9 @@ export const routerSidebar = [
         element: <UserProfile/>,
         path: '/u/:id'
     },
+    {
+        exact: true,
+        element: <ProjectDetail />,
+        path: '/projects/:id'
+    }
 ]

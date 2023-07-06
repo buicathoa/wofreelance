@@ -3,7 +3,7 @@ let SocketId_UserID = []
 const pushUserOnline = (user_info) => {
     SocketId_UserID.push(user_info)
     console.log('SocketId_UserID', SocketId_UserID)
-    return SocketId_UserID
+    // return SocketId_UserID
 }
 
 const removeUserOnline = (user_id) => {
@@ -27,5 +27,12 @@ const findIndexUser = (user) => {
     return index
 }
 
+const addUserInfo = (user_id, socket_id) => {
+    const index = SocketId_UserID.findIndex((globalVar) => user_id === globalVar.user_id)
+    if(index === -1) {
+        SocketId_UserID.push({user_id: user_id, socket_id: socket_id})
+    }
+}
 
-module.exports = {pushUserOnline, removeUserOnline, getUserOnline, findUser, findIndexUser}
+
+module.exports = {pushUserOnline, removeUserOnline, getUserOnline, findUser, findIndexUser, addUserInfo}

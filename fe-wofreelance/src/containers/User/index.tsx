@@ -35,12 +35,14 @@ import { LocationActions } from '../../reducers/listReducer/locationReducer';
 import { validImg } from '../../constants';
 
 import './style.scss'
+import { SocketContext } from '../../SocketContext';
 const UserProfile = () => {
     const dispatch = useDispatch()
     const [form] = Form.useForm()
     const portfolioRef = useRef(null)
     const reviewsRef = useRef(null)
     const resumeRef = useRef(null)
+    const socket = useContext(SocketContext)
     // const socket = useContext(SocketContext)
     const location = useLocation()
 
@@ -124,20 +126,20 @@ const UserProfile = () => {
             return () => window.removeEventListener("scroll", handleScroll);
         }
     }, [location])
+    
+    useEffect(() => {
+        if (Object?.values(user_info).length > 0) {
+            socket.emit('user_status', user_info.id)
+            socket.on("user_status_result", (data) => {
+                const userInfo = data.find((x: any) => x.user_id === user_info.id)
+                setUserStatus(userInfo ? userInfo : {})
+            });
 
-    // useEffect(() => {
-    //     if (Object?.values(user_info).length > 0) {
-    //         socket.emit('user_status', user_info.id)
-    //         socket.on("user_status_result", (data) => {
-    //             const userInfo = data.find((x: any) => x.user_id === user_info.id)
-    //             setUserStatus(userInfo ? userInfo : {})
-    //         });
-
-    //         setFileUploaded({
-    //             ...fileUploaded, preview: user_info?.avatar_cropped
-    //         })
-    //     }
-    // }, [user_info])
+            setFileUploaded({
+                ...fileUploaded, preview: user_info?.avatar_cropped
+            })
+        }
+    }, [user_info])
 
 
     const handleMoveToDiv = (ref: any) => {

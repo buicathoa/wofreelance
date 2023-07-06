@@ -1,0 +1,235 @@
+@import "../../../../css/custom";
+
+.detail-project-wrapper {
+    color: $textcolor;
+
+    .ant-col-17 {
+        padding-right: calc(12 / $fdf) * $rem;
+
+        .detail-project-left {
+
+            .ant-form {
+                .detail-project-info {
+                    padding: calc(24 / $fdf) * $rem;
+                    background-color: #ffffff;
+                    border-radius: 5px;
+                    box-shadow: 0 1px 3px #12151b29;
+
+                    .detail-project-header {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: calc(16 / $fdf) * $rem;
+
+                        .title {
+
+                            font-weight: 700;
+                            font-size: calc(22 / $fdf) * $rem;
+                            line-height: 1.44;
+                        }
+
+                        .bidding-info {
+                            text-transform: uppercase;
+
+                            .bidding-limit {
+                                font-weight: 700;
+                                font-size: calc(18 / $fdf) * $rem;
+                                line-height: 1.5;
+                                margin-bottom: calc(8 / $fdf) * $rem;
+                            }
+
+                            .bidding-time-remain {
+                                display: flex;
+                                align-items: center;
+
+                                span {
+                                    display: block;
+                                    font-weight: 700;
+                                    font-size: calc(13 / $fdf) * $rem;
+
+                                    &.anticon {
+                                        margin-right: calc(4 / $fdf) * $rem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .detail-project-description {
+                        font-weight: 400;
+                        font-size: calc(17 / $fdf) * $rem;
+                        line-height: 1.4;
+                        margin-bottom: calc(24 / $fdf) * $rem;
+                    }
+
+                    .detail-project-skills {
+                        margin-bottom: calc(10 / $fdf) * $rem;
+
+                        .title {
+                            font-weight: 700;
+                            font-size: calc(18 / $fdf) * $rem;
+                            line-height: 1.5;
+                            margin-bottom: calc(12 / $fdf) * $rem;
+                        }
+
+                        .list-skills {
+                            display: flex;
+
+                            span {
+                                display: block;
+                                margin-right: calc(6 / $fdf) * $rem;
+                                margin-bottom: calc(6 / $fdf) * $rem;
+                                padding: calc(3 / $fdf) * $rem calc(12 / $fdf) * $rem;
+                                transition: background-color .2s ease-out, color .2s ease-out;
+                                border: 1px solid #bcc5d3;
+                                cursor: pointer;
+                                border-radius: 10px;
+
+                                &:hover {
+                                    color: $maincolor;
+                                    border-color: $maincolor;
+                                }
+                            }
+                        }
+                    }
+
+                    .detail-project-bottom {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-weight: 400;
+                        font-size: calc(13 / $fdf) * $rem;
+                        line-height: 1.45;
+                        margin-bottom: calc(24 / $fdf) * $rem;
+                    }
+                }
+
+                .detail-project-bidding {
+                    .ant-card {
+                        border-radius: 5px;
+                        box-shadow: 0 1px 3px #12151b29;
+                        margin-top: calc(16 / $fdf) * $rem;
+                        .alert-message {
+                            font-size: calc(15 / $fdf) * $rem;
+                            font-weight: 400;
+                            line-height: 1.4;
+                            margin-bottom: calc(16 / $fdf) * $rem;
+                        }
+
+                        .bidding-rate {
+                            display: flex;
+
+                            .ant-form-item {
+                                width: 40%;
+
+                                &:first-child {
+                                    margin-right: calc(24 / $fdf) * $rem;
+                                }
+                            }
+                        }
+
+                        .list-button {
+                            display: flex;
+                            justify-content: flex-end;
+
+                            button {
+                                font-size: calc(19 / $fdf) * $rem;
+                                line-height: 1.4;
+                                text-align: center;
+                                padding: 0 calc(13 / $fdf) * $rem;
+                                height: calc(40 / $fdf) * $rem;
+                                border-radius: 2px !important;
+
+                                // line-height: calc(40 / $fdf) * $rem;
+                                &:last-child {
+                                    background: #e60278;
+                                    border-color: #e60278;
+                                    color: #f7f8f9;
+                                    font-weight: 500;
+
+                                    &:hover {
+                                        background: #800444;
+                                        border-color: #800444;
+                                    }
+                                }
+
+                                &:first-child {
+                                    margin-right: calc(16 / $fdf) * $rem;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .ant-col-7 {
+        .detail-project-right {
+            .about-client {
+                padding: calc(24 / $fdf) * $rem;
+                background-color: #ffffff;
+                border-radius: 5px;
+                box-shadow: 0 1px 3px #12151b29;
+                .title{
+                    font-weight: 700;
+                    font-size: calc(18 / $fdf) * $rem;
+                    line-height: 1.5;
+                    margin-bottom: calc(18 / $fdf) * $rem;
+                }
+                .client-direction{
+                    font-weight: 400;
+                    font-size: calc(17 / $fdf) * $rem;
+                    line-height: 1.4;
+                    margin-bottom: calc(10 / $fdf) * $rem;
+                    .anticon{
+                        color: #3d4a5d
+                    }
+                }
+                .client-rated{
+                    margin-bottom: calc(10 / $fdf) * $rem;
+                }
+                .client-dated-joined{
+                    margin-bottom: calc(10 / $fdf) * $rem;
+                    font-weight: 400;
+                    font-size: calc(17 / $fdf) * $rem;
+                    line-height: 1.4;
+                    margin-bottom: calc(24 / $fdf) * $rem;
+                    .anticon{
+                        margin-right: calc(8 / $fdf) * $rem;
+                        color: #3d4a5d
+                    }
+                }
+                .client-verification{
+                    .client-verification-item{
+                        margin-bottom: calc(10 / $fdf) * $rem;
+                        span{
+                            font-weight: 400;
+                            font-size: calc(19 / $fdf) * $rem;
+                            line-height: 1.4;
+                            // display: block;
+                            &.anticon{
+                                color: #3d4a5d;
+                                margin-right: calc(8 / $fdf) * $rem;
+                            }
+                        }
+                    }
+                }
+            }
+            .ant-card {
+                border-radius: 5px;
+                box-shadow: 0 1px 3px #12151b29;
+                margin-top: calc(16 / $fdf) * $rem;
+                img{
+                    display: block;
+                    margin: 0 auto;
+                }
+                .winning-bid-description{
+                    margin-top: calc(18 / $fdf) * $rem;
+                    font-weight: 400;
+                    font-size:  calc(19 / $fdf) * $rem;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
+}

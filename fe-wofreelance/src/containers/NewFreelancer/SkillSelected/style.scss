@@ -33,7 +33,7 @@
           padding-right: calc(16 / $fdf) * $rem;
           margin-bottom: calc(24 / $fdf) * $rem;
           .ant-card {
-            box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+            box-shadow: $boxshadow;
             // width: calc(350 / $fdf) * $rem;
             .ant-card-body{
               padding: calc(16 / $fdf) * $rem !important;
@@ -48,7 +48,7 @@
               overflow-y: scroll;
               .category-item {
                 padding: calc(16 / $fdf) * $rem;
-                box-shadow: inset 0 -1px #dedede;
+                box-shadow: $boxshadow;
                 border-bottom: 1px solid #dedede;
                 display: flex;
                 justify-content: space-between;

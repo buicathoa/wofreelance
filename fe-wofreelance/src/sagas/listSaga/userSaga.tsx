@@ -112,6 +112,7 @@ function* getUserInfo(action: AnyAction): Generator {
     try {
         const response:any = yield apiRequest(apiUrl.user.getUserInfo, param, 'general')
         yield put(UserActions.getUserInfoSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.getNotificationsSuccess((response as ResponseFormatItem).data.noti_count))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

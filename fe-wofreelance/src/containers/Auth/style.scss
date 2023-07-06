@@ -54,7 +54,7 @@
   }
 
   .auth-component {
-    box-shadow: 0 0 6px #dedede;
+    box-shadow: $boxshadow;
     border-radius: 5px;
     max-width: calc(400 / $fdf) * $rem;
     padding: calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem;
@@ -184,13 +184,12 @@
         padding: calc(16 / $fdf) * $rem;
         display: flex;
         align-items: center;
-        box-shadow: 0 10px 20px #0000000f, 0 2px 6px #0000000f,
-          0 0 1px #0000000f;
+        box-shadow: $boxshadow;
         border-radius: 5px;
         cursor: pointer;
 
         &:hover {
-          box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
+          box-shadow: $boxshadow;
         }
 
         &:first-child {

@@ -101,9 +101,8 @@ const onConnection = (socket) => {
   app.get("/v1/user/email-verified", (req, res) => {
     userController.emailVerified(req, res, socket, io);
   });
+  app.use("/v1/user", userRoute())
   // userService.emailVerified(socket, io)
-  app.use("/v1/posts", postsRoute(socket, io));
-  app.use("/v1/user", userRoute(socket, io));
 };
 
 // io
@@ -121,28 +120,26 @@ const onConnection = (socket) => {
 //     }
 // })
 
-io.use((socket, next) => {
-  try{
-    if (socket.handshake.headers.authorization !== 'null') {
-      const decoded = jwt_decode(socket.handshake.headers.authorization);
-      if (decoded) {
-         UserProfile.findOne({
-          where: {
-            id: decoded.id
-          }
-        }).then(() => {
-          next()
-        })
-      } else {
-        next(new Error('Authentication error'));
-      }
-    } else {
-      next(new Error('Authentication error'));
-    }
-  } catch(err) {
-    console.log(err)
-  }
-})
+// io.use((socket, next) => {
+  
+//     if (socket.handshake.auth.token !== null) {
+//       const decoded = jwt_decode(socket.handshake.auth.token);
+//       if (decoded) {
+//          UserProfile.findOne({
+//           where: {
+//             id: decoded.id
+//           }
+//         }).then(() => {
+//           next()
+//         })
+//       } else {
+//         next(new Error('Authentication error'));
+//       }
+//     } else {
+//       next(new Error('Authentication error'));
+//     }
+  
+// })
 
 io.on("connection", (socket) => {
   onConnection(socket);
@@ -165,6 +162,7 @@ app.use("/v1/currency", currencyRoute);
 app.use("/v1/budgets", budgetRoute);
 app.use("/v1/portfolio", portfolioRoute);
 app.use("/v1", generalRoute);
+app.use("/v1/posts", postsRoute)
 
 //crawl data for universities
 // function delay(time) {

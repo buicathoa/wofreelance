@@ -5,7 +5,8 @@ const App = createSlice({
     initialState: {
         isLoading: false,
         currencies: [],
-        budgets: [] 
+        budgets: [], 
+        notifications: 0
     },
     reducers: ({
         openLoading: (state, actions) => {
@@ -19,7 +20,13 @@ const App = createSlice({
         getBudgetsSuccess: (state, actions) => {
             state.budgets = actions.payload
         },
-        uploadFiles: (state, acctions) => {}
+        uploadFiles: (state, acctions) => {},
+        getNotificationsSuccess: (state, actions) => {
+            state.notifications = actions.payload
+        },
+        updateNotificationsSuccess: (state, actions) => {
+            state.notifications += 1
+        }
         // addToCart: (state, actions) => {}
     })
 })

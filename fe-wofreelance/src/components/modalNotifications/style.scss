@@ -1,0 +1,11 @@
+@import "../../css/custom";
+
+.ant-notification-notice{
+    background-color:#a6a4a8;
+    color: #ffffff;
+    font-size: calc(16 / $fdf) * $rem;
+    .ant-notification-notice-message{
+        color: #ffffff;
+        font-weight: 600;
+    }
+}

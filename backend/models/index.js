@@ -141,7 +141,8 @@ db.jobskillset.belongsTo(db.jobcategories, {
 
 
 db.userprofile.hasMany(db.posts, {
-  foreignKey: 'user_id'
+  foreignKey: 'user_id',
+  as: 'user'
 })
 db.posts.belongsTo(db.userprofile, {
   foreignKey: 'user_id'
@@ -169,22 +170,13 @@ db.budgets.belongsTo(db.currencies, {
 })
 
 
+
 // ========================================================================================== End ==========================================================================================//
 
 
 
 
 // =============================================================================== Many to Many Relationship =============================================================================== // 
-db.userprofile.hasMany(db.posts, {
-  foreignKey: 'id'
-})
-
-db.posts.belongsTo(db.userprofile, {
-  foreignKey: 'user_id'
-})
-
-
-
 
 db.posts.belongsToMany(db.jobskillset, {
   through: db.post_skillsets,

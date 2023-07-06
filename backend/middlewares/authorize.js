@@ -23,7 +23,7 @@ const authorize = (roles = []) => {
             },
           ],
         });
-        if (!userFound.token) {
+        if (!userFound?.token) {
           res.status(401).json({ message: "You are not authenticated." });
         } else {
           if (userFound) {
