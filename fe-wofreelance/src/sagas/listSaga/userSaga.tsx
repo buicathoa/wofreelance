@@ -1,5 +1,5 @@
 
-import { select , put, takeLatest } from "redux-saga/effects";
+import { select , put, takeLatest, call } from "redux-saga/effects";
 import { push } from 'react-router-redux';
 import { apiRequest } from "../../utils/apiRequest";
 import { HREF, apiUrl } from "../../constants";
@@ -26,9 +26,10 @@ export function* UserTaskSaga(): Generator {
 function* signIn(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
-        const response = yield apiRequest(apiUrl.user.signin, param, 'general')
+        const response:any = yield apiRequest(apiUrl.user.signin, param, 'general')
         if (response) {
             yield put(UserActions.signinSuccess((response as ResponseFormatItem).data))
+            yield call([localStorage, 'setItem'], 'access_token', response?.data.token);
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)

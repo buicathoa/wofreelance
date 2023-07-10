@@ -12,6 +12,7 @@ import { io } from "socket.io-client";
 import { UserInterface } from "./interface";
 import { useSelector } from "react-redux";
 import { RootState } from "./reducers/rootReducer";
+// import { socket } from "./SocketContext";
 
 const BasicLayout = () => {
   // useEffect(() => {
@@ -43,7 +44,6 @@ const BasicLayout = () => {
 }
 
 function App() {
-
   return (
     <Routes>
       <Route path="/" element={<BasicLayout />}>

@@ -32,8 +32,10 @@ const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
 const { io } = require("../../server");
-const { removeUserOnline } = require("../../globalVariable");
-const {myEmitter} = require("../../myEmitter");
+const { removeUserOnline, getSocketState } = require("../../globalVariable");
+const EventEmitter = require("../../myEmitter");
+const myEmitter = require("../../myEmitter");
+const myModule = require('./../../wsHandler/userSocket');
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
@@ -190,7 +192,6 @@ const userService = {
               token,
               ...others
             } = user.dataValues;
-            myEmitter.emit(USER_SIGNIN, {user_id:  user.id, socket_id: socket?.id})
             return {
               message: "Login success.",
               data: others,
@@ -221,7 +222,7 @@ const userService = {
           },
         }
       );
-      myEmitter.emit(USER_SIGNOUT, decoded.id)
+      // myEmitter.emit(USER_SIGNOUT, decoded.id)
       transaction.commit();
       return true;
     } catch (err) {
@@ -310,7 +311,9 @@ const userService = {
           const decoded = jwt_decode(userFound.ip_address);
           const user_info = await axios.get(
             `https://api.ipdata.co/${decoded.ip_address}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
-          );
+          ).catch(err => {
+            console.log('error_ip', err.respose)
+          });
           const timeConvert =
             new Date(user_info.data.time_zone.current_time).getTime() -
             new Date().getTimezoneOffset() * 60 * 1000;
@@ -326,7 +329,6 @@ const userService = {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
-          myEmitter.emit(ADD_USER_INFO, userFound.id)
           return timeResponse
             ? { ...others, current_time: timeResponse }
             : { ...others };

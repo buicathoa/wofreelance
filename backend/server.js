@@ -27,6 +27,7 @@ const userController = require("./controllers/UserController/user.controller");
 const userSocket = require("./wsHandler/userSocket");
 const CONSTANT = require("./constants");
 const router = require("express").Router();
+const {Server} = require('socket.io');
 
 const db = require("./models");
 const Countries = db.countries;
@@ -35,6 +36,8 @@ const UserProfile = db.userprofile;
 const jwt_decode = require("jwt-decode");
 const multer = require("multer");
 const notificationSocket = require("./wsHandler/notificationSocket");
+const myEmitter = require("./myEmitter");
+const { validateSocket } = require("./globalVariable");
 const upload = multer();
 
 // const verifiedEmailSuccess = require("./services/UserService/user.service");
@@ -77,6 +80,14 @@ app.use(function (req, res, next) {
   next();
 });
 
+function initSocket(server) {
+  return new Server(server, {
+    cors: {
+      origin: '*'
+    }
+  });
+}
+
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
@@ -96,12 +107,11 @@ const onConnection = (socket) => {
   //   })
   //   socket.emit(USER_INFO, {user: user})
   // })
-  userSocket(socket, io);
+  userSocket(socket, io)
   notificationSocket(socket, io);
   app.get("/v1/user/email-verified", (req, res) => {
     userController.emailVerified(req, res, socket, io);
   });
-  app.use("/v1/user", userRoute())
   // userService.emailVerified(socket, io)
 };
 
@@ -120,30 +130,35 @@ const onConnection = (socket) => {
 //     }
 // })
 
-// io.use((socket, next) => {
+io.use((socket, next) => {
   
-//     if (socket.handshake.auth.token !== null) {
-//       const decoded = jwt_decode(socket.handshake.auth.token);
-//       if (decoded) {
-//          UserProfile.findOne({
-//           where: {
-//             id: decoded.id
-//           }
-//         }).then(() => {
-//           next()
-//         })
-//       } else {
-//         next(new Error('Authentication error'));
-//       }
-//     } else {
-//       next(new Error('Authentication error'));
-//     }
+    if (socket.handshake.auth.token !== null) {
+      const decoded = jwt_decode(socket.handshake.auth.token);
+      if (decoded) {
+         UserProfile.findOne({
+          where: {
+            id: decoded.id
+          }
+        }).then(() => {
+          next()
+        })
+      } else {
+        next(new Error('Authentication error'));
+      }
+    } else {
+      next(new Error('Authentication error'));
+    }
   
+})
+// myEmitter.on('connection', (client) => {
+  io.on("connection", (socket) => {
+    onConnection(socket);
+    // const checkSocketConnection = validateSocket(socket.id)
+    // if(!checkSocketConnection){
+    //   onConnection(socket);
+    // }
+  });
 // })
-
-io.on("connection", (socket) => {
-  onConnection(socket);
-});
 
 app.use(bodyParser.json({ limit: "50mb" })); // for parsing application/json
 app.use(
@@ -163,7 +178,7 @@ app.use("/v1/budgets", budgetRoute);
 app.use("/v1/portfolio", portfolioRoute);
 app.use("/v1", generalRoute);
 app.use("/v1/posts", postsRoute)
-
+app.use("/v1/user", userRoute)
 //crawl data for universities
 // function delay(time) {
 //   return new Promise(function (resolve) {

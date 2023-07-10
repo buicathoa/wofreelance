@@ -6,12 +6,12 @@ import { ResponseFormatItem, UserInterface } from '../../../interface'
 import { RootState } from '../../../reducers/rootReducer'
 import { UserActions } from '../../../reducers/listReducer/userReducer'
 import { useDispatch } from 'react-redux'
+import { SocketContext } from '../../../SocketProvider'
 
 const ProfileContent = ({user}:any) => {
-    // const socket = useContext(SocketContext)
+    const socket: any = useContext(SocketContext)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
     const signout = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(UserActions.signout({ param, resolve, reject }));
@@ -19,7 +19,8 @@ const ProfileContent = ({user}:any) => {
     };
 
     const handleSignout = () => {
-        signout({}).then((res) => {
+        signout({}).then(() => {
+            socket.emit('user_signout', user.id)
             localStorage.removeItem('access_token');
                 navigate('/signin')
         })

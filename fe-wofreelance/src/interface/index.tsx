@@ -296,7 +296,8 @@ export interface userReducerInterface {
     user_skills: Array<SkillsetInterface>,
     languages: Array<LanguagesInterface>,
     address_generated: AddressGeneratedInterface,
-    user_info: UserInterface
+    user_info: UserInterface,
+    isLoggedIn: boolean
 }
 
 export interface categoryReducerInterface {

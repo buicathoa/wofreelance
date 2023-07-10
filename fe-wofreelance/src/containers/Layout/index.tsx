@@ -22,9 +22,11 @@ import { EducationActions } from "../../reducers/listReducer/educationReducer";
 import { QualifycationActions } from "../../reducers/listReducer/qualificationReducer";
 import Footer from "../Footer";
 import { PortfolioActions } from "../../reducers/listReducer/portfolioReducer";
-import { SocketContext } from "../../SocketContext";
+// import { SocketContext } from "../../SocketContext";
 import { AppActions } from "../../reducers/listReducer/appReducer";
 import { modalNotifications } from "../../components/modalNotifications";
+import { SocketContext } from "../../SocketProvider";
+// import { socket } from "../../SocketContext";
 // import { SocketContext } from "../../SocketContext";
 
 
@@ -32,7 +34,8 @@ const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const socket = useContext(SocketContext)
+  // const socket = useContext(SocketContext)
+  const socket: any = useContext(SocketContext)
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(UserActions.getUserInfo({ param, resolve, reject }));
@@ -119,24 +122,26 @@ const Layout = () => {
             navigate('/not-found')
           })
       } else {
-        getUserInfo({})
+        getUserInfo({}).then((res) => {
+          socket.emit("add_user_info", res.data.id)
+        })
       }
     }
   }, [location])
 
-  useEffect(() => {
-    socket.on("new_post_notify_response", (data) => {
-      debugger
-      dispatch(AppActions.updateNotificationsSuccess(1))
-      modalNotifications(data.title, `Here the latest project matching your skills: ${data.project_detail}\
-      ,Skills: ${data.skills.map((skill: any) => {
-        return skill.label
-      }).join(", ")}`)
-    });
-    return () => {
-      socket.off('new_post_notify_response');
-    };
-  },[])
+  // useEffect(() => {
+  //   socket.on("new_post_notify_response", (data) => {
+  //     debugger
+  //     dispatch(AppActions.updateNotificationsSuccess(1))
+  //     modalNotifications(data.title, `Here the latest project matching your skills: ${data.project_detail}\
+  //     ,Skills: ${data.skills.map((skill: any) => {
+  //       return skill.label
+  //     }).join(", ")}`)
+  //   });
+  //   return () => {
+  //     socket.off('new_post_notify_response');
+  //   };
+  // },[])
 
   const handlePostProject = () => {
     navigate('/post-project')

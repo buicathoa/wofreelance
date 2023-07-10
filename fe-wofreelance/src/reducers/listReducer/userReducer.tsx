@@ -6,7 +6,8 @@ const initialState: userReducerInterface = {
     user_skills: [],
     languages: [],
     address_generated: {},
-    user_info: {}
+    user_info: {},
+    isLoggedIn: false
 }
 
 const User = createSlice({
@@ -15,7 +16,8 @@ const User = createSlice({
     reducers: ({
         signin: (state, actions) => { },
         signinSuccess: (state, actions) => {
-            state.user = actions.payload
+            state.user = actions.payload;
+            state.isLoggedIn = true
         },
         signout: (state, actions) => {},
         checkExistUser: (state, actions) => { },

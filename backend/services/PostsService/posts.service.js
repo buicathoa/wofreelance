@@ -13,7 +13,7 @@ const QueryParameter = require("../../utils/QueryParameter");
 const { cloudinary } = require("../../utils/helper");
 const dayjs = require("dayjs");
 const CONSTANT = require("../../constants");
-const {myEmitter} = require("../../myEmitter");
+const myEmitter = require("../../myEmitter");
 const Post = db.posts;
 const JobSubCategories = db.jobsubcategories;
 const Posts_skillsets = db.post_skillsets;
@@ -92,7 +92,7 @@ const PostService = {
         throw new ClientError("Bad request.")
       }
       //send notification to client with socket
-      myEmitter.emit(NEW_POST_NOTIFY, {...newPost.dataValues, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
+      myEmitter.emit(NEW_POST_NOTIFY, {...newPost, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
 
       await transaction.commit()
       return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}

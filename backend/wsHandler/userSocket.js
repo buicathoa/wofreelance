@@ -1,8 +1,8 @@
 const CONSTANT = require("../constants");
-const { findUser, getUserOnline, pushUserOnline, removeUserOnline, addUserInfo } = require("../globalVariable");
+const { findUser, getUserOnline, pushUserOnline, removeUserOnline, addUserInfo, getSocketState } = require("../globalVariable");
 const db = require("../models");
 const jwt_decode = require("jwt-decode");
-const {myEmitter} = require("../myEmitter");
+const myEmitter = require("../myEmitter");
 
 const UserProfile = db.userprofile;
 const UserLoggedIn = db.user_loggedin;
@@ -31,8 +31,11 @@ module.exports = (socket, io) => {
     await io.to(`user_id_${user.id}`).emit(USER_INFO, user);
   });
 
-  myEmitter.on(ADD_USER_INFO, async(user_id) => {
-    addUserInfo(user_id, socket.id)
+  socket.on(ADD_USER_INFO, async(user_id) => {
+    const user = findUser(user_id)
+    if(!user){
+      addUserInfo(user_id, socket.id)
+    }
   })
 
   socket.on(USER_STATUS, async (user_id) => {
@@ -44,7 +47,7 @@ module.exports = (socket, io) => {
     pushUserOnline({user_id: user_id, socket_id: socket.id })
   })
 
-  myEmitter.on(USER_SIGNOUT, (user_id) => {
+  socket.on(USER_SIGNOUT, (user_id) => {
     removeUserOnline(user_id)
   })
 

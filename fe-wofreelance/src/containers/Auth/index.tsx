@@ -13,7 +13,7 @@ import axios from 'axios';
 import { getCookie } from '../../utils/helper';
 import { LeftOutlined } from '@ant-design/icons'
 import { io } from "socket.io-client";
-import { SocketContext, socket } from '../../SocketContext';
+// import { SocketContext, socket } from '../../SocketContext';
 
 
 const Auth = () => {
@@ -65,7 +65,7 @@ const Auth = () => {
     signin({...values, status: 'sign_up'}).then((res: any) => {
       if (res.code === 200) {
         localStorage.setItem('access_token', res.data.token)
-        socket.emit("user_signin", res.data.data.id)
+        // socket.emit("user_signin", res.data.data.id)
         navigate('/')
       } else {
         openError(res.err.response.data.message)

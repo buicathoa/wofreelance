@@ -6,22 +6,25 @@ import Loading from './components/Loading';
 import App from './App';
 import Layout from './containers/Layout';
 import store from './reducers/rootReducer';
-import { SocketContext, socket } from "./SocketContext";
+// import { SocketContext, socket } from "./SocketContext";
 
 import './index.css';
+// import { socket, SocketContext } from './SocketContext';
+import { SocketProvider } from './SocketProvider';
+// import { SocketProvider } from './SocketProvider';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 
 root.render(
-  <SocketContext.Provider value={socket}>
-    <Provider store={store}>
+  <Provider store={store}>
+    <SocketProvider>
       <BrowserRouter>
         <Loading />
         <App />
       </BrowserRouter>
-    </Provider>
-  </SocketContext.Provider>
+    </SocketProvider>
+  </Provider>
 );
 
