@@ -13,6 +13,7 @@ import axios from 'axios';
 import { getCookie } from '../../utils/helper';
 import { LeftOutlined } from '@ant-design/icons'
 import { io } from "socket.io-client";
+import { SocketContext } from '../../SocketProvider';
 // import { SocketContext, socket } from '../../SocketContext';
 
 
@@ -21,10 +22,11 @@ const Auth = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
+  const socket: any = useContext(SocketContext)
   const {id} = useParams()
   const [formValues, setformValues] = useState({})
   const [loginType, setLoginType] = useState('')
-  const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
+  const [userFbInfo, setUserFbInfo] = useState<UserInterface>({user_active: false})
   const validateMessages = {
     required: 'This field is required'
   }
@@ -65,8 +67,8 @@ const Auth = () => {
     signin({...values, status: 'sign_up'}).then((res: any) => {
       if (res.code === 200) {
         localStorage.setItem('access_token', res.data.token)
+        navigate('/dashboard')
         // socket.emit("user_signin", res.data.data.id)
-        navigate('/')
       } else {
         openError(res.err.response.data.message)
       }

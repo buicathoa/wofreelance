@@ -3,9 +3,9 @@ import { freelancer_logo } from '../../assets'
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, TeamOutlined } from '@ant-design/icons'
 import { Badge, Button, Popover } from "antd";
 import './style.scss'
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { ResponseFormatItem, UserInterface } from "../../interface";
+import { NotificationInterface, ResponseFormatItem, UserInterface } from "../../interface";
 import { UserActions } from "../../reducers/listReducer/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
@@ -26,6 +26,7 @@ import { PortfolioActions } from "../../reducers/listReducer/portfolioReducer";
 import { AppActions } from "../../reducers/listReducer/appReducer";
 import { modalNotifications } from "../../components/modalNotifications";
 import { SocketContext } from "../../SocketProvider";
+import { NotificationsActions } from "../../reducers/listReducer/notificationsReducer";
 // import { socket } from "../../SocketContext";
 // import { SocketContext } from "../../SocketContext";
 
@@ -34,6 +35,7 @@ const Layout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+  const [openNoti, setOpenNoti] = useState(false)
   // const socket = useContext(SocketContext)
   const socket: any = useContext(SocketContext)
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
@@ -78,17 +80,24 @@ const Layout = () => {
     });
   };
 
+  const getAllNotifications = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(NotificationsActions.getAllNotifications({ param, resolve, reject }));
+    });
+  };
+
+  const updateUser = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+        dispatch(UserActions.updateUser({ param, resolve, reject }));
+    });
+};
 
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
+  const notifications: Array<NotificationInterface> = useSelector((state: RootState) => state.notifications.notifications)
   const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
 
   useEffect(() => {
-    const userTokenCookie: any = getCookie('access_token')
-    if (userTokenCookie) {
-      localStorage.setItem('access_token', userTokenCookie)
-      getUserInfo({})
-      deleteCookie('access_token')
-    } else {
+    if (socket) {
       if (!checkLocalStorage('access_token')) {
         const nextLocation = location.pathname.replaceAll('/', '%252')
         navigate(`/signin?next=${nextLocation}`)
@@ -119,34 +128,63 @@ const Layout = () => {
           }
         })
           .catch((err) => {
+
             navigate('/not-found')
           })
       } else {
         getUserInfo({}).then((res) => {
-          socket.emit("add_user_info", res.data.id)
+          console.log(socket)
         })
       }
+    } else {
+      const userTokenCookie: any = getCookie('access_token')
+      if (userTokenCookie) {
+        localStorage.setItem('access_token', userTokenCookie)
+        getUserInfo({})
+        deleteCookie('access_token')
+      }
     }
-  }, [location])
+  }, [location, socket])
 
-  // useEffect(() => {
-  //   socket.on("new_post_notify_response", (data) => {
-  //     debugger
-  //     dispatch(AppActions.updateNotificationsSuccess(1))
-  //     modalNotifications(data.title, `Here the latest project matching your skills: ${data.project_detail}\
-  //     ,Skills: ${data.skills.map((skill: any) => {
-  //       return skill.label
-  //     }).join(", ")}`)
-  //   });
-  //   return () => {
-  //     socket.off('new_post_notify_response');
-  //   };
-  // },[])
+  useEffect(() => {
+    if (socket) {
+      socket.on("new_post_notify_response", (data: any) => {
+        dispatch(UserActions.increaseNotifications({}))
+        modalNotifications(
+          {notiMess: data.title, description: `Here the latest project matching your skills: ${data.project_detail}\
+        ,Skills: ${data.skills.map((skill: any) => {
+          return skill.label
+        }).join(", ")}`,noti_url:  data.noti_url
+      })
+      });
+      socket.on("project_bidding_response", (data: any) => {
+        dispatch(UserActions.increaseNotifications({}))
+        return modalNotifications({notiMess: 'New bidding',description: data.message, noti_url: data.url})
+      })
+    }
+  }, [socket])
 
   const handlePostProject = () => {
     navigate('/post-project')
   }
 
+  const handleOpenNoti = () => {
+    if(openNoti) {
+      setOpenNoti(false)
+    } else {
+      getAllNotifications({}).then(() => {
+        if(user.noti_count! > 0) {
+          updateUser({noti_count: 0}).then(() => {
+            dispatch(UserActions.updateNoticountSuccess({}))
+            setOpenNoti(true)
+          })
+        } else {
+          setOpenNoti( true)
+        }
+      })
+
+    }
+  }
 
   return (
     <div>
@@ -181,7 +219,7 @@ const Layout = () => {
           </div>
           <div className="nav-menu-right">
             <div className="message-notify">
-              <Popover content={<NotificationContent />} trigger="hover" placement="bottom">
+              <Popover content={<NotificationContent notifications={notifications}/>} onOpenChange={handleOpenNoti} open={openNoti} trigger="click" placement="bottom">
                 <Badge count={user.noti_count} size="small">
                   <BellOutlined />
                 </Badge>

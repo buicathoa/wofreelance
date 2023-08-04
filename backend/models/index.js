@@ -58,9 +58,12 @@ db.currencies = require("./Currency/currency")(sequelize,DataTypes)
 db.budgets = require("./Budgets/budgets")(sequelize, DataTypes)
 db.portfolio = require("./Portfolio/portfolio")(sequelize, DataTypes)
 db.notifications = require("./Notifications/notifications")(sequelize, DataTypes)
-
+db.sockets = require("./SocketModel/socketmodel")(sequelize, DataTypes)
+db.rooms = require("./Chat/room")(sequelize, DataTypes)
+db.messages = require("./Chat/messages")(sequelize, DataTypes)
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
+db.bidding = require("./Bidding/bidding")(sequelize, DataTypes)
 
 
 //skillset: javascript, react,...
@@ -88,6 +91,10 @@ db.portfolio_skillset = require("./Portfolio/portfolio_skillset")(sequelize, Dat
 // Junction table between notifications and user
 db.user_notifications = require("./Notifications/user_notifications")(sequelize, DataTypes)
 
+
+// Junction table between bidding and user
+db.user_bidding = require("./userModel/user_bidding")(sequelize, DataTypes)
+
 //reviews table
 // db.reviews = require("./Reviews/review")(sequelize, DataTypes)
 
@@ -95,6 +102,9 @@ db.user_notifications = require("./Notifications/user_notifications")(sequelize,
 db.posts = require("./Posts/post")(sequelize, DataTypes)
 
 db.user_loggedin = require("./UserLoggedIn/userloggedin")(sequelize, DataTypes)
+
+// Junction table between users and rooms
+db.users_rooms = require("./Chat/users_rooms")(sequelize, DataTypes)
 // =============================================================================== One to One Relationships =================================================================//
 
 db.userroles.hasOne(db.userprofile, {
@@ -127,6 +137,16 @@ db.user_loggedin.belongsTo(db.userprofile, {
   foreignKey: 'user_id',
   as: 'user_info'
 })
+
+
+db.userprofile.hasOne(db.sockets, {
+  foreignKey: 'user_id',
+  // as: 'user'
+})
+db.sockets.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  // as: 'user'
+})
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
 //Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
@@ -142,10 +162,11 @@ db.jobskillset.belongsTo(db.jobcategories, {
 
 db.userprofile.hasMany(db.posts, {
   foreignKey: 'user_id',
-  as: 'user'
+  as: 'post'
 })
 db.posts.belongsTo(db.userprofile, {
-  foreignKey: 'user_id'
+  foreignKey: 'user_id',
+  as: 'user'
 })
 
 
@@ -170,6 +191,36 @@ db.budgets.belongsTo(db.currencies, {
 })
 
 
+
+db.budgets.hasMany(db.posts, {
+  foreignKey: 'project_budget',
+  as: 'budget'
+})
+db.posts.belongsTo(db.budgets, {
+  foreignKey: 'project_budget',
+  as: 'budget'
+})
+
+
+
+db.posts.hasMany(db.bidding, {
+  foreignKey: 'post_id',
+  as: 'biddings'
+})
+db.bidding.belongsTo(db.posts, {
+  foreignKey: 'post_id',
+  as: 'biddings'
+})
+
+
+db.rooms.hasMany(db.messages, {
+  foreignKey: 'room_id',
+  as: 'messages'
+})
+db.messages.belongsTo(db.rooms, {
+  foreignKey: 'room_id',
+  as: 'messages'
+})
 
 // ========================================================================================== End ==========================================================================================//
 
@@ -278,6 +329,35 @@ db.userprofile.belongsToMany(db.notifications, {
   foreignKey: 'user_id',
   otherKey: 'notification_id',
   as: 'notifications'
+})
+
+
+
+db.userprofile.belongsToMany(db.bidding, {
+  through: db.user_bidding,
+  foreignKey: 'user_id',
+  otherKey: 'bidding_id',
+  as: 'bidding'
+})
+db.bidding.belongsToMany(db.userprofile, {
+  through: db.user_bidding,
+  foreignKey: 'bidding_id',
+  otherKey: 'user_id',
+  as: 'user'
+})
+
+
+db.userprofile.belongsToMany(db.rooms, {
+  through: db.users_rooms,
+  foreignKey: 'user_id',
+  otherKey: 'room_id',
+  as: 'room'
+})
+db.rooms.belongsToMany(db.userprofile, {
+  through: db.users_rooms,
+  foreignKey: 'room_id',
+  otherKey: 'user_id',
+  as: 'user'
 })
 
 // ========================================================================================== End ==========================================================================================//

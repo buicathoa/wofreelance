@@ -7,7 +7,8 @@ const myEmitter = require("../myEmitter");
 const UserProfile = db.userprofile;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
-const User_Notifications = db.user_notifications
+const User_Notifications = db.user_notifications;
+const Sockets = db.sockets
 
 module.exports = (socket, io) => {
   const {
@@ -17,7 +18,8 @@ module.exports = (socket, io) => {
     USER_SIGNIN,
     USER_SIGNOUT,
     USER_RECONNECT,
-    ADD_USER_INFO
+    ADD_USER_INFO,
+    USERS_ONLINE
   } = CONSTANT.WS_EVENT;
 
   myEmitter.on(TOKEN, async (token) => {
@@ -31,11 +33,8 @@ module.exports = (socket, io) => {
     await io.to(`user_id_${user.id}`).emit(USER_INFO, user);
   });
 
-  socket.on(ADD_USER_INFO, async(user_id) => {
-    const user = findUser(user_id)
-    if(!user){
-      addUserInfo(user_id, socket.id)
-    }
+  socket.on(ADD_USER_INFO, (user_id) => {
+    addUserInfo(user_id, socket.id)
   })
 
   socket.on(USER_STATUS, async (user_id) => {
@@ -44,7 +43,7 @@ module.exports = (socket, io) => {
   }),
 
   socket.on(USER_SIGNIN, async(user_id) => {
-    pushUserOnline({user_id: user_id, socket_id: socket.id })
+    socket.join(USERS_ONLINE)
   })
 
   socket.on(USER_SIGNOUT, (user_id) => {
@@ -57,7 +56,4 @@ module.exports = (socket, io) => {
     pushUserOnline({user_id: decoded.id, socket_id: socket.id})
   })
 
-  setInterval(() => {
-    socket.emit("user_status_result", getUserOnline());
-  }, 30000);
 };

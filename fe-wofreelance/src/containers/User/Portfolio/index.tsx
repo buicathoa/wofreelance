@@ -131,15 +131,14 @@ const Portfolio = () => {
         dispatch(AppActions.openLoading(true))
         if (modifyPortfolio === 'add') {
             createPortfolio(payload).then(res => {
-                openSuccess(res.message)
-                openSuccess('Create Port')
+                openSuccess({notiMess: res.message})
                 setModifyPortfolio('')
                 getPortfolios({})
                 setformValues({})
             })
         } else {
             updatePortfolio({ ...payload, id: formValues.id }).then((res) => {
-                openSuccess(res.message)
+                openSuccess({notiMess: res.message})
                 setModifyPortfolio('')
                 getPortfolios({})
                 setformValues({})
@@ -152,9 +151,8 @@ const Portfolio = () => {
     const onSubmitFile = async (e: any) => {
         const formData = new FormData()
         let file = e.target.files[0]
-        // debugger
         if (listFilesSelected.length === 3) {
-            openError("You are allowed to upload maximum three files at one Portfolio")
+            openError({notiMess: "You are allowed to upload maximum three files at one Portfolio"})
         } else {
             const listFiles = [...listFilesSelected]
             formData.append("content_type", contentTypeSelected)
@@ -237,7 +235,7 @@ const Portfolio = () => {
         deletePortfolio({ id: recordSelectedId }).then((res) => {
             setIsOpenModalConfirm(false)
             getPortfolios({})
-            openSuccess(res.message)
+            openSuccess({notiMess: res.message})
         })
     }
 

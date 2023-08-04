@@ -8,15 +8,20 @@ const UserProfile = db.userprofile;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
 const User_Notifications = db.user_notifications;
+const User_Socket = db.user_;
 const Skillset = db.jobskillset;
+const Sockets = db.sockets;
+const Bidding = db.bidding;
 const sequelize = db.sequelize;
 
 module.exports = (socket, io) => {
-  const { NEW_POST_NOTIFY, NEW_POST_NOTIFY_RESPONSE } = CONSTANT.WS_EVENT;
+  const { NEW_POST_NOTIFY, PROJECT_BIDDING, PROJECT_BIDDING_RESPONSE, NEW_MESSAGE, NEW_MESSAGE_RESPONSE } =
+    CONSTANT.WS_EVENT;
 
-  myEmitter.once(NEW_POST_NOTIFY, async (data) => {
+  socket.on(NEW_POST_NOTIFY, async (data) => {
     let transaction = await sequelize.transaction();
     try {
+      console.log(io);
       const skills = data.skills.map((skill) => {
         return skill.value;
       });
@@ -29,7 +34,7 @@ module.exports = (socket, io) => {
         noti_type: "post",
         noti_title: data.title,
         noti_content: `${data.project_detail}: ${skills_name.join(", ")}`,
-        noti_url: data.post_url,
+        noti_url: data.noti_url,
       });
 
       // finding user matching skills except user create
@@ -56,8 +61,8 @@ module.exports = (socket, io) => {
       });
 
       //add notification type received to each user who were found in prev step
-      userMatchingSkills.forEach((user) => {
-        User_Notifications.create({
+      userMatchingSkills.forEach(async (user) => {
+        await User_Notifications.create({
           notification_id: notifications.id,
           user_id: user.id,
           noti_status: "received",
@@ -65,7 +70,7 @@ module.exports = (socket, io) => {
 
         //update noti_count to one more
 
-        UserProfile.increment(
+        await UserProfile.increment(
           {
             noti_count: +1,
           },
@@ -77,13 +82,14 @@ module.exports = (socket, io) => {
         );
 
         //emit an event to all user online and matching the skills
-        const indexUserOnline = findIndexUser(user);
-        if (indexUserOnline !== -1) {
-          const userOnl = findUser(user.id);
-          socket.broadcast
-            .to(userOnl.socket_id)
-            .emit("new_post_notify_response", data);
-        }
+        const userOnline = await Sockets.findOne({
+          where: {
+            user_id: user.id,
+          },
+        });
+        await socket.broadcast
+          .to(userOnline.socket_id)
+          .emit("new_post_notify_response", data);
       });
 
       // send notification to online user
@@ -92,4 +98,69 @@ module.exports = (socket, io) => {
       await transaction.rollback();
     }
   });
+
+  socket.on(PROJECT_BIDDING, async (data) => {
+    let transaction = await sequelize.transaction();
+    try {
+      const decoded = jwt_decode(socket.handshake.auth.token);
+      //Finding user who own this post and active
+      const userFound = await Sockets.findOne({
+        where: {
+          user_id: data.user_id,
+        },
+      });
+
+      //Finding user who bid the post
+      const userBid = await UserProfile.findOne({
+        attributes: ["username"],
+        where: {
+          id: decoded.id,
+        },
+      });
+
+      //Count the bid of this post
+      const countBid = await Bidding.count({
+        where: {
+          post_id: data.post_id,
+        },
+      });
+
+      await socket.broadcast
+        .to(userFound?.socket_id)
+        .emit(PROJECT_BIDDING_RESPONSE, {
+          message:
+            countBid <= 1
+              ? `${
+                  userBid?.username
+                } bid to your post: ${data.describe_proposal.slice(0, 10)}... `
+              : `${userBid.username} and ${
+                  countBid - 1
+                } others bid to your post`,
+          url: data?.url,
+        });
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  });
+
+  socket.on(NEW_MESSAGE, async (data) => {
+    let transaction = await sequelize.transaction();
+    try {
+      const decoded = jwt_decode(socket.handshake.auth.token);
+      await UserProfile.increment(
+        {
+          noti_mess: +1,
+        },
+        {
+          where: {
+            id: user.id,
+          },
+        }
+      );
+    } catch (err) {
+
+    }
+  })
 };

@@ -69,14 +69,14 @@ export interface CategorySkillsetNewFreelance {
 }
 
 export interface SignupFormInterface {
-    username ?: string,
-    email ?: string,
-    password ?: string
+    username?: string,
+    email?: string,
+    password?: string
 }
 
 export interface SkillselectedComponentInterface {
     skillsetSelected?: Array<SkillsetInterface>,
-    setSkillsetSelected?:  React.Dispatch<React.SetStateAction<Array<SkillsetInterface>>>,
+    setSkillsetSelected?: React.Dispatch<React.SetStateAction<Array<SkillsetInterface>>>,
     setPercent?: React.Dispatch<React.SetStateAction<number>>,
 }
 
@@ -88,7 +88,7 @@ export interface AlertBannerComponentInterface {
 
 export interface ModalConfirmInterface {
     title?: string,
-    icon?:  any | null,
+    icon?: any | null,
     content?: string | null,
     description?: string | null,
     visible?: boolean,
@@ -150,7 +150,58 @@ export interface UserInterface {
         country_official_name?: string
     },
     current_time?: string,
-    noti_count?: number
+    noti_count?: number,
+    user_active: boolean
+}
+
+export interface BudgetInterface {
+    id: string,
+    currency_id?: number,
+    minimum: number,
+    maximum?: number,
+    name: string,
+    project_type: string,
+    currency: CurrencyInterface,
+    createdAt?: Date,
+    updatedAt?: Date
+}
+
+export interface BiddingInterface {
+    id: number,
+    bidding_amount?: number,
+    hourly_rate?: number,
+    weekly_limit?: number,
+    post_id?: number,
+    delivered_time?: number,
+    describe_proposal: string,
+    createdAt?: Date,
+    updatedAt?: Date,
+    project_paid_type: number,
+    user: UserInterface,
+    budget: BudgetInterface
+}
+
+export interface BiddingInterfaceResponse {
+    items: Array<BiddingInterface>,
+    totalRecord: number
+}
+export interface PostInteface {
+    id: number,
+    title: string,
+    project_detail: string,
+    bidding_time_start: Date,
+    bidding_time_end: Date,
+    project_paid_type: string,
+    post_status: string,
+    file?: string,
+    post_type: string,
+    post_url: string,
+    createdAt: Date,
+    updatedAt: Date,
+    list_skills: Array<SkillsetInterface>,
+    user: UserInterface,
+    budget: BudgetInterface,
+    biddings: Array<BiddingInterface>
 }
 
 export interface CurrencyInterface {
@@ -161,16 +212,6 @@ export interface CurrencyInterface {
     short_name: string
 }
 
-export interface BudgetInterface {
-    id: number,
-    currency: CurrencyInterface,
-    minimum: number,
-    maximum?: number,
-    name: string,
-    project_type: string,
-    createdAt?: Date,
-    updatedAt?: Date
-}
 
 export interface LanguagesInterface {
     id?: number,
@@ -256,7 +297,25 @@ export interface CountryInterface {
     updatedAt?: Date
 }
 
-export interface PhotoandNameComponentInterface{
+export interface ChatReducerInterface  {
+    user: UserInterface,
+    message_url?: string,
+    message_title?: string,
+    chat_window_status: string //open, hide, close
+}
+
+export interface NotificationInterface {
+    id: number,
+    noti_type: string,
+    noti_content: string,
+    noti_url: string,
+    noti_title: string,
+    createdAt?: Date,
+    updatedAt?: Date,
+    noti_status?: string
+}
+
+export interface PhotoandNameComponentInterface {
     fileUploaded?: File,
     setFileUploaded?: React.Dispatch<React.SetStateAction<File>>,
     formValues?: any,
@@ -276,7 +335,7 @@ export interface SkillSelectionComponentInterface {
     skillsetSelected?: Array<SkillsetInterface>,
     setSkillsetSelected: React.Dispatch<React.SetStateAction<any>>,
     listSkills?: Array<SkillsetInterface>,
-    setListSkills:  React.Dispatch<React.SetStateAction<any>>,
+    setListSkills: React.Dispatch<React.SetStateAction<any>>,
     categorySelected?: CategoryInterface,
     setCategorySelected: React.Dispatch<React.SetStateAction<any>>,
     debouncedText?: string,
@@ -306,15 +365,15 @@ export interface categoryReducerInterface {
 }
 
 export interface experienceReducerInterface {
-    experiences: Array<ExperiencesInterface> 
+    experiences: Array<ExperiencesInterface>
 }
 
 export interface portfolioReducerInterface {
-    portfolios: Array<PortfolioInterface> 
+    portfolios: Array<PortfolioInterface>
 }
 
 export interface qualificationReducerInterface {
-    qualifications: Array<QualificationInterface> 
+    qualifications: Array<QualificationInterface>
 }
 
 export interface educationReducerInterface {

@@ -5,15 +5,20 @@ import { Notifications } from '../../interface'
 // import { errorIcon } from 'assets'
 // import './styles.scss'
 
-export const openSuccess = (notiMess = 'Action success', notiDuration = 3, notiPlacement = null): any => {
+interface openMessageInterface {
+    notiMess?: string,
+    notiDuration?: number
+}
+
+export const openSuccess = ({notiMess, notiDuration}: openMessageInterface) => {
     return message.open({
         type: 'success',
-        content: notiMess,
-        duration: notiDuration
+        content: notiMess ?? 'Action success',
+        duration: notiDuration,
     })
 }
 
-export function openError(notiMess: string, notiDuration = 3, notiPlacement = null) {
+export function openError({notiMess, notiDuration}: openMessageInterface) {
     message.open({
         type: 'error',
         content: notiMess,
@@ -21,11 +26,11 @@ export function openError(notiMess: string, notiDuration = 3, notiPlacement = nu
     })
 }
 
-export function openWarning(notiMess: string, notiDuration = null, notiPlacement = null) {
+export function openWarning({notiMess, notiDuration}: openMessageInterface) {
     notification.warning({
         // icon: <img src={errorIcon} />,
         message: notiMess || 'Warning',
-        placement: notiPlacement || 'bottomRight',
+        placement: 'bottomRight',
         duration: notiDuration || 2
     })
 }

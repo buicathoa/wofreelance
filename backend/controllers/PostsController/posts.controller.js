@@ -30,9 +30,9 @@ const postsController = {
         }
     },
 
-    getPostById: async(req, res) => {
+    getPostByRoute: async(req, res) => {
         try {
-            const result = await PostService.getPostById(req, res)
+            const result = await PostService.getPostByRoute(req, res)
             return handleSuccess(res, result)
         } catch(err) {
             return handleError(res, err)

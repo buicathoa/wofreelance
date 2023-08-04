@@ -1,23 +1,113 @@
+/* eslint-disable react/no-danger-with-children */
 import { Button, Card, Col, Form, Input, Rate, Row } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ClockCircleFilled, FlagFilled, MailFilled, SmileFilled, EnvironmentFilled } from '@ant-design/icons'
 import { AlertBanner } from '../../../../components/AlertBanner'
 
 import './style.scss'
-export const Details = () => {
-    const [form] = Form.useForm()
+import { BiddingInterface, PostInteface, ResponseFormatItem, UserInterface } from '../../../../interface'
+import dayjs from 'dayjs'
+import { PostActions } from '../../../../reducers/listReducer/postReducer'
+import { useDispatch } from 'react-redux'
+import { SocketContext } from '../../../../SocketProvider'
+import { AppActions } from '../../../../reducers/listReducer/appReducer'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../../../reducers/rootReducer'
+import _, { set } from 'lodash'
+interface componentInterface {
+    postItem?: PostInteface,
+    biddingEnd: string,
+    setActiveTab: React.Dispatch<React.SetStateAction<string>>,
+    modifyBid: string,
+    setModifyBid: React.Dispatch<React.SetStateAction<string>>,
+    formValues: any,
+    setformValues: React.Dispatch<React.SetStateAction<any>>
+}
 
-    const [formValues, setformValues] = useState({})
+export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModifyBid, formValues, setformValues }: componentInterface) => {
+    const [form] = Form.useForm()
+    const socket: any = useContext(SocketContext)
+    const dispatch = useDispatch()
+
+    const [idxOwnBid, setIdxOwnBid] = useState<number>(-1)
 
     const validateMessages = {
         required: 'This field is required'
     }
 
+    const validateSchema = {
+        delivered_time: [
+            {
+                required: true
+            }
+        ],
+        bidding_amount: [
+            {
+                required: true
+            }
+        ],
+        hourly_rate: [
+            {
+                required: true
+            }
+        ]
+        , describe_proposal: [
+            {
+                required: true
+            }
+        ]
+    }
+
+    const user: UserInterface = useSelector((state: RootState) => state.user.user)
+    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
+    const bids: Array<BiddingInterface> = useSelector((state: RootState) => state.post.bids)
+    const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
+    const biddingPost = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(PostActions.biddingPost({ param, resolve, reject }));
+        });
+    };
+
+    const updateBid = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(PostActions.updateBid({ param, resolve, reject }));
+        });
+    };
+
     useEffect(() => {
         form.resetFields()
     }, [formValues])
 
-    const onSubmitForm = () => { }
+    useEffect(() => {
+        if (bids.length > 0) {
+            const idxBid = bids.findIndex((bid) => bid.user.id === user.id)
+            setIdxOwnBid(idxBid)
+        }
+    }, [bids])
+
+    const onSubmitForm = (values: any) => {
+        dispatch(AppActions.openLoading(true))
+        if (modifyBid === 'edit') {
+            updateBid({ ...values, id: formValues!.id }).then(() => {
+                setActiveTab('2')
+            })
+        } else {
+            biddingPost({ ...values, post_id: postItem!?.id, user_id: postItem?.user?.id }).then((res) => {
+                socket.emit("project_bidding", {
+                    user_id: postItem?.user?.id,
+                    post_id: postItem!?.id,
+                    url: postItem?.post_url,
+                    describe_proposal: values?.describe_proposal
+                })
+                setIdxOwnBid(totalBids + 1)
+                setActiveTab('2')
+            })
+        }
+    }
+
+    const handleCloseBidding = () => {
+        setModifyBid('')
+    }
 
     return (
         <div className="detail-project-wrapper">
@@ -25,10 +115,10 @@ export const Details = () => {
                 <Col span={17}>
                     <div className="detail-project-left">
                         <Form
-                            id="profile_form_new_freelancer"
+                            id="bidding_form"
                             form={form}
                             layout="vertical"
-                            name="profile_form_new_freelancer"
+                            name="bidding_form"
                             onFinish={onSubmitForm}
                             initialValues={formValues}
                             scrollToFirstError
@@ -39,37 +129,26 @@ export const Details = () => {
                                 <div className="detail-project-header">
                                     <div className="title">Project Details</div>
                                     <div className="bidding-info">
-                                        <div className="bidding-limit">$600 - $1500</div>
+                                        <div className="bidding-limit">{postItem?.budget?.currency?.short_name} {postItem?.budget?.minimum} - {postItem?.budget?.maximum} {postItem?.budget?.currency?.name}</div>
                                         <div className="bidding-time-remain">
                                             <ClockCircleFilled />
-                                            <span className="bidding-remain-title">Bidding ends in 6 days, 23 hours</span>
+                                            <span className="bidding-remain-title">{biddingEnd}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="detail-project-description">
-                                    I am looking for a skilled graphic designer to create a one-page keypad interface for my product. The purpose of the keypad interface is to navigate menu options. I have almost have the design in my mind. I want to show it to the Keypad vendor in a 3D looking way with Rubber buttons
-
-                                    I have some ideas in mind for the design elements and styles, but I am open to suggestions from the designer.
-
-                                    The primary colors that I want to use for the interface are bright colors.
-
-                                    Ideal skills and experience for this project include:
-                                    - Proficiency in graphic design software
-                                    - Knowledge of user interface design principles
-                                    - Creativity and ability to incorporate suggestions and ideas
-                                    - Attention to detail in creating a visually appealing interface
-                                    - Ability to work within given specifications and requirements
-                                </div>
+                                {postItem?.project_detail && <div className="detail-project-description" dangerouslySetInnerHTML={{ __html: postItem!.project_detail }} />}
                                 <div className="detail-project-skills">
                                     <div className="title">Skill Required</div>
                                     <div className="list-skills">
-                                        <span>Graphic Design</span>
-                                        <span>Photoshop</span>
-                                        <span>Icon Design</span>
+                                        {postItem?.list_skills.map((skill, idx) => {
+                                            return (
+                                                <span key={idx}>{skill.name}</span>
+                                            )
+                                        })}
                                     </div>
                                 </div>
                                 <div className="detail-project-bottom">
-                                    <span>Project ID: 335</span>
+                                    <span>Project ID: {postItem?.id}</span>
                                     <div className="report-project">
                                         <FlagFilled /> Report Project
                                     </div>
@@ -77,29 +156,43 @@ export const Details = () => {
                                 <div className="detail-project-alert">
                                     <AlertBanner title={"Beware of scams"} description='If you are being asked to pay a security deposit, or if you are being asked to chat on Telegram, WhatsApp, or another messaging platform, it is likely a scam. Report these projects or contact Support for assistance.' type='warning' />
                                 </div>
+                                <div className="attachments"></div>
                             </div>
-                            <div className="detail-project-bidding">
+                            {((postItem?.user?.username !== user?.username && bids.findIndex((bid) => bid.user.id === user.id) === -1) || modifyBid === 'edit') && <div className="detail-project-bidding">
                                 <Card title="Place a Bid on this Project">
                                     <div className="alert-message">You will be able to edit your bid until the project is awarded to someone.</div>
-                                    <div className="bidding-rate">
-                                        <Form.Item name="email" className="custom-form-item" label="Hourly Rate">
-                                            <Input placeholder='Hourly Rate' className='form-input' type="number" suffix="INR" prefix="$" />
-                                        </Form.Item>
-                                        <Form.Item name="email" className="custom-form-item" label="This project will be delivered in">
-                                            <Input placeholder='This project will be delivered in' className='form-input' suffix="Hrs" prefix="$" />
-                                        </Form.Item>
-                                    </div>
+                                    {postItem?.project_paid_type === 'hourly' ?
+                                        <>
+                                            <div className="bidding-rate">
+                                                <Form.Item name="hourly_rate" rules={validateSchema.hourly_rate} className="custom-form-item" label="Hourly Rate">
+                                                    <Input placeholder='Hourly Rate' className='form-input' type="number" suffix={postItem?.budget?.currency?.name} prefix={postItem?.budget?.currency?.short_name} />
+                                                </Form.Item>
+                                                <Form.Item name="delivered_time" rules={validateSchema.delivered_time} className="custom-form-item" label="This project will be delivered in">
+                                                    <Input placeholder='This project will be delivered in' className='form-input' suffix="Hrs" prefix={postItem?.budget?.currency?.short_name} />
+                                                </Form.Item>
+                                            </div>
+                                        </> : <>
+                                            <div className="bidding-rate">
+                                                <Form.Item name="bidding_amount" rules={validateSchema.bidding_amount} className="custom-form-item" label="Bid amount">
+                                                    <Input placeholder='Bid amount' className='form-input' type="number" suffix={postItem?.budget?.currency?.name} prefix={postItem?.budget?.currency?.short_name} />
+                                                </Form.Item>
+                                                <Form.Item name="delivered_time" rules={validateSchema.delivered_time} className="custom-form-item" label="Delivery time">
+                                                    <Input placeholder='Delivery time' className='form-input' suffix="Days" prefix="$" />
+                                                </Form.Item>
+                                            </div>
+
+                                        </>}
                                     <div className="bidding-description">
-                                        <Form.Item name="email" className="custom-form-item" label="Describe your proposal">
+                                        <Form.Item name="describe_proposal" rules={validateSchema.describe_proposal} className="custom-form-item" label="Describe your proposal">
                                             <Input.TextArea placeholder='Describe your proposal' className='form-input text-area' />
                                         </Form.Item>
                                     </div>
                                     <div className="list-button">
-                                        <Button className="back">Cancel</Button>
-                                        <Button form="education_form" key="submit" htmlType="submit" className="next">Save Bid</Button>
+                                        {modifyBid === 'edit' && <Button className="back" onClick={handleCloseBidding}>Cancel</Button>}
+                                        <Button form="bidding_form" key="submit" htmlType="submit" className="next">Save Bid</Button>
                                     </div>
                                 </Card>
-                            </div>
+                            </div>}
                         </Form>
                     </div>
                 </Col>
@@ -107,13 +200,17 @@ export const Details = () => {
                     <div className="detail-project-right">
                         <div className="about-client">
                             <div className="title">About the Client</div>
-                            <div className="client-direction"><EnvironmentFilled /> Ho Chi Minh City</div>
+                            <div className="client-info">
+                                <img className="avatar" src={postItem?.user?.avatar_cropped} />
+                                <div>{postItem?.user?.username}</div>
+                            </div>
+                            <div className="client-direction"><img src={`http://flags.fmcdn.net/data/flags/mini/${(postItem?.user?.country?.country_name)?.toLowerCase()}.png`} /> {postItem?.user?.country?.country_official_name}</div>
                             <div className="client-rated">
-                                <Rate defaultValue={0} />
+                                <Rate disabled defaultValue={3} className="rating" />
                                 <span className="rated-number">0.0</span>
                             </div>
                             <div className="client-dated-joined">
-                                <ClockCircleFilled /> Member since Jun 19, 2023
+                                <ClockCircleFilled /> Member since {dayjs(postItem?.user?.createdAt).format('MMM DD, YYYY')}
                             </div>
                             <div className="client-verification">
                                 <div className="client-verification-item">

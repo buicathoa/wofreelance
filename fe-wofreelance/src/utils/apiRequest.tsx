@@ -12,7 +12,7 @@ export const apiRequest = (url: string, payload: any, type: string) => {
         { headers: headers },
     )
         .then(((res: any) => {
-            return res.data
+            return res.data 
         }))
         .catch((err: any) => {
             throw err

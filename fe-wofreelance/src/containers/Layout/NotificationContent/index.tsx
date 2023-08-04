@@ -1,19 +1,43 @@
 import React, { useRef, useState } from 'react'
-import { SettingOutlined, CalendarOutlined, LeftOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { SettingOutlined, CalendarOutlined, LeftOutlined, BellTwoTone, CloseOutlined } from '@ant-design/icons'
 import { notification } from '../../../assets'
 
 import './style.scss'
-import { Button, Switch } from 'antd'
+import { Button, Empty, Switch } from 'antd'
 import usePrevious from '../../../utils/usePrevious'
+import { NotificationInterface, ResponseFormatItem } from '../../../interface'
+import { useNavigate } from 'react-router-dom'
+import { HREF } from '../../../constants'
+import { NotificationsActions } from '../../../reducers/listReducer/notificationsReducer'
+import { useDispatch } from 'react-redux'
 
-const NotificationContent = () => {
+interface NotificationContent {
+    notifications: Array<NotificationInterface>
+}
+
+const NotificationContent = ({ notifications }: NotificationContent) => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [notiType, setNotiType] = useState<string>('recent')
-    const prevState:string | undefined = usePrevious(notiType)
+    const prevState: string | undefined = usePrevious(notiType)
+
+    const updateNotification = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(NotificationsActions.updateNotification({ param, resolve, reject }));
+        });
+    }
 
     const handleOpenNotiType = (type: string) => {
         setNotiType(type)
     }
 
+    const handleToggleNotification = (noti: NotificationInterface) => {
+        updateNotification({
+            notification_id: noti.id
+        }).then(() => {
+            navigate(noti.noti_url, {replace: true})
+        })
+    }
     return (
         <div className="notification-content-wrapper">
             {notiType !== 'settings' ?
@@ -22,83 +46,29 @@ const NotificationContent = () => {
                     <div className={`header-item ${notiType === 'saved' ? 'active' : ''}`} onClick={() => handleOpenNotiType('saved')}>Saved Alerts</div>
                     <SettingOutlined className="setting-icon" onClick={() => handleOpenNotiType('settings')} />
                 </div> : <div className="notification-header settings">
-                    <LeftOutlined className="back-icon" onClick={() => setNotiType(prevState!)}/>
+                    <LeftOutlined className="back-icon" onClick={() => setNotiType(prevState!)} />
                     <div className="header-notify-text">NOTIFICATIONS SETTINGS</div>
                 </div>
             }
             <div className={`notification-lists ${notiType === 'recent' ? '' : 'hidden'}`}>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP an sdo much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
-                <div className="notification-item">
-                    <div className="notification-image">
-                        <CalendarOutlined />
-                    </div>
-                    <div className="notification-content">
-                        <div className="title">Wordpress contactfrom 7 popup...</div>
-                        <div className="content">CSS, HTML, PHP and so much more...</div>
-                    </div>
-                </div>
+                {notifications.length > 0 ? notifications?.map((noti: NotificationInterface, idx: number) => {
+                    if (noti.noti_type === 'post') {
+                        return (
+                            <div className="notification-item" key={idx} onClick={() => handleToggleNotification(noti)}>
+                                <div className="notification-item-left">
+                                    <div className="notification-image">
+                                        <BellTwoTone />
+                                    </div>
+                                    <div className="notification-content">
+                                        <div className="title">{noti.noti_title}</div>
+                                        <div className="content">{noti.noti_content}</div>
+                                    </div>
+                                </div>
+                                {noti?.noti_status === 'received' && <div className="read" />}
+                            </div>
+                        )
+                    }
+                }) : <Empty/>}
             </div>
             <div className={`saved-notification ${notiType === 'saved' ? '' : 'hidden'}`}>
                 <img src={notification} alt="" />

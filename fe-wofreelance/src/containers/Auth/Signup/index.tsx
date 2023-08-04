@@ -27,7 +27,7 @@ const Signup = () => {
     const [formValues, setformValues] = useState<SignupFormInterface>({})
     const [step, setStep] = useState(1)
     const [loginType, setLoginType] = useState('normal')
-    const [userFbInfo, setUserFbInfo] = useState<UserInterface>({})
+    const [userFbInfo, setUserFbInfo] = useState<UserInterface>({avatar: '', first_name: '', user_active: false})
 
     useEffect(() => {
         if (location.search) {
@@ -250,7 +250,7 @@ const Signup = () => {
             if (values?.agree) {
                 checkExistUser(values).then(res => {
                     if (!res.data) {
-                        openWarning(res?.message!)
+                        openWarning({notiMess: res?.message!})
                     } else {
                         setformValues(values)
                         setStep(2)
@@ -262,7 +262,7 @@ const Signup = () => {
         } else if (step === 2) {
             checkExistUser(values).then(res => {
                 if (!res.data) {
-                    openWarning(values.username ? 'Username already existed' : 'Email already existed')
+                    openWarning(values.username ? {notiMess: 'Username already existed'} : {notiMess: 'Email already existed'})
                 } else {
                     const newData = Object.assign(formValues, values, userFbInfo)
                     deleteCookie('user_info')

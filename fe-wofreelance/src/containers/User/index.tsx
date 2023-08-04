@@ -53,7 +53,7 @@ const UserProfile = () => {
     const [formValues, setformValues] = useState({})
     const [isOpenModifyAvt, setIsOpenModifyAvt] = useState(false)
     const [fileUploaded, setFileUploaded] = useState<any>({})
-    const [userStatus, setUserStatus] = useState<any>({})
+    const [userStatus, setUserStatus] = useState<boolean>(false)
     const [componentRoute, setComponentRoute] = useState('')
     const [isOpenModalPortfolio, setIsOpenModalPortfolio] = useState(false)
     const [portfolioSelected, setPortfolioSelected] = useState<PortfolioInterface>()
@@ -114,7 +114,6 @@ const UserProfile = () => {
                 const scrollTop = window.scrollY;
                 const windowHeight = window.innerHeight;
                 const documentHeight = document.body.clientHeight;
-                // debugger
                 if (scrollTop > documentHeight - windowHeight - 2500) {
                     setIsDisplayNavUser(true)
                 } else {
@@ -127,19 +126,15 @@ const UserProfile = () => {
             return () => window.removeEventListener("scroll", handleScroll);
         }
     }, [location])
-    
+
     useEffect(() => {
         if (Object?.values(user_info).length > 0) {
-            socket.emit('user_status', user_info.id)
-            socket.on("user_status_result", (data: any) => {
-                const userInfo = data.find((x: any) => x.user_id === user_info.id)
-                setUserStatus(userInfo ? userInfo : {})
-            });
-
+            setUserStatus(user_info?.user_active)
             setFileUploaded({
                 ...fileUploaded, preview: user_info?.avatar_cropped
             })
         }
+
     }, [user_info])
 
 
@@ -168,9 +163,9 @@ const UserProfile = () => {
     const handleChangeHourlyRate = (event: any) => {
         const number = parseInt(event.target.value)
         if (number < 0) {
-            openWarning('Negative number is not allowed.')
+            openWarning({notiMess: 'Negative number is not allowed.'})
         } else if (number === 0) {
-            openWarning('Negative number must be larger than 0.')
+            openWarning({notiMess: 'Negative number must be larger than 0.'})
         } else {
             return
         }
@@ -266,8 +261,8 @@ const UserProfile = () => {
                                                     </> :
                                                     <div className="general-info-left">
                                                         <div className="general-info-left-item">
-                                                            <div className="icon-active" style={{ background: Object?.keys(userStatus).length > 0 ? '#5dc26a' : 'rgb(247, 71, 32)' }}></div>
-                                                            <div className="content status"><span style={{ color: Object?.keys(userStatus).length > 0 ? '#5dc26a' : 'rgb(247, 71, 32)' }}>I'm {Object?.keys(userStatus).length > 0 ? 'Online' : 'Offline'}!</span></div>
+                                                            <div className="icon-active" style={{ background: userStatus ? '#5dc26a' : 'rgb(247, 71, 32)' }}></div>
+                                                            <div className="content status"><span style={{ color: userStatus ? '#5dc26a' : 'rgb(247, 71, 32)' }}>I'm {userStatus ? 'Online' : 'Offline'}!</span></div>
                                                         </div>
                                                         <div className="general-info-left-item">
                                                             <PoundCircleFilled className="money" />
@@ -373,7 +368,7 @@ const UserProfile = () => {
 
                                             } else {
                                                 return (
-                                                    <Col span={8} key={idx}  onClick={() => handleOpenPort(port)}>
+                                                    <Col span={8} key={idx} onClick={() => handleOpenPort(port)}>
                                                         <div className="portfolio-item">
                                                             {isImg ? <div className="portfolio-item-image">
                                                                 <img src={file} />

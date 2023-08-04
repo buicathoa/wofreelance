@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { TwitterOutlined, FacebookOutlined, YoutubeOutlined, InstagramOutlined } from '@ant-design/icons'
+import { BellFilled, UpOutlined, YoutubeOutlined, InstagramOutlined } from '@ant-design/icons'
 
 import './style.scss'
 const Footer = () => {

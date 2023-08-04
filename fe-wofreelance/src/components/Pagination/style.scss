@@ -1,0 +1,19 @@
+
+@import "../../css/custom";
+
+
+.pagination-wrapper{
+    .ant-pagination{
+        display: flex;
+        justify-content: center;
+        .ant-pagination-item-active{
+            background-color: $navactive;
+            border-color: $navactive;
+            a{
+                color: #ffffff;
+            font-weight: 500;
+            }
+            
+        }
+    }
+}

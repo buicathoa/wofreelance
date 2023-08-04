@@ -66,12 +66,23 @@ export const apiUrl = {
         getAll: 'country/get'
     },
     post: {
-        create: 'posts/create'
+        create: 'posts/create',
+        getDetail: 'posts/get-by-route',
+        bidding: {
+            getallBid: 'bidding/get-all',
+            create: 'bidding/create',
+            update: 'bidding/update',
+            delete: 'bidding/delete'
+        }
     },
     portfolio: {
         create: 'portfolio/create',
         getAll: 'portfolio/get-all',
         update: 'portfolio/update',
         delete: 'portfolio/delete'
+    },
+    notifications: {
+        getAll: 'notifications/get-all',
+        update: 'notifications/update'
     }
 }

@@ -7,7 +7,7 @@ const checkSecretKey = require("../../middlewares/checkSecretKey");
 
 router.post("/create", authorize(["director", "admin", "user"]), postsController.createPosts);
 router.post("/get-all", postsController.getAllPosts);
-router.post("/get-by-id", postsController.getPostById);
+router.post("/get-by-route", postsController.getPostByRoute);
 router.post(
   "/personal/get-all",
   authorize(["director", "admin", "user"]),

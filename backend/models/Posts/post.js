@@ -18,9 +18,16 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     project_detail: DataTypes.STRING,
     project_budget: DataTypes.FLOAT,
-    bidding_time_start: DataTypes.DATE,
     bidding_time_end: DataTypes.DATE,
-    project_paid_type: DataTypes.STRING,
+    project_paid_type: {
+      type: DataTypes.STRING,
+      validate: {
+        isIn: {
+          args: [['hourly','fixed_price']],
+          msg: 'Must be paid by hour or fixed price'
+        }
+      }
+    },
     post_status: DataTypes.STRING, //not_received: nhận được thông báo nhưng chưa bấm vào chuông, received: Nhận được thông báo và bấm vào chuông, seen
     file: DataTypes.STRING,
     post_type: DataTypes.STRING,

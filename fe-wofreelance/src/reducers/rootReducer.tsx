@@ -12,6 +12,8 @@ import QualificationReducer from "./listReducer/qualificationReducer";
 import LocationReducer from "./listReducer/locationReducer";
 import PostReducer from "./listReducer/postReducer";
 import PortfolioReducer from "./listReducer/portfolioReducer";
+import NotificationsReducer from "./listReducer/notificationsReducer";
+import ChatReducer from "./listReducer/chatReducer";
 
 const rootReducer = combineReducers({
     app: AppReducer,
@@ -22,7 +24,9 @@ const rootReducer = combineReducers({
     qualification: QualificationReducer,
     location: LocationReducer,
     post: PostReducer,
-    portfolio: PortfolioReducer
+    portfolio: PortfolioReducer,
+    notifications: NotificationsReducer,
+    chat: ChatReducer
 })
 
 const sagaMiddleware = createSagaMiddleware();

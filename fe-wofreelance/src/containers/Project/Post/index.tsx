@@ -15,9 +15,11 @@ import { RootState } from '../../../reducers/rootReducer'
 import { CategoryActions } from '../../../reducers/listReducer/categoryReducer'
 import { PostActions } from '../../../reducers/listReducer/postReducer'
 import { openError } from '../../../components/Notifications'
+import { SocketContext } from '../../../SocketProvider'
+import { useDebounce } from '../../../utils/useDebounce'
 // import { SocketContext } from '../../../SocketContext'
 export const Post = () => {
-    // const socket = useContext(SocketContext)
+    const socket: any = useContext(SocketContext)
 
     const dispatch = useDispatch()
     const [form] = Form.useForm()
@@ -34,6 +36,7 @@ export const Post = () => {
     const [listSkillSelected, setListSkillsSelected] = useState([])
     const [isComplete, setIsComplete] = useState(false)
     const [listFilesSelected, setListFilesSelected] = useState<Array<string>>([])
+    const [valueSearch, setValueSearch] = useState<string>('')
 
     const postPurpose = [
         { icon: <IdcardTwoTone />, title: 'Post a project', description: 'Receive free quotes, best for when you have a specific idea, the project is not visual in nature or the project is complex.', is_recommend: true, value: 'project' },
@@ -78,9 +81,21 @@ export const Post = () => {
         });
     };
 
+    const debounceText = useDebounce(valueSearch, 500)
+    console.log('debounceText', debounceText)
     useEffect(() => {
         getCurrencies({})
     }, [])
+
+    useEffect(() => {
+        getAllSkillsets(debounceText !== '' ? { skill: debounceText } : {}).then((res) => {
+            const options: any = res?.data?.map((opt) => {
+                return { text: opt?.name, value: opt?.id }
+            })
+            setlistSkills(options)
+        })
+
+    }, [debounceText])
 
     const onSubmitForm = (values: any) => {
         switch (step) {
@@ -95,12 +110,7 @@ export const Post = () => {
                     ...values, post_type: postPurposeSelected, project_paid_type: paidTypeSelected, project_budget: budgetSelected, list_skills: listSkillSelected.length > 0 ? listSkillSelected : [], files: listFilesSelected
                 }
                 createPost(payload).then((res) => {
-                    // debugger
-                    // const data = {
-                    //     skills: listSkillSelected, user_id: res.data!?.user_id, post_id: res.data!.id, noti_type: 'post',
-                    //     noti_title: res?.data?.title, noti_content: res?.data?.project_detail, noti_url: `posts/${(res?.data?.title).toLowerCase().replaceAll(' ', '-')}-${res?.data?.id}`
-                    // }
-                    // socket.emit('new_post_notify', data)
+                    socket.emit('new_post_notify', { ...res.data, skills: listSkillSelected, noti_url: `posts/${(res?.data?.title).toLowerCase().replaceAll(' ', '-')}-${res?.data?.id}` })
                 })
                 break;
         }
@@ -136,7 +146,7 @@ export const Post = () => {
         formData.append('files', e.target.files[0])
         const contentType: string = renderTypeOfContent(file.type.split('/')[1])
         if (contentType === 'not_allowed') {
-            openError(`Type of ${file.type} is not allowed`)
+            openError({ notiMess: `Type of ${file.type} is not allowed` })
             return false
         }
         formData.append("content_type", contentType)
@@ -145,32 +155,12 @@ export const Post = () => {
             listFile.push(res.url![0])
             setListFilesSelected(listFile)
         }).catch(err => {
-            openError(err.response.data.message)
+            openError({ notiMess: err.response.data.message })
         })
     }
 
     const handleSearch = (text: string) => {
-        let timeout
-        if (timeout) {
-            clearTimeout(timeout)
-            timeout = null
-        }
-        const getSkillsApi = () => {
-            getAllSkillsets({}).then((res: any) => {
-                const recordFound = res?.data?.filter((skill: any) => (skill.name).toLowerCase().includes(text.toLowerCase()))
-                    .map((skill: any) => {
-                        return { text: skill.name, value: skill.id }
-                    })
-                setlistSkills(recordFound)
-            })
-        }
-
-
-        if (text !== '') {
-            timeout = setTimeout(getSkillsApi, 300)
-        } else {
-            setlistSkills([])
-        }
+        setValueSearch(text)
     }
 
     const handleSelectPostPurpose = (item: any, currentStep: number) => {
@@ -208,7 +198,6 @@ export const Post = () => {
     }
 
     const handleChangeSkills = (skills: any) => {
-        // console.log(skills)
         setListSkillsSelected(skills)
     }
 

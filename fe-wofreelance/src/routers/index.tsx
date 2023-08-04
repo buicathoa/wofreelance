@@ -56,6 +56,6 @@ export const routerSidebar = [
     {
         exact: true,
         element: <ProjectDetail />,
-        path: '/projects/:id'
+        path: '/posts/:post_detail'
     }
 ]

@@ -15,11 +15,14 @@ const dayjs = require("dayjs");
 const CONSTANT = require("../../constants");
 const myEmitter = require("../../myEmitter");
 const Post = db.posts;
-const JobSubCategories = db.jobsubcategories;
+const Budgets = db.budgets;
 const Posts_skillsets = db.post_skillsets;
 const UserProfiles = db.userprofile;
 const JobSkillset = db.jobskillset;
-const Countries = db.countries
+const Countries = db.countries;
+const Currencies = db.currencies;
+const Bidding = db.bidding
+
 const sequelize = db.sequelize;
 // const sequelizeCategories = db.sequelizeCategories;
 // const sequelizeJunctionTable = db.sequelizeJunctionTable;
@@ -47,7 +50,6 @@ const PostService = {
             project_detail: project_detail,
             project_budget: parseInt(project_budget),
             // avg_bid_unit: avg_bid_unit,
-            bidding_time_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             bidding_time_end: dayjs().add(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
             project_paid_type: project_paid_type,
             post_status: "open",
@@ -92,7 +94,6 @@ const PostService = {
         throw new ClientError("Bad request.")
       }
       //send notification to client with socket
-      myEmitter.emit(NEW_POST_NOTIFY, {...newPost, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.id}`})
 
       await transaction.commit()
       return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
@@ -253,12 +254,17 @@ const PostService = {
     }
   },
 
-  getPostById: async (req, res) => {
+  getPostByRoute: async (req, res) => {
     try{
-      const {post_id} = req.body;
+      const {route} = req.body;
       const result = await Post.findOne({
+        attributes: {
+          exclude: ['project_budget', "user_id"]
+        },
         where: {
-          id: post_id 
+          post_url: {
+            [Op.like]: `%${route}%`
+          } 
         },
         include: [
           {
@@ -272,17 +278,54 @@ const PostService = {
           {
             model: UserProfiles,
             as: 'user',
-            attributes: ['joined', 'first_name', 'last_name', 'avatar_cropped', 'country_id'],
+            attributes: ['id', 'username', 'first_name', 'last_name', 'avatar_cropped', 'createdAt'],
             include: [
               {
                 model: Countries,
-                as: 'country'
+                as: 'country',
+                attributes: ['id', 'country_name', 'country_official_name']
               }
             ]
-          }
+          },
+          {
+            model: Budgets,
+            attributes: ['id', 'minimum', 'maximum', 'name', 'project_type'],
+            as: 'budget',
+            include: [
+              {
+                model: Currencies,
+                as: 'currency',
+                attributes: ['id', 'short_name', 'name']
+              }
+            ]
+          },
+          // {
+          //   model: Bidding,
+          //   as: 'biddings',
+          //   include: [
+          //     {
+          //       model: UserProfiles,
+          //       attributes: ['id', 'username', 'first_name', 'last_name', 'title', 'avatar_cropped', 'createdAt', 'user_active'],
+          //       as: 'user',
+          //       through: {
+          //         attributes: []
+          //       },
+          //       include: [
+          //         {
+          //           model: Countries,
+          //           as: 'country',
+          //           attributes: ['id', 'country_name', 'country_official_name']
+          //         }
+          //       ]
+          //     }
+          //   ]
+          // }
         ]
       })
-      return result
+      const response = {...result?.dataValues, biddings: result?.dataValues?.biddings?.map((bid) => {
+        return {...bid.dataValues, user: bid.dataValues.user[0]}
+      }) ?? []}
+      return response
     } catch(err) {
       throw err;
     }

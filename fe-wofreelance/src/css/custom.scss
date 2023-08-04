@@ -14,6 +14,20 @@ canvas {
   padding: 0 !important;
 }
 
+.rating {
+  margin-right: calc(24 / $fdf) * $rem;
+  font-size: calc(20 / $fdf) * $rem;
+  .ant-rate-star {
+      &.ant-rate-star-full {
+          color: #e60278
+      }
+  }
+}
+
+.rated-number{
+  font-size: calc(20 / $fdf) * $rem;
+}
+
 .contact-decor {
   height: 3px;
   width: 95%;

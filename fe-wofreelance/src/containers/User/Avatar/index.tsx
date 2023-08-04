@@ -135,14 +135,14 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
         isMountedRef.current = false
         uploadFiles(formData).then((res) => {
             updateUser({avatar_cropped: res.url![0], avatar: res.url![1]}).then(() => {
-                openSuccess('Change avatar success.')
+                openSuccess({notiMess: 'Change avatar success.'})
                 setIsLoading(false)
                 setIsOpenModifyAvt(false)
                 setCrop({ ...crop, isDefault: true })
                 isMountedRef.current = false
             })
         }).catch((err) => {
-            openError(err.response.data.message)
+            openError({notiMess: err.response.data.message})
         })
     }
 

@@ -127,7 +127,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
-    }
+    },
+    user_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    noti_mess: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
   }, {
     sequelize,
     modelName: 'UserProfile',

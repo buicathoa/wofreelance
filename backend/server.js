@@ -19,6 +19,11 @@ const currencyRoute = require("./routes/CurrencyRoute/currency.route");
 const budgetRoute = require("./routes/BudgetsRoute/budget.route");
 const portfolioRoute = require("./routes/PortfolioRoute/portfolio.route");
 const generalRoute = require("./routes/GeneralRoute/general.route");
+const biddingRoute = require("./routes/BiddingRoute/bidding.route");
+const notificationsRoute = require("./routes/NotificationsRoute/notifications.route");
+const chatRoute = require("./routes/ChatRoute/chat.route");
+
+
 const puppeteer = require("puppeteer");
 // const JunctionRoute = require("./routes/JunctionRoute/junction.route");
 const { sequelize } = require("./models");
@@ -38,6 +43,7 @@ const multer = require("multer");
 const notificationSocket = require("./wsHandler/notificationSocket");
 const myEmitter = require("./myEmitter");
 const { validateSocket } = require("./globalVariable");
+const connectHandler = require("./wsHandler/connectHandler");
 const upload = multer();
 
 // const verifiedEmailSuccess = require("./services/UserService/user.service");
@@ -80,21 +86,20 @@ app.use(function (req, res, next) {
   next();
 });
 
-function initSocket(server) {
-  return new Server(server, {
-    cors: {
-      origin: '*'
-    }
-  });
-}
 
 const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+const io =  new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
+    origin: "http://localhost:3000"
+  }
+})
+
+// require("socket.io")(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 const onConnection = (socket) => {
   // const {TOKEN, USER_INFO} = CONSTANT.WS_EVENT
@@ -152,6 +157,7 @@ io.use((socket, next) => {
 })
 // myEmitter.on('connection', (client) => {
   io.on("connection", (socket) => {
+    connectHandler(socket, io)
     onConnection(socket);
     // const checkSocketConnection = validateSocket(socket.id)
     // if(!checkSocketConnection){
@@ -179,6 +185,9 @@ app.use("/v1/portfolio", portfolioRoute);
 app.use("/v1", generalRoute);
 app.use("/v1/posts", postsRoute)
 app.use("/v1/user", userRoute)
+app.use("/v1/bidding", biddingRoute)
+app.use("/v1/notifications", notificationsRoute)
+app.use("/v1/messages", chatRoute)
 //crawl data for universities
 // function delay(time) {
 //   return new Promise(function (resolve) {

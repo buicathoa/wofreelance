@@ -8,12 +8,11 @@ const SocketContext = createContext(null);
 
 const SocketProvider = ({ children }: any) => {
     const isLoggedIn: boolean = useSelector((state: RootState) => state.user.isLoggedIn)
-    console.log('isLoggedIn1', isLoggedIn)
     const [socket, setSocket] = useState<any>()
     useEffect(() => {
-        if(isLoggedIn){
+        if (isLoggedIn || localStorage.getItem('access_token')) {
             const SOCKET_URL = "http://localhost:1203";
-            const socket = io(SOCKET_URL, {
+            const sockets = io(SOCKET_URL, {
                 auth: {
                     token: localStorage.getItem('access_token'),
                 },
@@ -23,10 +22,19 @@ const SocketProvider = ({ children }: any) => {
                 reconnectionDelayMax: 5000,
                 reconnectionAttempts: 5
             })
-            setSocket(socket)
+            sockets.on('reconnect', () => {
+                console.log('reconnect success',)
+                localStorage.setItem('socketId', sockets.id)
+            })
+            setSocket(sockets)
             // socket.connect()
-        }
-    }, [isLoggedIn]);
+        } 
+        // else {
+        //     const nextLocation = location.pathname.replaceAll('/', '%252')
+        //     navigate(`/signin`)
+        // }
+    }, [isLoggedIn])
+
 
     return (
         <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

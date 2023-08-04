@@ -1,3 +1,0 @@
-const userSocket = (socket, io) => {
-    
-}
