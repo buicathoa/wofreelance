@@ -66,7 +66,6 @@ function App() {
         <Route path="/not-found" element={<NotFound />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <ChatWindowFrame />
     </>
   );
 }

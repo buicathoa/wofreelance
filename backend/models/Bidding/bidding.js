@@ -63,6 +63,13 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    room_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'rooms',
+        key: 'id'
+      }
+    },
     describe_proposal: DataTypes.STRING
   }, {
     sequelize,

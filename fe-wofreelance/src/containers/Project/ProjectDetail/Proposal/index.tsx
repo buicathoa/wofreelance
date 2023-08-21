@@ -1,5 +1,5 @@
 /* eslint-disable react/no-danger-with-children */
-import { Button, Card, Col, Form, Input, Rate, Row, Tooltip } from 'antd'
+import { Button, Card, Col, Empty, Form, Input, Rate, Row, Tooltip } from 'antd'
 import React, { useContext, useEffect, useState } from 'react'
 import { InteractionFilled, IssuesCloseOutlined } from '@ant-design/icons'
 import { AlertBanner } from '../../../../components/AlertBanner'
@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom'
 import { ModalConfirm } from '../../../../components/ModalConfirm'
 import { openSuccess } from '../../../../components/Notifications'
 import { PaginationDivide } from '../../../../components/Pagination'
-import { ChatActions } from '../../../../reducers/listReducer/chatReducer'
+import { InteractionsActions } from '../../../../reducers/listReducer/interactionReducer'
 interface componentInterface {
     postItem?: PostInteface,
     setModifyBid: React.Dispatch<React.SetStateAction<string>>,
@@ -67,7 +67,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
 
     const bids: Array<BiddingInterface> = useSelector((state: RootState) => state.post.bids)
     const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
-
+    console.log('bids', bids)
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
     const deleteBid = (param: any): Promise<ResponseFormatItem> => {
@@ -173,7 +173,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     }
 
     const handleAddInteractions = (bid: BiddingInterface) => {
-        dispatch(ChatActions.addInteraction({user: bid.user, message_url: postItem?.post_url, message_title: postItem?.title, chat_window_status: 'open'}))
+        dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, last_name: bid.user.last_name }], message_url: postItem?.post_url, message_title: postItem?.title, chat_window_status: 'open',  bidding_id: bid.id, room_id: bid.room_id }))
     }
 
     const handlePagingAction = (currentPageValue: number, viewInPageValue: number) => {
@@ -183,68 +183,73 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     return (
         <div className="proposal-wrapper">
             {renderProposal()}
-            {idxOwnBid !== -1 && <span className="proposal-title">Others proposal</span>}
             {bids
-                ?.filter((bid) => bid.id !== bids[idxOwnBid]?.id)
-                ?.map((bid, idx) => {
-                    return (
-                        <div className="proposal-item" key={idx}>
-                            <div className="proposal-header">
-                                <div className="proposal-left">
-                                    <div className="proposal-user-avatar">
-                                        <img src={bid?.user?.avatar_cropped} alt="" />
-                                    </div>
-                                    <div className="proposal-user-information">
-                                        <div className="proposal-user-info">
-                                            <div className="proposal-name_status">
-                                                <div className="proposal-name">{bid?.user?.first_name} {bid?.user?.last_name} <Link className="proposal-username" to={`/u/${bid?.user?.username}`}>@{bid?.user?.username}</Link></div>
-                                                <div className={`user-status ${bid?.user?.user_active ? 'active' : 'deactive'}`}></div>
+                ?.filter((bid) => bid.id !== bids[idxOwnBid]?.id).length > 0 &&
+                <div className="other-proposals">
+                    {idxOwnBid !== -1 && <span className="proposal-title">Others proposal</span>}
+                    {bids
+                        ?.filter((bid) => bid.id !== bids[idxOwnBid]?.id)
+                        ?.map((bid, idx) => {
+                            return (
+                                <div className="proposal-item" key={idx}>
+                                    <div className="proposal-header">
+                                        <div className="proposal-left">
+                                            <div className="proposal-user-avatar">
+                                                <img src={bid?.user?.avatar_cropped} alt="" />
                                             </div>
-                                            <div className="summary-statistics">
-                                                <Tooltip title="something..." placement='bottom'><div className="rating"><Rate disabled defaultValue={0} /><span className="number">4.9</span></div></Tooltip>
-                                                <Tooltip title="something..." placement='bottom'><div className="reviews"><InteractionFilled /><span className="number">598</span></div></Tooltip>
-                                                <Tooltip title="something..." placement='bottom'><div className="percent-success"><IssuesCloseOutlined /><span className="number">6</span></div></Tooltip>
-                                                <div className="country">
-                                                    <img src={`http://flags.fmcdn.net/data/flags/mini/${(bid?.user?.country?.country_name)?.toLowerCase()}.png`} /> <span>{bid?.user?.country?.country_official_name}</span>
+                                            <div className="proposal-user-information">
+                                                <div className="proposal-user-info">
+                                                    <div className="proposal-name_status">
+                                                        <div className="proposal-name">{bid?.user?.first_name} {bid?.user?.last_name} <Link className="proposal-username" to={`/u/${bid?.user?.username}`}>@{bid?.user?.username}</Link></div>
+                                                        <div className={`user-status ${bid?.user?.user_active ? 'active' : 'deactive'}`}></div>
+                                                    </div>
+                                                    <div className="summary-statistics">
+                                                        <Tooltip title="something..." placement='bottom'><div className="rating"><Rate disabled defaultValue={0} /><span className="number">4.9</span></div></Tooltip>
+                                                        <Tooltip title="something..." placement='bottom'><div className="reviews"><InteractionFilled /><span className="number">598</span></div></Tooltip>
+                                                        <Tooltip title="something..." placement='bottom'><div className="percent-success"><IssuesCloseOutlined /><span className="number">6</span></div></Tooltip>
+                                                        <div className="country">
+                                                            <img src={`http://flags.fmcdn.net/data/flags/mini/${(bid?.user?.country?.country_name)?.toLowerCase()}.png`} /> <span>{bid?.user?.country?.country_official_name}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="proposal-user-title">
+                                                    {bid?.user?.title}
                                                 </div>
                                             </div>
+                                            <div className={`user-status ${bid?.user?.user_active ? 'active' : 'deactive'}`}></div>
                                         </div>
-                                        <div className="proposal-user-title">
-                                            {bid?.user?.title}
+                                        <div className="proposal-right">
+                                            <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bid?.hourly_rate}&nbsp;{postItem?.budget?.currency?.name}</div>
+                                            <div className="amount-time">in {bid?.delivered_time} days</div>
                                         </div>
                                     </div>
-                                    <div className={`user-status ${bid?.user?.user_active ? 'active' : 'deactive'}`}></div>
+                                    <div className="proposal-summary">
+                                        <div className="proposal-summary-left" dangerouslySetInnerHTML={{ __html: ((bid?.describe_proposal)?.replace(/\n/g, '<br>')) || '' }}></div>
+                                        <div className="proposal-summary-right">
+                                            {
+                                                user.id === postItem?.user.id ? (
+                                                    <div className="proposal-button">
+                                                        <div className="chat-button" onClick={() => handleAddInteractions(bid)}>
+                                                            <Button>Chat</Button>
+                                                            <div className={`user-status ${bid.user.user_active ? 'online' : 'offline'}`}></div>
+                                                        </div>
+                                                        <Button>Award</Button>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="time-response-message">Replies within a few hours</div>
+                                                        <Link className="report-bid" to="#">Report bid</Link>
+                                                        {dayjs(bid.createdAt).diff(dayjs(bid.updatedAt)) ? <div className="proposal-status">Editted</div> : null}
+                                                    </>
+                                                )
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="proposal-right">
-                                    <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bid?.hourly_rate}&nbsp;{postItem?.budget?.currency?.name}</div>
-                                    <div className="amount-time">in {bid?.delivered_time} days</div>
-                                </div>
-                            </div>
-                            <div className="proposal-summary">
-                                <div className="proposal-summary-left" dangerouslySetInnerHTML={{ __html: ((bid?.describe_proposal)?.replace(/\n/g, '<br>')) || '' }}></div>
-                                <div className="proposal-summary-right">
-                                    {
-                                        user.id === postItem?.user.id ? (
-                                            <div className="proposal-button">
-                                                <div className="chat-button" onClick={() => handleAddInteractions(bid)}>
-                                                    <Button>Chat</Button>
-                                                    <div className={`user-status ${bid.user.user_active ? 'online' : 'offline'}`}></div>
-                                                </div>
-                                                <Button>Award</Button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="time-response-message">Replies within a few hours</div>
-                                                <Link className="report-bid" to="#">Report bid</Link>
-                                                {dayjs(bid.createdAt).diff(dayjs(bid.updatedAt)) ? <div className="proposal-status">Editted</div> : null}
-                                            </>
-                                        )
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    )
-                })}
+                            )
+                        })}
+                    <PaginationDivide totalRecord={totalBids} handlePagingAction={handlePagingAction} />
+                </div>}
             <ModalConfirm
                 title={'Confirm'}
                 content={'Are you sure to retract this bid'}
@@ -252,7 +257,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                 setVisible={setIsOpenModalConfirm}
                 onConfirm={onConfirm}
             />
-            <PaginationDivide totalRecord={totalBids} handlePagingAction={handlePagingAction} />
+
         </div>
     )
 }

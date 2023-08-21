@@ -4,19 +4,27 @@ const jwt_decode = require("jwt-decode");
 const { Op } = require("sequelize");
 const myEmitter = require("../myEmitter");
 const { findIndexUser, findUser } = require("../globalVariable");
+const { Socket } = require("socket.io");
 const UserProfile = db.userprofile;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
 const User_Notifications = db.user_notifications;
-const User_Socket = db.user_;
+const Rooms = db.rooms;
 const Skillset = db.jobskillset;
 const Sockets = db.sockets;
 const Bidding = db.bidding;
+const Messages = db.messages;
+
 const sequelize = db.sequelize;
 
 module.exports = (socket, io) => {
-  const { NEW_POST_NOTIFY, PROJECT_BIDDING, PROJECT_BIDDING_RESPONSE, NEW_MESSAGE, NEW_MESSAGE_RESPONSE } =
-    CONSTANT.WS_EVENT;
+  const {
+    NEW_POST_NOTIFY,
+    PROJECT_BIDDING,
+    PROJECT_BIDDING_RESPONSE,
+    NEW_MESSAGE,
+    NEW_MESSAGE_RESPONSE,
+  } = CONSTANT.WS_EVENT;
 
   socket.on(NEW_POST_NOTIFY, async (data) => {
     let transaction = await sequelize.transaction();
@@ -146,21 +154,94 @@ module.exports = (socket, io) => {
   });
 
   socket.on(NEW_MESSAGE, async (data) => {
-    let transaction = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
+    // payload: room_id, content_type, content_text,
     try {
       const decoded = jwt_decode(socket.handshake.auth.token);
-      await UserProfile.increment(
-        {
-          noti_mess: +1,
-        },
-        {
-          where: {
-            id: user.id,
-          },
-        }
-      );
-    } catch (err) {
+      // increase all noti_mess of user in room + 1
 
+      const usersNotSeenMessage = await Messages.findAll({
+        attributes: ['sender', 'room_id', 'message_status', 'message_title', 'receiver_id'],
+        where: {
+          room_id: data.room_id
+        }
+      })
+      
+      const updateNotiMessPromises = await usersNotSeenMessage?.map((item) => {
+        if(item.dataValues.receiver_id !== decoded.id && (item.dataValues.message_status === 'seen')) {          
+          UserProfile.increment({
+            noti_mess: +1,
+          }, {
+            where: {
+              id: item.dataValues.receiver_id
+            }
+          })
+        }
+      })
+
+      await Promise.all(updateNotiMessPromises)
+
+
+      //find sender info
+
+      const senderInfo = await UserProfile.findOne({
+        attributes: ["id", "email", "last_name", "avatar_cropped"],
+        where: {
+          id: decoded.id,
+        },
+      });
+
+      //emit an event to all users online to display window chat
+      const roomFound = await Rooms.findOne({
+        where: {
+          id: data.room_id
+        },
+        include: [
+          {
+            model: UserProfile,
+            as: 'users',
+            attributes: ['id'],
+            where: {
+              user_active: true,
+              id: {
+                [Op.ne]: decoded.id
+              }
+            },
+            through: {
+              attributes: [],
+            },  
+            include: [
+              {
+                model: Sockets,
+                as: 'socket'
+              }
+            ]
+          }
+        ]
+      })
+
+      // filter to get users online in room
+      await roomFound?.users
+        ?.map((user) => {
+          socket.broadcast
+            .to(user.dataValues.socket.socket_id)
+            .emit(NEW_MESSAGE_RESPONSE, {
+              room: roomFound?.id,
+              message_title: data?.message_title,
+              message: {
+                sender: senderInfo,
+                content_type: data.content_type,
+                content_text: data.content_text,
+                message_status: "received",
+                message_title_url: data?.message_title_url
+              },
+            });
+          //emit an event to all users online in room
+          
+        });
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
     }
-  })
+  });
 };

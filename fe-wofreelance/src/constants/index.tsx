@@ -7,6 +7,8 @@ export const HREF = 'http://localhost:3000/'
 
 export const validImg = ['png', 'jpg', 'jpeg', 'bmp', 'tiff']
 
+export const messageStorage = 'messages_count'
+
 export const apiUrl = {
     app: {
         currency:{
@@ -84,5 +86,10 @@ export const apiUrl = {
     notifications: {
         getAll: 'notifications/get-all',
         update: 'notifications/update'
+    },
+    interactions: {
+        sendMessage: 'messages/send',
+        getAllLatestMessages: 'messages/latest/get-all',
+        getLatestMessageOfRoom: 'messages/latest/room/get-by-id'
     }
 }

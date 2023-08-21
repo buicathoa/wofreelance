@@ -139,14 +139,46 @@ db.user_loggedin.belongsTo(db.userprofile, {
 })
 
 
+
 db.userprofile.hasOne(db.sockets, {
   foreignKey: 'user_id',
+  as: 'socket'
   // as: 'user'
 })
 db.sockets.belongsTo(db.userprofile, {
   foreignKey: 'user_id',
   // as: 'user'
 })
+
+
+// db.rooms.hasOne(db.bidding, {
+//   foreignKey: 'room_id',
+//   as: 'socket'
+// })
+// db.bidding.belongsTo(db.rooms, {
+//   foreignKey: 'user_id',
+// })
+
+
+
+db.userprofile.hasMany(db.messages, {
+  foreignKey: 'sender',
+  as: 'sender_info'
+})
+db.messages.belongsTo(db.userprofile, {
+  foreignKey: 'sender',
+  as: 'sender_info'
+})
+
+db.userprofile.hasMany(db.messages, {
+  foreignKey: 'receiver_id',
+  as: 'receiver_info'
+})
+db.messages.belongsTo(db.userprofile, {
+  foreignKey: 'receiver_id',
+  as: 'receiver_info'
+})
+
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
 //Making relations categories one to many=> IT-Sofware has many Website development, BA,... and BA or website development can be stored in one specific category
@@ -351,13 +383,13 @@ db.userprofile.belongsToMany(db.rooms, {
   through: db.users_rooms,
   foreignKey: 'user_id',
   otherKey: 'room_id',
-  as: 'room'
+  as: 'rooms'
 })
 db.rooms.belongsToMany(db.userprofile, {
   through: db.users_rooms,
   foreignKey: 'room_id',
   otherKey: 'user_id',
-  as: 'user'
+  as: 'users'
 })
 
 // ========================================================================================== End ==========================================================================================//

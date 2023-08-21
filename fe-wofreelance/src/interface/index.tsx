@@ -151,7 +151,8 @@ export interface UserInterface {
     },
     current_time?: string,
     noti_count?: number,
-    user_active: boolean
+    user_active?: boolean,
+    noti_mess?: number
 }
 
 export interface BudgetInterface {
@@ -178,7 +179,8 @@ export interface BiddingInterface {
     updatedAt?: Date,
     project_paid_type: number,
     user: UserInterface,
-    budget: BudgetInterface
+    budget: BudgetInterface,
+    room_id?: number
 }
 
 export interface BiddingInterfaceResponse {
@@ -297,11 +299,13 @@ export interface CountryInterface {
     updatedAt?: Date
 }
 
-export interface ChatReducerInterface  {
-    user: UserInterface,
+export interface InteractionReducer  {
+    users: Array<UserInterface>,
     message_url?: string,
     message_title?: string,
-    chat_window_status: string //open, hide, close
+    chat_window_status: string, //open, hide, close,
+    bidding_id?: number,
+    room_id?: number
 }
 
 export interface NotificationInterface {
@@ -385,3 +389,33 @@ export interface locationReducerInterface {
     countries: Array<CountryInterface>,
 }
 
+export interface latestMessageInterface {
+    id: number,
+    room_name?: string,
+    room_users_id?: string,
+    createdAt: Date,
+    updatedAt: Date,
+    messages: messageDetailInterface,
+    users: Array<UserInterface>,
+    is_online?: boolean,
+    is_active?: boolean
+}
+
+export interface messageDetailInterface {
+    id: number,
+    content_text: string,
+    content_type: string,
+    message_title: string,
+    message_status: string,
+    sender_info: UserInterface,
+    createdAt: Date,
+    updatedAt: Date,
+    messages_state?: Array<messageStateInterface>
+}
+
+export interface messageStateInterface {
+    id: number,
+    message_status?: string,
+    first_name: string,
+    last_name: string
+}

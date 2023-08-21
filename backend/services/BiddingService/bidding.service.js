@@ -160,7 +160,6 @@ const BiddingService = {
           }
         );
 
-        //insert new record of notifications
 
         //Finding this post
         const postFound = await Posts.findOne({

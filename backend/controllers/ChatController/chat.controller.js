@@ -17,6 +17,30 @@ const ChatController = {
     } catch (err) {
       return handleError(res, err);
     }
+  },
+  getAllLatestMessages: async ( req, res) => {
+    try {
+      const messages = await ChatService.getAllLatestMessages(req, res);
+      return handleSuccess(res, messages, {message: "Get all latest messages success"})
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+  getLatestMessageOfRoom: async ( req, res) => {
+    try {
+      const messages = await ChatService.getLatestMessageOfRoom(req, res);
+      return handleSuccess(res, messages, {message: "Get latest messages success"})
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+  getMessagesDetail: async ( req, res) => {
+    try {
+      const messages = await ChatService.getMessagesDetail(req, res);
+      return handleSuccess(res, messages, {message: "Get all detail messages success"})
+    } catch (err) {
+      return handleError(res, err);
+    }
   }
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { freelancer_logo } from '../../assets'
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, TeamOutlined } from '@ant-design/icons'
@@ -5,7 +6,7 @@ import { Badge, Button, Popover } from "antd";
 import './style.scss'
 import { useEffect, useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { NotificationInterface, ResponseFormatItem, UserInterface } from "../../interface";
+import { NotificationInterface, ResponseFormatItem, UserInterface, latestMessageInterface } from "../../interface";
 import { UserActions } from "../../reducers/listReducer/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
@@ -16,67 +17,35 @@ import NotificationContent from "./NotificationContent";
 import MessagesContent from "./MessagesContent";
 import ProfileContent from "./ProfileContent";
 import { checkLocalStorage, deleteCookie, getCookie } from "../../utils/helper";
-import { ExperienceActions } from "../../reducers/listReducer/experienceReducer";
-import { CategoryActions } from "../../reducers/listReducer/categoryReducer";
-import { EducationActions } from "../../reducers/listReducer/educationReducer";
-import { QualifycationActions } from "../../reducers/listReducer/qualificationReducer";
-import Footer from "../Footer";
-import { PortfolioActions } from "../../reducers/listReducer/portfolioReducer";
-// import { SocketContext } from "../../SocketContext";
-import { AppActions } from "../../reducers/listReducer/appReducer";
 import { modalNotifications } from "../../components/modalNotifications";
 import { SocketContext } from "../../SocketProvider";
 import { NotificationsActions } from "../../reducers/listReducer/notificationsReducer";
+import ChatWindowFrame from "../ChatWindowFrame";
+import { InteractionsActions } from "../../reducers/listReducer/interactionReducer";
+import { messageStorage } from "../../constants";
 // import { socket } from "../../SocketContext";
 // import { SocketContext } from "../../SocketContext";
 
 
 const Layout = () => {
+  const initFilterData = {
+    page: 1,
+    limit: 5,
+    search_list: [],
+    sorts: []
+  }
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const [openNoti, setOpenNoti] = useState(false)
+  const [countMessagesNoti, setCountMessagesNoti] = useState(0)
+  const [openNotiMess, setOpenNotiMess] = useState(false)
+  const [filterLatestMessages, setFilterLatestMessages] = useState(initFilterData)
   // const socket = useContext(SocketContext)
   const socket: any = useContext(SocketContext)
   const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
       dispatch(UserActions.getUserInfo({ param, resolve, reject }));
-    });
-  };
-
-  const getUserInfoDestination = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(UserActions.getUserInfoDestination({ param, resolve, reject }));
-    });
-  };
-
-  const getAllExperience = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(ExperienceActions.getAllExperience({ param, resolve, reject }));
-    });
-  };
-
-  const getAllSkillsetForUser = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(CategoryActions.getAllSkillsetForUser({ param, resolve, reject }));
-    });
-  };
-
-  const getAllEducationUser = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(EducationActions.getAllEducationUser({ param, resolve, reject }));
-    });
-  };
-
-  const getAllQualification = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(QualifycationActions.getAllQualification({ param, resolve, reject }));
-    });
-  };
-
-  const getPortfolios = (param: any): Promise<ResponseFormatItem> => {
-    return new Promise((resolve, reject) => {
-      dispatch(PortfolioActions.getPortfolios({ param, resolve, reject }));
     });
   };
 
@@ -88,52 +57,43 @@ const Layout = () => {
 
   const updateUser = (param: any): Promise<ResponseFormatItem> => {
     return new Promise((resolve, reject) => {
-        dispatch(UserActions.updateUser({ param, resolve, reject }));
+      dispatch(UserActions.updateUser({ param, resolve, reject }));
     });
-};
+  };
+
+  const getAllLatestMessages = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(InteractionsActions.getAllLatestMessages({ param, resolve, reject }));
+    });
+  };
 
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
   const notifications: Array<NotificationInterface> = useSelector((state: RootState) => state.notifications.notifications)
-  const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
-
+  
   useEffect(() => {
-    if (socket) {
+    if (socket?.connected) {
       if (!checkLocalStorage('access_token')) {
         const nextLocation = location.pathname.replaceAll('/', '%252')
         navigate(`/signin?next=${nextLocation}`)
-      } else if (location.pathname.includes('/u/')) {
-        const username = location.pathname.split('/').at(-1)
-        getUserInfo({}).then((res: any) => {
-          if (res.code === 200) {
-            if (res.data.username === username) {
-              Promise.all([
-                getAllExperience({ user_id: res?.data?.id }),
-                getAllSkillsetForUser({ user_id: res?.data?.id }),
-                getAllEducationUser({ user_id: res?.data?.id }),
-                getAllQualification({ user_id: res?.data?.id }),
-                getPortfolios({ user_id: res?.data?.id })
-              ])
-              dispatch(UserActions.getUserInforDestinationSuccess(res.data))
-            } else {
-              getUserInfoDestination({ username: username }).then((res) => {
-                Promise.all([
-                  getAllExperience({ user_id: res?.data?.id }),
-                  getAllSkillsetForUser({ user_id: res?.data?.id }),
-                  getAllEducationUser({ user_id: res?.data?.id }),
-                  getAllQualification({ user_id: res?.data?.id }),
-                  getPortfolios({ user_id: res?.data?.id })
-                ])
-              })
-            }
-          }
-        })
-          .catch((err) => {
-
-            navigate('/not-found')
-          })
       } else {
-        getUserInfo({}).then((res) => {
-          console.log(socket)
+        getUserInfo({}).then((resUser) => {
+          getAllLatestMessages(filterLatestMessages).then(async (res) => {
+            let currentNotiMess = 0
+            await res?.data?.map((item: latestMessageInterface) => {
+              if (item.messages.message_status === 'received') {
+                currentNotiMess += 1
+              }
+            })
+            const isExistMessagesCount = localStorage.getItem('messages_count')
+            if(!isExistMessagesCount) {
+              localStorage.setItem('messages_count', currentNotiMess.toString())
+            } else {
+              currentNotiMess = parseInt(localStorage.getItem('messages_count')!)
+  
+            }
+            dispatch(InteractionsActions.getAllLatestMessagesSuccess({messages: res.data, currentUser: resUser?.data?.username}))
+            setCountMessagesNoti(currentNotiMess)
+          })
         })
       }
     } else {
@@ -147,19 +107,23 @@ const Layout = () => {
   }, [location, socket])
 
   useEffect(() => {
-    if (socket) {
+    if (socket?.connected) {
       socket.on("new_post_notify_response", (data: any) => {
         dispatch(UserActions.increaseNotifications({}))
         modalNotifications(
-          {notiMess: data.title, description: `Here the latest project matching your skills: ${data.project_detail}\
+          {
+            notiMess: data.title, description: `Here the latest project matching your skills: ${data.project_detail}\
         ,Skills: ${data.skills.map((skill: any) => {
-          return skill.label
-        }).join(", ")}`,noti_url:  data.noti_url
-      })
+              return skill.label
+            }).join(", ")}`, noti_url: data.noti_url
+          })
       });
       socket.on("project_bidding_response", (data: any) => {
         dispatch(UserActions.increaseNotifications({}))
-        return modalNotifications({notiMess: 'New bidding',description: data.message, noti_url: data.url})
+        return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
+      })
+      socket.on("new_message_response", (data: any) => {
+        dispatch(InteractionsActions.increaseNotificationsMessage(data))
       })
     }
   }, [socket])
@@ -169,25 +133,37 @@ const Layout = () => {
   }
 
   const handleOpenNoti = () => {
-    if(openNoti) {
+    if (openNoti) {
       setOpenNoti(false)
     } else {
       getAllNotifications({}).then(() => {
-        if(user.noti_count! > 0) {
-          updateUser({noti_count: 0}).then(() => {
+        if (user.noti_count! > 0) {
+          updateUser({ noti_count: 0 }).then(() => {
             dispatch(UserActions.updateNoticountSuccess({}))
             setOpenNoti(true)
           })
         } else {
-          setOpenNoti( true)
+          setOpenNoti(true)
         }
       })
+    }
+  }
 
+  const handleOpenNotiMess = () => {
+    if (openNotiMess) {
+      setOpenNotiMess(false)
+    } else {
+      if(countMessagesNoti > 0) {
+        setCountMessagesNoti(0)
+        localStorage.setItem(messageStorage, '0')
+      }
+      setOpenNotiMess(true)
     }
   }
 
   return (
     <div>
+      <ChatWindowFrame />
       {/* A "layout route" is a good place to put markup you want to
             share across all the pages on your site, like navigation. */}
       <nav className="nav-bar top">
@@ -219,13 +195,13 @@ const Layout = () => {
           </div>
           <div className="nav-menu-right">
             <div className="message-notify">
-              <Popover content={<NotificationContent notifications={notifications}/>} onOpenChange={handleOpenNoti} open={openNoti} trigger="click" placement="bottom">
+              <Popover content={<NotificationContent notifications={notifications} />} onOpenChange={handleOpenNoti} open={openNoti} trigger="click" placement="bottom">
                 <Badge count={user.noti_count} size="small">
                   <BellOutlined />
                 </Badge>
               </Popover>
-              <Popover content={<MessagesContent />} trigger="hover" placement="bottom">
-                <Badge count={10} size="small">
+              <Popover content={<MessagesContent visible={openNotiMess}/>} trigger="click" onOpenChange={handleOpenNotiMess} open={openNotiMess} placement="bottom">
+                <Badge count={countMessagesNoti} size="small">
                   <MessageOutlined />
                 </Badge>
               </Popover>

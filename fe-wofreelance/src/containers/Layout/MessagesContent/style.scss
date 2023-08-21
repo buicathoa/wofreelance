@@ -1,77 +1,118 @@
 @import "../../../css/custom";
 @import "../../../css/variable";
 
-.message-content-wrapper{
+.message-content-wrapper {
     width: calc(400 / $fdf) * $rem;
-    .message-content-header{
-        padding:  calc(24 / $fdf) * $rem  calc(24 / $fdf) * $rem  calc(4 / $fdf) * $rem;
+
+    .message-content-header {
+        padding: calc(24 / $fdf) * $rem calc(24 / $fdf) * $rem calc(4 / $fdf) * $rem;
         display: flex;
         align-items: center;
         font-size: calc(16 / $fdf) * $rem;
         line-height: 1.5;
         justify-content: space-between;
-        .title{
+
+        .title {
             font-weight: 700;
             color: $textcolor;
         }
-        a{
+
+        a {
             font-size: calc(14 / $fdf) * $rem;
         }
     }
-    .message-content-main{
-        .message-content-empty{
+
+    .message-content-main {
+        .message-content-empty {
             padding: calc(24 / $fdf) * $rem calc(12 / $fdf) * $rem;
-            .message-content-empty-image{
+
+            .message-content-empty-image {
                 display: flex;
                 justify-content: center;
-                img{
+
+                img {
                     width: calc(106 / $fdf) * $rem;
                     height: calc(88 / $fdf) * $rem;
                 }
             }
-            .message-content-empty-text{
+
+            .message-content-empty-text {
                 font-size: calc(13 / $fdf) * $rem;
                 line-height: 1.2;
                 font-weight: 400;
                 text-align: center;
             }
         }
-        .messages-list{
-            padding:  0 calc(12 / $fdf) * $rem;
+
+        .messages-list {
+            padding: 0 calc(12 / $fdf) * $rem;
             padding-bottom: calc(16 / $fdf) * $rem;
-            .message-item{
+
+            .message-item {
                 padding: calc(12 / $fdf) * $rem;
                 display: flex;
-                &:hover{
+
+                &:hover {
                     background-color: $hovercolor;
                     cursor: pointer;
                 }
-                .avatar{
+
+                .avatar {
                     margin-right: calc(8 / $fdf) * $rem;
-                    img{
+
+                    img {
                         width: calc(48 / $fdf) * $rem;
                         height: calc(48 / $fdf) * $rem;
                         border-radius: 2px;
                         object-fit: cover;
                     }
                 }
-                .message-item-content{
+
+                .message-item-content {
                     width: calc(100% - calc(72 / $fdf) * $rem);
-                    .sender-info{
+
+                    .sender-info {
                         display: flex;
                         justify-content: space-between;
-                        .sender-name{
-                            font-size: calc(14 / $fdf) * $rem;
+
+                        .sender-name {
+                            font-size: calc(16 / $fdf) * $rem;
                             color: $textcolor;
                             font-weight: 600;
-                            .sender-email{
+
+                            .sender-email {
                                 font-weight: 400;
                             }
                         }
-                        .message-latest-time{
+
+                        .message-latest-time {
                             font-size: calc(12 / $fdf) * $rem;
                             color: $textcolor;
                             opacity: 0.5;
+                        }
+                    }
+
+                    .message-info {
+                        display: flex;
+                        justify-content: space-between;
+
+                        .message-context {
+                            font-size: calc(14 / $fdf) * $rem;
+                            color: $textcolor;
+                            font-weight: 400;
+                            &.received{
+                                font-weight: 600;
+                            }
+                        }
+
+                        .message-status {
+                            width: calc(10 / $fdf) * $rem ;
+                            height: calc(10 / $fdf) * $rem ;
+                            border-radius: 50%;
+
+                            &.received {
+                                background-color: rgb(83, 83, 232);
+                            }
                         }
                     }
                 }

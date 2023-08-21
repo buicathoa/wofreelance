@@ -22,17 +22,16 @@ const SocketProvider = ({ children }: any) => {
                 reconnectionDelayMax: 5000,
                 reconnectionAttempts: 5
             })
-            sockets.on('reconnect', () => {
-                console.log('reconnect success',)
+            sockets.on('connect', () => {
+                setSocket(sockets)
                 localStorage.setItem('socketId', sockets.id)
-            })
-            setSocket(sockets)
-            // socket.connect()
+            })            
         } 
         // else {
         //     const nextLocation = location.pathname.replaceAll('/', '%252')
         //     navigate(`/signin`)
         // }
+        
     }, [isLoggedIn])
 
 

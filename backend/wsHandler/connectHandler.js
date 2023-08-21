@@ -6,7 +6,7 @@ const sequelize = db.sequelize;
 
 module.exports = async(socket, io) => {
     const decoded = jwt_decode(socket.handshake.auth.token);
-    const [user, created] = await SocketModel.findOrCreate({
+    const [created] = await SocketModel.findOrCreate({
         where: {
             user_id: decoded.id
         },

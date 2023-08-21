@@ -10,6 +10,7 @@ import { AppSaga } from './listSaga/appSaga'
 import { PostSaga } from './listSaga/postSaga'
 import { PortfolioSaga } from './listSaga/portfolioSaga'
 import { NotificationsSaga } from './listSaga/notificationSaga'
+import { InteractionSaga } from './listSaga/interactionSaga'
 
 export default function* rootSaga(){
     yield all([
@@ -22,6 +23,7 @@ export default function* rootSaga(){
         AppSaga(),
         PostSaga(),
         PortfolioSaga(),
-        NotificationsSaga()
+        NotificationsSaga(),
+        InteractionSaga()
     ])
 }

@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Messages.init({
     content_type: DataTypes.STRING,
     content_text: DataTypes.STRING,
+    message_title: DataTypes.STRING,
     room_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -37,6 +38,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 'received'
     },
+    receiver_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'userprofiles',
+        key: 'id'
+      }
+    },
+    message_title_url: {
+      type: DataTypes.STRING,
+    }
   }, {
     sequelize,
     modelName: 'Messages',

@@ -2,11 +2,11 @@ import { createSlice } from '@reduxjs/toolkit'
 import { userReducerInterface } from '../../interface'
 
 const initialState: userReducerInterface = {
-    user: {user_active: false},
+    user: {},
     user_skills: [],
     languages: [],
     address_generated: {},
-    user_info: {user_active: false},
+    user_info: {},
     isLoggedIn: false
 }
 
@@ -30,6 +30,7 @@ const User = createSlice({
         },
         getUserInfoDestination: (state, actions) => {},
         getUserInforDestinationSuccess: (state, actions) => {
+            debugger
             state.user_info = actions.payload
         },
         updateUser: (state, actions) => { },
@@ -49,7 +50,7 @@ const User = createSlice({
         },
         increaseNotifications: (state, actions) => {
             state.user = {...state.user, noti_count: state.user.noti_count! + 1}
-        }
+        },
     })
 })
 

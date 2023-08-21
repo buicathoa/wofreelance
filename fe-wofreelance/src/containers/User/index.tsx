@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Col, Rate, Row, Empty, Form, Input, Popover, Carousel } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     DollarCircleOutlined, EnvironmentFilled, ClockCircleFilled, FlagFilled,
     UserAddOutlined, UserOutlined, MailOutlined, FacebookOutlined, PoundCircleFilled, LikeFilled, LeftOutlined, RightOutlined
@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 import { UserActions } from '../../reducers/listReducer/userReducer';
 import { RootState } from '../../reducers/rootReducer';
-
+import _ from 'lodash'
 import { PortfolioInterface, ResponseFormatItem, SkillsetInterface, UserInterface } from '../../interface';
 import { certifications, portfolio, rating_empty } from '../../assets';
 // import { SocketContext } from '../../SocketContext';
@@ -36,6 +36,11 @@ import { validImg } from '../../constants';
 
 import './style.scss'
 import { SocketContext } from '../../SocketProvider';
+import { CategoryActions } from '../../reducers/listReducer/categoryReducer';
+import { EducationActions } from '../../reducers/listReducer/educationReducer';
+import { QualifycationActions } from '../../reducers/listReducer/qualificationReducer';
+import { PortfolioActions } from '../../reducers/listReducer/portfolioReducer';
+import { ExperienceActions } from '../../reducers/listReducer/experienceReducer';
 // import { SocketContext } from '../../SocketContext';
 const UserProfile = () => {
     const dispatch = useDispatch()
@@ -44,9 +49,8 @@ const UserProfile = () => {
     const reviewsRef = useRef(null)
     const resumeRef = useRef(null)
     // const socket = useContext(SocketContext)
-    const socket: any = useContext(SocketContext)
     const location = useLocation()
-
+    const navigate = useNavigate()
     const [isOpenSkillsModal, setIsOpenSkillsModal] = useState(false)
     const [isDisplayNavUser, setIsDisplayNavUser] = useState(false)
     const [isEditProfile, setIsEditProfile] = useState(false)
@@ -57,7 +61,7 @@ const UserProfile = () => {
     const [componentRoute, setComponentRoute] = useState('')
     const [isOpenModalPortfolio, setIsOpenModalPortfolio] = useState(false)
     const [portfolioSelected, setPortfolioSelected] = useState<PortfolioInterface>()
-
+    const socket: any = useContext(SocketContext)
     const validateMessages = {
         required: 'This field is required'
     }
@@ -101,6 +105,48 @@ const UserProfile = () => {
         });
     };
 
+    const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(UserActions.getUserInfo({ param, resolve, reject }));
+        });
+    };
+
+    const getAllSkillsetForUser = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(CategoryActions.getAllSkillsetForUser({ param, resolve, reject }));
+        });
+    };
+
+    const getAllEducationUser = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(EducationActions.getAllEducationUser({ param, resolve, reject }));
+        });
+    };
+
+    const getAllQualification = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(QualifycationActions.getAllQualification({ param, resolve, reject }));
+        });
+    };
+
+    const getPortfolios = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(PortfolioActions.getPortfolios({ param, resolve, reject }));
+        });
+    };
+
+    const getAllExperience = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(ExperienceActions.getAllExperience({ param, resolve, reject }));
+        });
+    };
+
+    const getUserInfoDestination = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(UserActions.getUserInfoDestination({ param, resolve, reject }));
+        });
+    };
+
     useEffect(() => {
         form.resetFields()
     }, [formValues])
@@ -128,14 +174,38 @@ const UserProfile = () => {
     }, [location])
 
     useEffect(() => {
-        if (Object?.values(user_info).length > 0) {
-            setUserStatus(user_info?.user_active)
-            setFileUploaded({
-                ...fileUploaded, preview: user_info?.avatar_cropped
-            })
+        if (!_.isEmpty(user)) {
+            const username = location.pathname.split('/').at(-1)
+            if (user?.username === username) {
+                setUserStatus(user?.user_active!)
+                setFileUploaded({ ...fileUploaded, preview: user?.avatar_cropped })
+                dispatch(UserActions.getUserInforDestinationSuccess(user))
+                Promise.all([
+                    getAllExperience({ user_id: user?.id }),
+                    getAllSkillsetForUser({ user_id: user?.id }),
+                    getAllEducationUser({ user_id: user?.id }),
+                    getAllQualification({ user_id: user?.id }),
+                    getPortfolios({ user_id: user?.id })
+                ])
+            } else {
+                getUserInfoDestination({ username: username }).then((res) => {
+                    setUserStatus(res?.data?.user_active)
+                    setFileUploaded({ ...fileUploaded, preview: res?.data?.avatar_cropped })
+                    Promise.all([
+                        getAllExperience({ user_id: res?.data?.id }),
+                        getAllSkillsetForUser({ user_id: res?.data?.id }),
+                        getAllEducationUser({ user_id: res?.data?.id }),
+                        getAllQualification({ user_id: res?.data?.id }),
+                        getPortfolios({ user_id: res?.data?.id })
+                    ])
+                })
+            }
         }
+        // if (socket?.connected) {
 
-    }, [user_info])
+        // }
+
+    }, [user])
 
 
     const handleMoveToDiv = (ref: any) => {
@@ -163,9 +233,9 @@ const UserProfile = () => {
     const handleChangeHourlyRate = (event: any) => {
         const number = parseInt(event.target.value)
         if (number < 0) {
-            openWarning({notiMess: 'Negative number is not allowed.'})
+            openWarning({ notiMess: 'Negative number is not allowed.' })
         } else if (number === 0) {
-            openWarning({notiMess: 'Negative number must be larger than 0.'})
+            openWarning({ notiMess: 'Negative number must be larger than 0.' })
         } else {
             return
         }

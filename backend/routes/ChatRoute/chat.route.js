@@ -9,5 +9,11 @@ const authorize = require('../../middlewares/authorize');
 
 router.post("/send", authorize(['director', 'admin', 'user']) , ChatController.sendMessages)
 
+router.post("/latest/get-all", authorize(['director', 'admin', 'user']) , ChatController.getAllLatestMessages)
+
+router.post("/latest/room/get-by-id", authorize(['director', 'admin', 'user']) , ChatController.getLatestMessageOfRoom)
+
+router.post("/detail/get-all", authorize(['director', 'admin', 'user']) , ChatController.getMessagesDetail)
+
 
 module.exports = router
