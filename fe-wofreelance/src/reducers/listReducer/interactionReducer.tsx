@@ -4,14 +4,16 @@ import _ from 'lodash'
 
 interface interactionReducer {
     interactions: Array<InteractionReducer>,
-    latestMessages: Array<latestMessageInterface>
+    latestMessages: Array<latestMessageInterface>,
+    unread_messages: number
 }
 
 // chat_window_status: open, hide, close, focus
 
 const initialState: interactionReducer = {
     interactions: [],
-    latestMessages: []
+    latestMessages: [],
+    unread_messages: 0
 }
 
 const Interactions = createSlice({
@@ -43,8 +45,8 @@ const Interactions = createSlice({
 
         sendMessagesSuccess: (state, actions) => {
             const latestMessagesClone = [...state.latestMessages]
-            const interactionsClone = [...state.interactions]
-            debugger
+            let interactionsClone = [...state.interactions]
+            let unreadMess = 0
             if (actions.payload.interaction_state === 'create') {
                 const roomName = actions?.payload.room_name?.split(',').map((user: string) => {
                     if (user.trim() !== actions.payload.currentUser && user !== '') {
@@ -54,27 +56,44 @@ const Interactions = createSlice({
                 const chatStatus = actions.payload?.users.some((user: any) => user.user_active)
                 const { interaction_state, ...others } = actions.payload
                 latestMessagesClone.push({ ...others, is_online: chatStatus, room_name: roomName })
-
-                const currentInteracion = interactionsClone?.findIndex((interaction, index) => index === actions.payload.interaction_index)
-                interactionsClone[currentInteracion] = { ...interactionsClone[currentInteracion], room_id: actions.payload.id }
             } else {
                 const currentLatestMess = latestMessagesClone?.findIndex(room => room.id === actions.payload.id)
                 const chatStatus = latestMessagesClone[currentLatestMess]?.users?.some((user: any) => user.user_active)
                 latestMessagesClone[currentLatestMess] = {
                     ...latestMessagesClone[currentLatestMess],
+                    unread_messages: actions?.payload?.unread_messages,
                     messages: {
                         ...actions.payload.messages,
                         sender_info: latestMessagesClone[currentLatestMess].messages.sender_info
                     },
                     is_online: chatStatus
                 }
+            }
+            unreadMess = latestMessagesClone.reduce((acc:any, o:any) => acc + parseInt(o.unread_messages), 0)
 
+            const currentInteracion = interactionsClone?.findIndex((interaction, index) => interaction.room_id === actions.payload.id) 
+            if(currentInteracion === -1) {
+                interactionsClone.push({
+                    message_title: actions.payload.messages.message_title,
+                    users: actions.payload.users,
+                    message_url: actions.payload.messages.message_title_url,
+                    chat_window_status: 'open',
+                    room_id: actions.payload.id
+                })
+            } else {
+                interactionsClone[currentInteracion] = {
+                    ...interactionsClone[currentInteracion],
+                    message_title: actions.payload.messages.message_title,
+                    message_url: actions.payload.messages.message_title_url,
+                    room_id: actions.payload.id
+                }
             }
 
             return {
                 ...state,
                 latestMessages: latestMessagesClone,
-                interactions: interactionsClone
+                interactions: interactionsClone,
+                unread_messages: unreadMess
             }
         },
 
@@ -114,6 +133,7 @@ const Interactions = createSlice({
                     is_online: chatStatus
                 }
             })
+            state.unread_messages = actions?.payload?.messages?.reduce((acc: any, o: any) => acc + parseInt(o.unread_messages), 0)
         },
 
         increaseNotificationsMessage: (state, actions) => {

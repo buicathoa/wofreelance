@@ -21,9 +21,9 @@ export function* InteractionSaga(): Generator {
 function* sendMessages(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
-        const response:any = yield apiRequest(apiUrl.interactions.sendMessage, param, 'general')
-        if(param.room_id) {
-            yield put(InteractionsActions.sendMessagesSuccess({...response.data, interaction_state: 'update'}))
+        const response:any = yield apiRequest(apiUrl.interactions.sendMessage, param.param, 'general')
+        if(param.param.room_id) {
+            yield put(InteractionsActions.sendMessagesSuccess({...response.data, interaction_state: 'update', interaction_index: param.interaction_index}))
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)

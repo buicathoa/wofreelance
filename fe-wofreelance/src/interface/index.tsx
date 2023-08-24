@@ -390,15 +390,17 @@ export interface locationReducerInterface {
 }
 
 export interface latestMessageInterface {
+    unread_message: number;
     id: number,
     room_name?: string,
     room_users_id?: string,
-    createdAt: Date,
-    updatedAt: Date,
+    createdAt?: Date,
+    updatedAt?: Date,
     messages: messageDetailInterface,
     users: Array<UserInterface>,
     is_online?: boolean,
-    is_active?: boolean
+    is_active?: boolean,
+    unread_messages?: number
 }
 
 export interface messageDetailInterface {

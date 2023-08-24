@@ -70,18 +70,18 @@ const ChatService = {
       if (!room) {
         //create the room
         roomName = receiversName?.join(', ');
-        const roomCreated = await Rooms.create({
+        roomFound = await Rooms.create({
           room_name: roomName,
         });
-        roomFound = roomCreated
-        room = roomCreated.id;
+
+        room = roomFound.id;
 
         //check if not exist the room and exist bidding_id => update bidding with room_id
 
         if(bidding_id) {
           await Bidding.update(
             {
-              room_id: roomCreated.id
+              room_id: roomFound.id
             },
             {
               where: {
@@ -91,65 +91,8 @@ const ChatService = {
           )
         }
 
-
         //add users to the rooms
         // 2. add receivers to the room
-
-        // insert new message the owner
-        await Users_Rooms.create({
-          user_id: senderInfo.id,
-          room_id: roomCreated.id
-        })
-        ownMessage = await Messages.create({
-            message_status: "seen",
-            content_type: content_type,
-            content_text: content_text,
-            message_title: message_title,
-            sender: decoded.id,
-            room_id: roomCreated.id,
-            receiver_id: senderInfo.id,
-            message_title_url: message_title_url,
-        })
-
-        await listReceivers
-        ?.filter(item => item.id !== decoded.id)
-        ?.map(async (receiver) => {
-          await Users_Rooms.create({
-            user_id: receiver.dataValues.id,
-            room_id: roomCreated.id,
-          });
-          //Create new messages table record
-          await Messages.create({
-            message_status: "received",
-            content_type: content_type,
-            content_text: content_text,
-            message_title: message_title,
-            sender: decoded.id,
-            room_id: roomCreated.id,
-            receiver_id: receiver.id,
-            message_title_url: message_title_url,
-          });
-        });
-      } else {
-        roomFound = await Rooms.findOne({
-          where: {
-            id: room,
-          },
-        });
-        if (!roomFound) {
-          throw new Error("Room not found");
-        }
-        roomName = roomFound.dataValues?.room_name;
-        
-        //find the members inside the room
-        const memsInRoom = await Users_Rooms.count({
-          where: {
-            [Op.not]: {
-              user_id: decoded.id
-            },
-            room_id: roomFound.id
-          }
-        })
 
         // insert new message the owner
         await Users_Rooms.create({
@@ -167,21 +110,61 @@ const ChatService = {
             message_title_url: message_title_url,
         })
 
-        //insert new message for the other who inside the room
-
-        await Messages.update(
-          {
-            message_status: 'seen'
+        await listReceivers
+        ?.filter(item => item.id !== decoded.id)
+        ?.map(async (receiver) => {
+          await Users_Rooms.create({
+            user_id: receiver.dataValues.id,
+            room_id: roomFound.id,
+          });
+          //Create new messages table record
+          await Messages.create({
+            message_status: "received",
+            content_type: content_type,
+            content_text: content_text,
+            message_title: message_title,
+            sender: decoded.id,
+            room_id: roomFound.id,
+            receiver_id: receiver.id,
+            message_title_url: message_title_url,
+          });
+        });
+      } else {
+        //find the members inside the room
+        roomFound = await Rooms.findOne({
+          attributes: [
+            'id',
+            'room_name',
+            'createdAt',
+            'updatedAt',
+            [
+              sequelize.literal(
+                `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = ${room})`
+              ),
+              "unread_messages",
+            ],
+          ],
+          where: {
+            id: room,
           },
-          {
-            where: {
-              message_status: "received",
-              room_id: roomFound.id
-            },
-            order: [["createdAt", "DESC"]],
-            limit: memsInRoom,
-          }
-        )
+        });
+
+        if (!roomFound) {
+          throw new Error("Room not found");
+        }
+        roomName = roomFound.dataValues?.room_name;
+
+        // insert new message the owner
+        ownMessage = await Messages.create({
+            message_status: "seen",
+            content_type: content_type,
+            content_text: content_text,
+            message_title: message_title,
+            sender: decoded.id,
+            room_id: roomFound.id,
+            receiver_id: senderInfo.id,
+            message_title_url: message_title_url,
+        })
         
         await listReceivers
         ?.filter(item => item.id !== decoded.id)
@@ -225,7 +208,18 @@ const ChatService = {
           {
             model: Rooms,
             as: "rooms",
-
+            attributes: [
+              'id',
+              'room_name',
+              'createdAt',
+              'updatedAt',
+              [
+                sequelize.literal(
+                  `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = rooms.id)`
+                ),
+                "unread_messages",
+              ],
+            ],
             through: {
               model: Users_Rooms,
               attributes: [],
@@ -248,7 +242,7 @@ const ChatService = {
                 attributes: {
                   exclude: ['receiver_id']
                 },
-                group: ["createdAt"],
+                // group: ["createdAt"],
                 include: [
                   {
                     model: UserProfile,
@@ -289,6 +283,14 @@ const ChatService = {
   getLatestMessageOfRoom: async (req, res) => {
     try {
       const decoded = jwt_decode(req.headers.authorization);
+
+      const senderInfo = await UserProfile.findOne({
+        attributes: ["id", "email", "username"],
+        where: {
+          id: decoded.id,
+        },
+      });
+
       const latestMess = await Rooms.findOne({
         where: {
           id: req.body.room_id,
@@ -335,7 +337,7 @@ const ChatService = {
           },
         ],
       });
-      return {...latestMess.dataValues, messages: latestMess.messages[0].dataValues ?? {}};
+      return {...latestMess.dataValues, messages: latestMess.messages[0].dataValues ?? {}, sender_info: senderInfo.dataValues};
     } catch (err) {
       throw err;
     }

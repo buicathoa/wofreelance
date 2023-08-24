@@ -65,14 +65,17 @@ function ChatWindowFrame() {
       bidding_id: item?.bidding_id,
       room_id: item?.room_id
     }
-    console.log(event.target.value)
-    sendMessages(payload).then((res) => {
+    sendMessages({param: payload, interaction_index: index}).then((res) => {
       if(!item.room_id) {
         getLatestMessageOfRoom({
           room_id: res?.data?.id,
           currentUser: user.username,
           interaction_index: index
+        }).then((resLatest: any) => {
+          socket.emit("new_message", {room_id: resLatest?.data?.id})
         })
+      } else {
+        socket.emit("new_message", {room_id: res?.data?.messages?.room_id})
       }
     })
   }
@@ -92,9 +95,11 @@ function ChatWindowFrame() {
   }
 
   const renderWindowChatName = (users: Array<UserInterface>) => {
-    const windowChatName = users?.map((user) => user.last_name).join(' ,')
+    const windowChatName = users?.map((user) => user.username).join(' ,')
     return windowChatName
   }
+  
+  console.log('interactions', interactions)
 
   const handleOpenChatWindow = (interaction: any) => {
 

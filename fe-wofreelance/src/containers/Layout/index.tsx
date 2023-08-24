@@ -6,7 +6,7 @@ import { Badge, Button, Popover } from "antd";
 import './style.scss'
 import { useEffect, useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { NotificationInterface, ResponseFormatItem, UserInterface, latestMessageInterface } from "../../interface";
+import { InteractionReducer, NotificationInterface, ResponseFormatItem, UserInterface, latestMessageInterface } from "../../interface";
 import { UserActions } from "../../reducers/listReducer/userReducer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../reducers/rootReducer";
@@ -69,7 +69,11 @@ const Layout = () => {
 
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
   const notifications: Array<NotificationInterface> = useSelector((state: RootState) => state.notifications.notifications)
-  
+  const unread_messages: number = useSelector((state: RootState) => state.interactions.unread_messages)
+  const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
+  const interactions: Array<InteractionReducer> = useSelector((state: RootState) => state.interactions.interactions)
+
+  console.log('interactions', interactions)
   useEffect(() => {
     if (socket?.connected) {
       if (!checkLocalStorage('access_token')) {
@@ -77,22 +81,8 @@ const Layout = () => {
         navigate(`/signin?next=${nextLocation}`)
       } else {
         getUserInfo({}).then((resUser) => {
-          getAllLatestMessages(filterLatestMessages).then(async (res) => {
-            let currentNotiMess = 0
-            await res?.data?.map((item: latestMessageInterface) => {
-              if (item.messages.message_status === 'received') {
-                currentNotiMess += 1
-              }
-            })
-            const isExistMessagesCount = localStorage.getItem('messages_count')
-            if(!isExistMessagesCount) {
-              localStorage.setItem('messages_count', currentNotiMess.toString())
-            } else {
-              currentNotiMess = parseInt(localStorage.getItem('messages_count')!)
-  
-            }
-            dispatch(InteractionsActions.getAllLatestMessagesSuccess({messages: res.data, currentUser: resUser?.data?.username}))
-            setCountMessagesNoti(currentNotiMess)
+          getAllLatestMessages(filterLatestMessages).then((res) => {
+            dispatch(InteractionsActions.getAllLatestMessagesSuccess({messages: res.data, currentUser: resUser?.data?.usernames}))
           })
         })
       }
@@ -123,7 +113,10 @@ const Layout = () => {
         return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
       })
       socket.on("new_message_response", (data: any) => {
-        dispatch(InteractionsActions.increaseNotificationsMessage(data))
+        const idxLatestMess = latestMessages.findIndex((mess) => mess.id === data.id)
+        console.log('interactions_ne', interactions)
+        const idxInteractions = interactions.findIndex((item: any) => item.room_id === data.id)
+        dispatch(InteractionsActions.sendMessagesSuccess({...data, interaction_state: idxLatestMess === -1 ? 'create' : 'update', interaction_index: idxInteractions}))
       })
     }
   }, [socket])
@@ -149,16 +142,8 @@ const Layout = () => {
     }
   }
 
-  const handleOpenNotiMess = () => {
-    if (openNotiMess) {
-      setOpenNotiMess(false)
-    } else {
-      if(countMessagesNoti > 0) {
-        setCountMessagesNoti(0)
-        localStorage.setItem(messageStorage, '0')
-      }
-      setOpenNotiMess(true)
-    }
+  const handleOpenNotiMess = (open: boolean) => {
+    setOpenNotiMess(open)
   }
 
   return (
@@ -201,7 +186,7 @@ const Layout = () => {
                 </Badge>
               </Popover>
               <Popover content={<MessagesContent visible={openNotiMess}/>} trigger="click" onOpenChange={handleOpenNotiMess} open={openNotiMess} placement="bottom">
-                <Badge count={countMessagesNoti} size="small">
+                <Badge count={unread_messages} size="small">
                   <MessageOutlined />
                 </Badge>
               </Popover>

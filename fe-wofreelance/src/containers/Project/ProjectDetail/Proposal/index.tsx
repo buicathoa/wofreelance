@@ -173,7 +173,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     }
 
     const handleAddInteractions = (bid: BiddingInterface) => {
-        dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, last_name: bid.user.last_name }], message_url: postItem?.post_url, message_title: postItem?.title, chat_window_status: 'open',  bidding_id: bid.id, room_id: bid.room_id }))
+        dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, username: bid.user.username }], message_url: postItem?.post_url, message_title: postItem?.title, chat_window_status: 'open',  bidding_id: bid.id, room_id: bid.room_id }))
     }
 
     const handlePagingAction = (currentPageValue: number, viewInPageValue: number) => {

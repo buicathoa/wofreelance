@@ -83,6 +83,15 @@
                             .sender-email {
                                 font-weight: 400;
                             }
+                            .count-unread {
+                                margin-left: calc(16 / $fdf) * $rem ;
+                                padding: calc(4 / $fdf) * $rem calc(8 / $fdf) * $rem;
+                                border-radius: 50%;
+                                background-color: rgb(118, 118, 226);
+                                color: #ffffff;
+                                font-weight: 500;
+                                font-size: calc(12 / $fdf) * $rem;
+                            }
                         }
 
                         .message-latest-time {

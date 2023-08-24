@@ -19,25 +19,25 @@ const MessagesContent = ({visible}: MessagesContentInterface) => {
     const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
 
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
-    useEffect(() => {
-        if(visible) {
-            const messagesClone = latestMessages?.map((message) => {
-                console.log(user)
-                const roomNameArray = message.room_name?.split(',')
-                const roomNameNew = roomNameArray?.map((item) => {
-                    if(item.trim() !== user.username && item !== '') {
-                        return item.trim()
-                    }
-                })?.filter((item) => item)?.join(',')
-                return {
-                    ...message,
-                    room_name: roomNameNew,
+    // useEffect(() => {
+    //     if(visible) {
+    //         const messagesClone = latestMessages?.map((message) => {
+    //             console.log('message', message)
+    //             const roomNameArray = message.room_name?.split(',')
+    //             const roomNameNew = roomNameArray?.map((item) => {
+    //                 if(item.trim() !== user.username && item !== '') {
+    //                     return item.trim()
+    //                 }
+    //             })?.filter((item) => item)?.join(',')
+    //             return {
+    //                 ...message,
+    //                 room_name: roomNameNew,
 
-                }
-            })
-            setMessages(messagesClone)
-        }
-    }, [visible])
+    //             }
+    //         })
+    //         setMessages(messagesClone)
+    //     }
+    // }, [visible])
 
 
 
@@ -49,7 +49,7 @@ const MessagesContent = ({visible}: MessagesContentInterface) => {
                 <Link to="#"><div className="view-all">View all</div></Link>
             </div>
             <div className="message-content-main">
-                {messages.length === 0 ?
+                {latestMessages.length === 0 ?
                     <div className="message-content-empty">
                         <div className="message-content-empty-image">
                             <img src={live_chat} alt="" />
@@ -58,7 +58,7 @@ const MessagesContent = ({visible}: MessagesContentInterface) => {
                             Start connecting with others by <Link to="#">browsing</Link> or <Link to="#">posting a project</Link>
                         </div>
                     </div> : <div className="messages-list">
-                        {messages?.map((interaction, index) => {
+                        {latestMessages?.map((interaction, index) => {
                         return (
                             <div className="message-item" key={index}>
                             <div className="avatar">
@@ -66,11 +66,11 @@ const MessagesContent = ({visible}: MessagesContentInterface) => {
                             </div>
                             <div className="message-item-content">
                                 <div className="sender-info">
-                                    <div className={`sender-name`}>{interaction.room_name}</div>
+                                    <div className={`sender-name`}>{interaction.room_name}{interaction?.unread_messages !== 0 && <span className="count-unread">{interaction?.unread_messages}</span>}</div>
                                     <div className="message-latest-time">{dayjs(interaction.createdAt).format('dddd D H:mm')}</div>
                                 </div>
                                 <div className="message-info">
-                                    <div className={`message-context ${interaction?.messages?.message_status}`}>{interaction?.messages?.content_text}</div>
+                                    <div className={`message-context ${interaction?.messages?.message_status}`}>{interaction?.messages?.sender_info?.username === user?.username ? 'You' : interaction?.messages?.sender_info?.username}:  {interaction?.messages?.content_text}</div>
                                     <div className={`message-status ${interaction?.messages?.message_status}`}></div>
                                 </div>
                             </div>
