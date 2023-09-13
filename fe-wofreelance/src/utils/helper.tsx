@@ -1,4 +1,5 @@
 
+import { UserInterface } from '../interface'
 import { excelIcon, jpgIcon, mp3Icon, mp4Icon, pdfIcon, pngIcon, svgIcon, wordIcon } from './../assets'
 
 export const getBase64 = (file: File) => {
@@ -127,4 +128,19 @@ export const renderTypeOfContent = (path: string) => {
     contentType = 'not_allowed'
   }
   return contentType
+}
+
+export const renderRoomImage = (users: Array<UserInterface>, currentUser: UserInterface) => {
+  let roomImg: any
+  if(users.length <= 2) {
+    roomImg = users?.find((u) => u.username !== currentUser.username)?.avatar_cropped!
+    return <img src={roomImg} alt="" />
+  } else if(users.length > 2) {
+    const remainUsers = users?.filter((u) => u.username !== currentUser.username)
+    roomImg = <div className="img-wrapper">
+      <img src={remainUsers[0]?.avatar_cropped} alt="" />
+      <img src={remainUsers[1]?.avatar_cropped} alt="" />
+    </div>
+    return roomImg
+  }
 }

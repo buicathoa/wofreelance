@@ -41,6 +41,22 @@ const ChatController = {
     } catch (err) {
       return handleError(res, err);
     }
+  },
+  getUnreadMessages: async (req, res) => {
+    try {
+      const unreadMess = await ChatService.getUnreadMessages(req, res);
+      return handleSuccess(res, unreadMess)
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+  getRoomDetail: async (req, res) => {
+    try {
+      const result = await ChatService.getRoomDetail(req, res);
+      return handleSuccess(res, result)
+    } catch (err) {
+      return handleError(res, err);
+    }
   }
 };
 

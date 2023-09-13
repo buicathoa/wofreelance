@@ -9,6 +9,7 @@ const { ClientError } = require("../../errors");
 
 const RestApiMethods = require("../../utils/QueryInsertPattern");
 const QueryParameter = require("../../utils/QueryParameter");
+const { default: axios } = require("axios");
 const Currency = db.currencies;
 const Bidding = db.bidding;
 const JobSkillset = db.jobskillset;
@@ -35,16 +36,15 @@ const ChatService = {
         receivers,
         message_title,
         message_title_url,
-        bidding_id
+        bidding_id,
       } = req.body;
       const decoded = jwt_decode(req.headers.authorization);
-      let roomName = "";
       let ownMessage;
-      let roomFound
+      let roomFound;
       const listReceiversPromises = [...receivers, decoded.id].map(
         (receiver) => {
           const recordCreated = UserProfile.findOne({
-            attributes: ["id", "email", "username"],
+            attributes: ["id", "username", "user_active", "avatar_cropped"],
             where: {
               id: receiver,
             },
@@ -56,39 +56,70 @@ const ChatService = {
       const listReceivers = await Promise.all(listReceiversPromises);
 
       const receiversName = listReceivers.map((item) => {
-        return item.dataValues.username
+        return item.dataValues.username;
       });
 
       let room = room_id ?? null;
       const senderInfo = await UserProfile.findOne({
-        attributes: ["id", "email", "username"],
+        attributes: ["id", "avatar_cropped", "username"],
         where: {
           id: decoded.id,
         },
       });
+
+      const maxPosition = await Messages.findOne({
+        attributes: [
+          [sequelize.fn("max", sequelize.col("message_position")), "position"],
+        ],
+      });
       // does not have the room before
       if (!room) {
         //create the room
-        roomName = receiversName?.join(', ');
-        roomFound = await Rooms.create({
-          room_name: roomName,
+        const roomCreated = await Rooms.create({
+          room_title: message_title,
+          room_url: message_title_url,
+        });
+
+        roomFound = await Rooms.findOne({
+          attributes: [
+            "id",
+            "createdAt",
+            "updatedAt",
+            "room_title",
+            "room_url",
+            [
+              sequelize.literal(
+                `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = ${roomCreated.id})`
+              ),
+              "unread_messages",
+            ],
+            [
+              sequelize.literal(
+                `(SELECT room_name from Users_Rooms where user_id = ${decoded.id} AND room_id=id)`
+              ),
+              "room_name",
+            ],
+          ],
+          where: {
+            id: roomCreated.id,
+          },
         });
 
         room = roomFound.id;
 
         //check if not exist the room and exist bidding_id => update bidding with room_id
 
-        if(bidding_id) {
+        if (bidding_id) {
           await Bidding.update(
             {
-              room_id: roomFound.id
+              room_id: roomFound.id,
             },
             {
               where: {
-                id: bidding_id
-              }
+                id: bidding_id,
+              },
             }
-          )
+          );
         }
 
         //add users to the rooms
@@ -97,51 +128,64 @@ const ChatService = {
         // insert new message the owner
         await Users_Rooms.create({
           user_id: senderInfo.id,
-          room_id: roomFound.id
-        })
+          room_id: roomFound.id,
+          room_name: receiversName
+            ?.filter((username) => username !== senderInfo.username)
+            .join(", "),
+        });
         ownMessage = await Messages.create({
-            message_status: "seen",
-            content_type: content_type,
-            content_text: content_text,
-            message_title: message_title,
-            sender: decoded.id,
-            room_id: roomFound.id,
-            receiver_id: senderInfo.id,
-            message_title_url: message_title_url,
-        })
+          message_status: "seen",
+          content_type: content_type,
+          content_text: content_text,
+          sender: decoded.id,
+          room_id: roomFound.id,
+          receiver_id: senderInfo.id,
+          message_position: maxPosition.dataValues.position + 1 ?? 0,
+        });
 
         await listReceivers
-        ?.filter(item => item.id !== decoded.id)
-        ?.map(async (receiver) => {
-          await Users_Rooms.create({
-            user_id: receiver.dataValues.id,
-            room_id: roomFound.id,
+          ?.filter((item) => item.id !== decoded.id)
+          ?.map(async (receiver) => {
+            await Users_Rooms.create({
+              user_id: receiver.dataValues.id,
+              room_id: roomFound.id,
+              room_name: receiversName
+                ?.filter(
+                  (username) => username !== receiver.dataValues.username
+                )
+                .join(", "),
+            });
+            //Create new messages table record
+            await Messages.create({
+              message_status: "received",
+              content_type: content_type,
+              content_text: content_text,
+              sender: decoded.id,
+              room_id: roomFound.id,
+              receiver_id: receiver.id,
+              message_position: maxPosition.dataValues.position + 1 ?? 0,
+            });
           });
-          //Create new messages table record
-          await Messages.create({
-            message_status: "received",
-            content_type: content_type,
-            content_text: content_text,
-            message_title: message_title,
-            sender: decoded.id,
-            room_id: roomFound.id,
-            receiver_id: receiver.id,
-            message_title_url: message_title_url,
-          });
-        });
       } else {
         //find the members inside the room
         roomFound = await Rooms.findOne({
           attributes: [
-            'id',
-            'room_name',
-            'createdAt',
-            'updatedAt',
+            "id",
+            "createdAt",
+            "updatedAt",
+            "room_title",
+            "room_url",
             [
               sequelize.literal(
                 `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = ${room})`
               ),
               "unread_messages",
+            ],
+            [
+              sequelize.literal(
+                `(SELECT room_name from Users_Rooms where Users_Rooms.user_id = ${decoded.id} AND Users_Rooms.room_id=${room})`
+              ),
+              "room_name",
             ],
           ],
           where: {
@@ -152,38 +196,39 @@ const ChatService = {
         if (!roomFound) {
           throw new Error("Room not found");
         }
-        roomName = roomFound.dataValues?.room_name;
 
         // insert new message the owner
         ownMessage = await Messages.create({
-            message_status: "seen",
-            content_type: content_type,
-            content_text: content_text,
-            message_title: message_title,
-            sender: decoded.id,
-            room_id: roomFound.id,
-            receiver_id: senderInfo.id,
-            message_title_url: message_title_url,
-        })
-        
-        await listReceivers
-        ?.filter(item => item.id !== decoded.id)
-        ?.map(async (receiver) => {
-          await Messages.create({
-            message_status: 'received',
-            content_type: content_type,
-            content_text: content_text,
-            sender: decoded.id,
-            message_title: message_title,
-            room_id: room,
-            receiver_id: receiver.dataValues.id,
-            message_title_url: message_title_url,
-          });
+          message_status: "seen",
+          content_type: content_type,
+          content_text: content_text,
+          sender: decoded.id,
+          room_id: roomFound.id,
+          receiver_id: senderInfo.id,
+          message_position: maxPosition.dataValues.position + 1 ?? 0,
         });
+
+        await listReceivers
+          ?.filter((item) => item.id !== decoded.id)
+          ?.map(async (receiver) => {
+            await Messages.create({
+              message_status: "received",
+              content_type: content_type,
+              content_text: content_text,
+              sender: decoded.id,
+              room_id: room,
+              receiver_id: receiver.dataValues.id,
+              message_position: maxPosition.dataValues.position + 1 ?? 0,
+            });
+          });
       }
       await transaction.commit();
-      const {receiver_id, ...others} = ownMessage.dataValues
-      return {...roomFound.dataValues, messages: others};
+      const { receiver_id, sender, ...others } = ownMessage.dataValues;
+      return {
+        ...roomFound.dataValues,
+        messages: { ...others, sender_info: senderInfo },
+        users: listReceivers,
+      };
     } catch (err) {
       await transaction.rollback();
       throw err;
@@ -200,7 +245,7 @@ const ChatService = {
       const decoded = jwt_decode(req.headers.authorization);
 
       const latestMessages = await UserProfile.findOne({
-        attributes: [],
+        attributes: ["ip_address"],
         where: {
           id: decoded.id,
         },
@@ -209,15 +254,22 @@ const ChatService = {
             model: Rooms,
             as: "rooms",
             attributes: [
-              'id',
-              'room_name',
-              'createdAt',
-              'updatedAt',
+              "id",
+              "createdAt",
+              "updatedAt",
+              "room_url",
+              "room_title",
               [
                 sequelize.literal(
                   `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = rooms.id)`
                 ),
                 "unread_messages",
+              ],
+              [
+                sequelize.literal(
+                  `(SELECT room_name from Users_Rooms where user_id = ${decoded.id} AND room_id=rooms.id)`
+                ),
+                "room_name",
               ],
             ],
             through: {
@@ -240,13 +292,13 @@ const ChatService = {
                 limit: 1,
                 // distinct: true,
                 attributes: {
-                  exclude: ['receiver_id']
+                  exclude: ["receiver_id"],
                 },
                 // group: ["createdAt"],
                 include: [
                   {
                     model: UserProfile,
-                    attributes: ["id", "email", "username"],
+                    attributes: ["id", "username", "avatar_cropped"],
                     as: "sender_info",
                   },
                 ],
@@ -254,12 +306,7 @@ const ChatService = {
               {
                 model: UserProfile,
                 as: "users",
-                attributes: ["email", "username", "user_active"],
-                where: {
-                  [Op.not]: {
-                    id: decoded.id,
-                  },
-                },
+                attributes: ["id", "username", "user_active", "avatar_cropped"],
                 through: {
                   attributes: [],
                 },
@@ -292,6 +339,25 @@ const ChatService = {
       });
 
       const latestMess = await Rooms.findOne({
+        attributes: [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "room_title",
+          "room_url",
+          [
+            sequelize.literal(
+              `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = ${req.body.room_id})`
+            ),
+            "unread_messages",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT room_name from Users_Rooms where user_id = ${decoded.id} AND room_id=${req.body.room_id})`
+            ),
+            "room_name",
+          ],
+        ],
         where: {
           id: req.body.room_id,
         },
@@ -299,7 +365,7 @@ const ChatService = {
           {
             model: Messages,
             where: {
-              receiver_id: decoded.id
+              receiver_id: decoded.id,
             },
             as: "messages",
             order: [["createdAt", "DESC"]],
@@ -308,7 +374,6 @@ const ChatService = {
               "id",
               "content_text",
               "content_type",
-              "message_title",
               "message_status",
               "createdAt",
               "updatedAt",
@@ -317,7 +382,7 @@ const ChatService = {
             include: [
               {
                 model: UserProfile,
-                attributes: ["id", "email", "username"],
+                attributes: ["id", "username", "avatar_cropped"],
                 as: "sender_info",
               },
             ],
@@ -325,7 +390,7 @@ const ChatService = {
           {
             model: UserProfile,
             as: "users",
-            attributes: ["email", "username", "user_active"],
+            attributes: ["id", "username", "user_active", "avatar_cropped"],
             where: {
               [Op.not]: {
                 id: decoded.id,
@@ -337,7 +402,13 @@ const ChatService = {
           },
         ],
       });
-      return {...latestMess.dataValues, messages: latestMess.messages[0].dataValues ?? {}, sender_info: senderInfo.dataValues};
+      return {
+        ...latestMess?.dataValues,
+        messages: {
+          ...(latestMess?.messages[0]?.dataValues ?? {}),
+          sender_info: senderInfo.dataValues,
+        },
+      };
     } catch (err) {
       throw err;
     }
@@ -348,15 +419,16 @@ const ChatService = {
     try {
       const { page, limit, search_list, sorts } = req.body;
       const whereMessages = QueryParameter.querySearch(search_list);
-      const sortMessages = QueryParameter.querySort(sorts);
-
+      const sortMessages = QueryParameter.querySort([
+        { name_field: "createdAt", sort_type: "DESC" },
+      ]);
+      const decoded = jwt_decode(req.headers.authorization);
       const messagesDetail = await Messages.findAll({
         where: whereMessages,
         attributes: [
           "id",
           "content_text",
           "content_type",
-          "message_title",
           "createdAt",
           "updatedAt",
           [
@@ -369,16 +441,17 @@ const ChatService = {
         include: [
           {
             model: UserProfile,
-            attributes: ["id", "email", "last_name"],
+            attributes: ["id", "username", "avatar_cropped"],
             as: "sender_info",
             required: false,
           },
         ],
         order: [[...sortMessages]],
-        group: ["content_text"],
+        group: ["message_position"],
         offset: (page - 1) * limit,
         limit: limit,
       });
+
       await transaction.commit();
       return messagesDetail;
     } catch (err) {
@@ -387,10 +460,73 @@ const ChatService = {
     }
   },
 
+  getUnreadMessages: async (req, res) => {
+    try {
+      const decoded = jwt_decode(req.headers.authorization);
+      const messagesDetail = await Messages.count({
+        where: {
+          message_status: "received",
+          receiver_id: decoded.id,
+        },
+      });
+      return messagesDetail;
+    } catch (err) {
+      throw err;
+    }
+  },
+
   updateInteraction: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
     } catch (err) {}
+  },
+
+  getRoomDetail: async (req, res) => {
+    try {
+      const decoded = jwt_decode(req.headers.authorization);
+      const result = await Rooms.findOne({
+        attributes: [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "room_url",
+          "room_title",
+          [
+            sequelize.literal(
+              `(SELECT COUNT(id) FROM messages WHERE messages.message_status = 'received' AND messages.receiver_id = ${decoded.id} AND messages.room_id = ${req.body.room_id})`
+            ),
+            "unread_messages",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT room_name from Users_Rooms where user_id = ${decoded.id} AND room_id=${req.body.room_id})`
+            ),
+            "room_name",
+          ],
+        ],
+        where: {
+          id: req.body.room_id,
+        },
+        include: [
+          {
+            model: UserProfile,
+            as: "users",
+            attributes: ["id", "username", "user_active", "avatar_cropped"],
+            where: {
+              [Op.not]: {
+                id: decoded.id,
+              },
+            },
+            through: {
+              attributes: [],
+            },
+          },
+        ]
+      });
+      return result
+    } catch (err) {
+      throw err
+    }
   },
 };
 

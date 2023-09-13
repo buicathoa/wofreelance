@@ -17,9 +17,12 @@ const User = createSlice({
         signin: (state, actions) => { },
         signinSuccess: (state, actions) => {
             state.user = actions.payload;
-            state.isLoggedIn = true
+            state.isLoggedIn = !state.isLoggedIn
         },
         signout: (state, actions) => {},
+        signoutSuccess: (state, actions) => {
+            state.isLoggedIn = false
+        },
         checkExistUser: (state, actions) => { },
         registerAccount: (state, actions) => { },
         signinFacebook: (state, actions) => { },
@@ -30,7 +33,6 @@ const User = createSlice({
         },
         getUserInfoDestination: (state, actions) => {},
         getUserInforDestinationSuccess: (state, actions) => {
-            debugger
             state.user_info = actions.payload
         },
         updateUser: (state, actions) => { },
@@ -52,7 +54,6 @@ const User = createSlice({
             state.user = {...state.user, noti_count: state.user.noti_count! + 1}
         },
         getNewNotiMessSuccess: (state, actions) => {
-            debugger
             state.user = {...state.user, noti_mess: actions.payload}
         },
         updateNotiMessSuccess: (state, actions) => {

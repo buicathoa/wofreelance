@@ -15,7 +15,7 @@ import { RootState } from "./reducers/rootReducer";
 import { checkLocalStorage } from "./utils/helper";
 import { BellFilled, UpOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons'
 import { Input } from "antd";
-import ChatWindowFrame from "./containers/ChatWindowFrame";
+import ChatWindowFrame from "./containers/ChatWindowFrame/ChatWindowItem";
 // import { socket } from "./SocketContext";
 
 const BasicLayout = () => {

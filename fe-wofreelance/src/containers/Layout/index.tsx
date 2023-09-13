@@ -23,6 +23,7 @@ import { NotificationsActions } from "../../reducers/listReducer/notificationsRe
 import ChatWindowFrame from "../ChatWindowFrame";
 import { InteractionsActions } from "../../reducers/listReducer/interactionReducer";
 import { messageStorage } from "../../constants";
+import { PostActions } from "../../reducers/listReducer/postReducer";
 // import { socket } from "../../SocketContext";
 // import { SocketContext } from "../../SocketContext";
 
@@ -67,6 +68,12 @@ const Layout = () => {
     });
   };
 
+  const getUnreadMessages = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(InteractionsActions.getUnreadMessages({ param, resolve, reject }));
+    });
+  };
+
   const user: UserInterface = useSelector((state: RootState) => state.user.user)
   const notifications: Array<NotificationInterface> = useSelector((state: RootState) => state.notifications.notifications)
   const unread_messages: number = useSelector((state: RootState) => state.interactions.unread_messages)
@@ -82,7 +89,8 @@ const Layout = () => {
       } else {
         getUserInfo({}).then((resUser) => {
           getAllLatestMessages(filterLatestMessages).then((res) => {
-            dispatch(InteractionsActions.getAllLatestMessagesSuccess({messages: res.data, currentUser: resUser?.data?.usernames}))
+            getUnreadMessages({})
+            dispatch(InteractionsActions.getAllLatestMessagesSuccess(res.data))
           })
         })
       }
@@ -114,9 +122,12 @@ const Layout = () => {
       })
       socket.on("new_message_response", (data: any) => {
         const idxLatestMess = latestMessages.findIndex((mess) => mess.id === data.id)
-        console.log('interactions_ne', interactions)
         const idxInteractions = interactions.findIndex((item: any) => item.room_id === data.id)
-        dispatch(InteractionsActions.sendMessagesSuccess({...data, interaction_state: idxLatestMess === -1 ? 'create' : 'update', interaction_index: idxInteractions}))
+        dispatch(InteractionsActions.addNewMessagesReceived({...data, interaction_state: idxLatestMess === -1 ? 'create' : 'update', interaction_index: idxInteractions}))
+      })
+      socket.on("user_authen", (data: any) => {
+        dispatch(InteractionsActions.userAuthenSocket(data))
+        dispatch(PostActions.userAuthenSocket(data))
       })
     }
   }, [socket])

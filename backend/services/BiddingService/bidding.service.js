@@ -29,9 +29,29 @@ const BiddingService = {
     const {page, limit, search_list, sorts} = req.body
     let result
     try {
+      const decoded = jwt_decode(req.headers.authorization);
       const wherePost = QueryParameter.querySearch(search_list)
       const sortPost = QueryParameter.querySort(sorts)
       const result = await Bidding.findAll({
+        attributes: [
+          'id',
+          'bidding_amount',
+          'hourly_rate',
+          'weekly_limit',
+          'post_id',
+          'delivered_time',
+          'describe_proposal',
+          'createdAt',
+          'updatedAt',
+          'project_paid_type',
+          'room_id',
+          [
+            sequelize.literal(
+              `(SELECT COUNT(id) FROM messages WHERE message_status = 'received' AND receiver_id = ${decoded.id} AND room_id = Bidding.room_id)`
+            ),
+            "unread_messages",
+          ]
+        ],
         where: {...wherePost, post_id: req.body.post_id},
         include: [
           {
@@ -45,7 +65,7 @@ const BiddingService = {
               "title",
               "avatar_cropped",
               "createdAt",
-              "user_active",
+              "user_active"
             ],
             include: [
               {

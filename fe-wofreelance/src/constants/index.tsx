@@ -9,6 +9,8 @@ export const validImg = ['png', 'jpg', 'jpeg', 'bmp', 'tiff']
 
 export const messageStorage = 'messages_count'
 
+export const IPDATA_ACCESS_KEY = '1c09dd0c3c057ac1e6ee1a85ab0c3fdb753cb5951080aa66b6fb28ba'
+
 export const apiUrl = {
     app: {
         currency:{
@@ -90,6 +92,9 @@ export const apiUrl = {
     interactions: {
         sendMessage: 'messages/send',
         getAllLatestMessages: 'messages/latest/get-all',
-        getLatestMessageOfRoom: 'messages/latest/room/get-by-id'
+        getLatestMessageOfRoom: 'messages/latest/room/get-by-id',
+        getUnreadMessages: 'messages/unread/get-all',
+        getMessagesDetail:  'messages/detail/get-all',
+        getRoomDetail: 'room/get-by-id'
     }
 }

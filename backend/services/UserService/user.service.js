@@ -28,6 +28,8 @@ const Experience = db.experiences;
 const Countries = db.countries;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
+const Sockets = db.sockets;
+
 const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
@@ -35,7 +37,7 @@ const { io } = require("../../server");
 const { removeUserOnline, getSocketState } = require("../../globalVariable");
 const EventEmitter = require("../../myEmitter");
 const myEmitter = require("../../myEmitter");
-const myModule = require('./../../wsHandler/userSocket');
+const myModule = require("./../../wsHandler/userSocket");
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
 // const io = require("socket.io")
 // const ServiceProfiles = db.serviceprofiles
@@ -222,7 +224,23 @@ const userService = {
           },
         }
       );
-      // myEmitter.emit(USER_SIGNOUT, decoded.id)
+
+      await Sockets.destroy({
+        where: {
+          user_id: decoded.id,
+        },
+      });
+      await UserProfile.update(
+        {
+          user_active: false,
+        },
+        {
+          where: {
+            id: decoded.id,
+          },
+        }
+      );
+
       transaction.commit();
       return true;
     } catch (err) {
@@ -309,13 +327,15 @@ const userService = {
         let timeResponse = null;
         if (userFound.ip_address) {
           const decoded = jwt_decode(userFound.ip_address);
-          const user_info = await axios.get(
-            `https://api.ipdata.co/${decoded.ip_address}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
-          ).catch(err => {
-            console.log('error_ip', err.respose)
-          });
+          const user_info = await axios
+            .get(
+              `https://api.ipdata.co/${decoded.ip_address}?api-key=${process.env.API_IPDATA_ACCESS_KEY}`
+            )
+            .catch((err) => {
+              console.log("error_ip", err.respose);
+            });
           const timeConvert =
-            new Date(user_info.data.time_zone.current_time).getTime() -
+            new Date(user_info?.data?.time_zone?.current_time).getTime() -
             new Date().getTimezoneOffset() * 60 * 1000;
           timeResponse = new Date(timeConvert).toLocaleString("en-US");
         }

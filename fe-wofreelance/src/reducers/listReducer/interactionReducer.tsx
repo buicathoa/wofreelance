@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+
 import { createSlice } from '@reduxjs/toolkit'
 import { InteractionReducer, latestMessageInterface } from '../../interface';
 import _ from 'lodash'
@@ -21,17 +23,27 @@ const Interactions = createSlice({
     initialState,
     reducers: ({
         addInteraction: (state, actions) => {
-            const idxCurrentInteraction = [...state.interactions]?.findIndex(interaction => _.isEqual(interaction.users?.sort((a, b) => a.id! - b.id!), actions.payload.users?.sort((a: any, b: any) => a.id - b.id)) && interaction.message_title === actions.payload.message_title)
+            let idxCurrentInteraction = -1
+            if(!actions?.payload?.room_id) {
+                idxCurrentInteraction =  [...state.interactions]?.findIndex((interaction: any) => (_.isEqual(interaction.users?.sort((a: any, b: any) => a.id! - b.id!), actions.payload.users?.sort((a: any, b: any) => a.id - b.id)) && interaction.room_title === actions.payload.room_title))
+            } else {
+                idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => interaction.room_id === actions.payload.room_id)
+            }
             const idxCurrentFocus = [...state.interactions]?.findIndex((interaction) => interaction.chat_window_status === 'focus')
             state.interactions[idxCurrentFocus] = { ...state.interactions[idxCurrentFocus], chat_window_status: 'open' }
             if (idxCurrentInteraction === -1) {
                 state.interactions = [...state.interactions, { ...actions.payload, chat_window_status: 'focus' }]
             } else {
-                state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], chat_window_status: 'focus' }
+                state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], ...actions.payload, chat_window_status: 'focus' }
             }
         },
         modifyInteraction: (state, actions) => {
-            const idxCurrentInteraction = [...state.interactions]?.findIndex((interaction) => _.isEqual(interaction.users?.sort((a, b) => a.id! - b.id!), actions.payload.users?.sort((a: any, b: any) => a.id - b.id)) && interaction.message_title === actions.payload.message_title)
+            let idxCurrentInteraction = -1
+            if(!actions?.payload?.room_id) {
+                idxCurrentInteraction =  [...state.interactions]?.findIndex((interaction: any) => (_.isEqual(interaction.users?.sort((a: any, b: any) => a.id! - b.id!), actions.payload.users?.sort((a: any, b: any) => a.id - b.id)) && interaction.room_title === actions.payload.room_title))
+            } else {
+                idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => interaction.room_id === actions.payload.room_id)
+            }
             const idxCurrentFocus = [...state.interactions]?.findIndex((interaction) => interaction.chat_window_status === 'focus')
             if (idxCurrentInteraction === idxCurrentFocus) {
                 state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], chat_window_status: actions.payload.chat_window_status }
@@ -46,108 +58,117 @@ const Interactions = createSlice({
         sendMessagesSuccess: (state, actions) => {
             const latestMessagesClone = [...state.latestMessages]
             let interactionsClone = [...state.interactions]
-            let unreadMess = 0
-            if (actions.payload.interaction_state === 'create') {
-                const roomName = actions?.payload.room_name?.split(',').map((user: string) => {
-                    if (user.trim() !== actions.payload.currentUser && user !== '') {
-                        return user.trim()
-                    }
-                })?.filter((item: string) => item)?.join(',')
-                const chatStatus = actions.payload?.users.some((user: any) => user.user_active)
-                const { interaction_state, ...others } = actions.payload
-                latestMessagesClone.push({ ...others, is_online: chatStatus, room_name: roomName })
-            } else {
-                const currentLatestMess = latestMessagesClone?.findIndex(room => room.id === actions.payload.id)
+            const currentLatestMess = latestMessagesClone?.findIndex(room => room.id === actions.payload.id)
+            const currentInteraction = interactionsClone?.findIndex((interaction) => interaction.id === actions.payload.id)
+            if(currentLatestMess !== -1) {
                 const chatStatus = latestMessagesClone[currentLatestMess]?.users?.some((user: any) => user.user_active)
                 latestMessagesClone[currentLatestMess] = {
                     ...latestMessagesClone[currentLatestMess],
-                    unread_messages: actions?.payload?.unread_messages,
-                    messages: {
-                        ...actions.payload.messages,
-                        sender_info: latestMessagesClone[currentLatestMess].messages.sender_info
-                    },
+                    ...actions.payload,
                     is_online: chatStatus
                 }
-            }
-            unreadMess = latestMessagesClone.reduce((acc:any, o:any) => acc + parseInt(o.unread_messages), 0)
-
-            const currentInteracion = interactionsClone?.findIndex((interaction, index) => interaction.room_id === actions.payload.id) 
-            if(currentInteracion === -1) {
-                interactionsClone.push({
-                    message_title: actions.payload.messages.message_title,
-                    users: actions.payload.users,
-                    message_url: actions.payload.messages.message_title_url,
-                    chat_window_status: 'open',
-                    room_id: actions.payload.id
-                })
+                interactionsClone[currentInteraction] = {...interactionsClone[currentInteraction], room_id: actions.payload.id, messages: [actions?.payload?.messages, ...interactionsClone[currentInteraction].messages!]}
             } else {
-                interactionsClone[currentInteracion] = {
-                    ...interactionsClone[currentInteracion],
-                    message_title: actions.payload.messages.message_title,
-                    message_url: actions.payload.messages.message_title_url,
-                    room_id: actions.payload.id
-                }
+                const chatStatus = actions.payload?.users?.some((user: any) => user.user_active)
+                latestMessagesClone.push({...actions.payload, is_online: chatStatus})
+                interactionsClone = [{...actions.payload, room_id: actions.payload.id, chat_window_status: 'focus', messages: [actions?.payload?.messages]}]
             }
-
+            
             return {
                 ...state,
                 latestMessages: latestMessagesClone,
-                interactions: interactionsClone,
-                unread_messages: unreadMess
+                interactions: interactionsClone
             }
         },
 
         getLatestMessageOfRoom: (state, actions) => { },
-        getLatestMessageOfRoomSuccess: (state, actions) => {
-            // const latestMessagesClone = [...state.latestMessages]
-            // const currentLatestMess = latestMessagesClone?.findIndex(msg => msg.id === actions.payload.id)
-            // const roomName = actions?.payload?.room_name?.split(',').map((user: any) => {
-            //     if (user.trim() !== actions.payload.currentUser && user !== '') {
-            //         return user.trim()
-            //     }
-            // })?.filter((item: any) => item)?.join(',')
-
-            // const chatStatus = actions.payload?.users.some((user:any) => user.user_active)
-
-            // latestMessagesClone[currentLatestMess] = {...actions.payload, room_name: roomName, is_online: chatStatus}
-            // debugger
-            // return {
-            //     ...state,
-            //     latestMessages: latestMessagesClone
-            // }
-        },
+        getLatestMessageOfRoomSuccess: (state, actions) => {},
 
 
         getAllLatestMessages: (state, actions) => { },
         getAllLatestMessagesSuccess: (state, actions) => {
-            state.latestMessages = actions.payload?.messages?.map((item: latestMessageInterface) => {
+            state.latestMessages = actions.payload?.map((item: latestMessageInterface) => {
                 const chatStatus = item?.users.some((user) => user.user_active)
-                const roomName = item?.room_name?.split(',').map((user) => {
-                    if (user.trim() !== actions.payload.currentUser && user !== '') {
-                        return user.trim()
-                    }
-                })?.filter((item) => item)?.join(',')
                 return {
                     ...item,
-                    room_name: roomName,
+                    room_name: item.room_name,
                     is_online: chatStatus
                 }
             })
-            state.unread_messages = actions?.payload?.messages?.reduce((acc: any, o: any) => acc + parseInt(o.unread_messages), 0)
         },
 
-        increaseNotificationsMessage: (state, actions) => {
-            console.log(state.latestMessages)
+        addNewMessagesReceived: (state, actions) => {
             const latestMessagesClone = [...state.latestMessages]
-            const roomFoundIndex: number = latestMessagesClone.findIndex((item) => item.id === actions.payload.room)
-            if (latestMessagesClone[roomFoundIndex]?.messages?.message_status === 'seen') {
-                latestMessagesClone[roomFoundIndex].messages.message_status = 'received'
+            const interactionsClone = [...state.interactions]
+            const currentLatestMess = latestMessagesClone?.findIndex(room => room.id === actions.payload.id)
+            const currentInteraction = [...state.interactions]?.findIndex((interaction) => interaction.id === actions.payload.id)
+            if(currentLatestMess !== -1) {
+                const chatStatus = latestMessagesClone[currentLatestMess]?.users?.some((user: any) => user.user_active)
+                if(currentInteraction !== -1) {
+                    interactionsClone[currentInteraction] = {...interactionsClone[currentInteraction], messages: [actions?.payload?.messages, ...interactionsClone[currentInteraction].messages!]}
+                }
+                latestMessagesClone[currentLatestMess] = {
+                    ...latestMessagesClone[currentLatestMess],
+                    ...actions.payload,
+                    unread_messages: latestMessagesClone[currentLatestMess].unread_messages! + 1,
+                    is_online: chatStatus
+                }
+            } else {
+                const chatStatus = actions.payload?.users?.some((user: any) => user.user_active)
+                latestMessagesClone.push({...actions.payload, is_online: chatStatus})
             }
+
+
+            
             return {
                 ...state,
-                latestMessages: latestMessagesClone
+                latestMessages: latestMessagesClone,
+                unread_messages: state.unread_messages + 1,
+                interactions: interactionsClone
             }
-        }
+        },
+
+        getUnreadMessages: (state, actions) => {},
+        getUnreadMessagesSuccess: (state, actions) => {
+            return {
+                ...state,
+                unread_messages: actions.payload
+            }
+        },
+
+        getMessagesDetail: (state, actions) => {},
+
+        userAuthenSocket: (state, actions) => {
+            let latestMessagesClone = [...state.latestMessages]
+            let interactionsClone = [...state.interactions]
+            latestMessagesClone = latestMessagesClone?.map((mess) => {
+                mess = {...mess, users: mess.users?.map((u) => {
+                    if(u.id === actions.payload.user_id) {
+                        return {...u, user_active: actions.payload.status === 'logout' ? false : true}
+                    } else {
+                        return {...u}
+                    }
+                })}
+                return mess
+            })
+            interactionsClone = interactionsClone?.map((inter) => {
+                inter = {...inter, users: inter.users?.map((u) => {
+                    if(u.id === actions.payload.user_id) {
+                        return {...u, user_active: actions.payload.status === 'logout' ? false : true}
+                    } else {
+                        return {...u}
+                    }
+                })}
+                return inter
+            })
+            return {
+                ...state,
+                latestMessages: latestMessagesClone,
+                interactions: interactionsClone
+            }
+        },
+
+        getRoomDetail: (state, actions) => {}
     })
 })
 

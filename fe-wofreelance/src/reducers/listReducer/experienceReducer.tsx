@@ -1,4 +1,3 @@
-/* eslint-disable array-callback-return */
 import { createSlice } from '@reduxjs/toolkit'
 import { experienceReducerInterface } from '../../interface'
 

@@ -187,7 +187,7 @@ app.use("/v1/posts", postsRoute)
 app.use("/v1/user", userRoute)
 app.use("/v1/bidding", biddingRoute)
 app.use("/v1/notifications", notificationsRoute)
-app.use("/v1/messages", chatRoute)
+app.use("/v1", chatRoute)
 //crawl data for universities
 // function delay(time) {
 //   return new Promise(function (resolve) {

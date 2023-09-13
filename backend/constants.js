@@ -14,7 +14,8 @@ const CONSTANT = {
         PROJECT_BIDDING: "project_bidding",
         PROJECT_BIDDING_RESPONSE: "project_bidding_response",
         NEW_MESSAGE: "new_message",
-        NEW_MESSAGE_RESPONSE: "new_message_response"
+        NEW_MESSAGE_RESPONSE: "new_message_response",
+        USER_AUTHEN: "user_authen"
     },
 }
 

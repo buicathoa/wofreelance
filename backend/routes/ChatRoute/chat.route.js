@@ -7,13 +7,16 @@ const qualificationController = require('../../controllers/QualificationControll
 const authorize = require('../../middlewares/authorize');
 
 
-router.post("/send", authorize(['director', 'admin', 'user']) , ChatController.sendMessages)
+router.post("/messages/send", authorize(['director', 'admin', 'user']) , ChatController.sendMessages)
 
-router.post("/latest/get-all", authorize(['director', 'admin', 'user']) , ChatController.getAllLatestMessages)
+router.post("/messages/latest/get-all", authorize(['director', 'admin', 'user']) , ChatController.getAllLatestMessages)
 
-router.post("/latest/room/get-by-id", authorize(['director', 'admin', 'user']) , ChatController.getLatestMessageOfRoom)
+router.post("/messages/latest/room/get-by-id", authorize(['director', 'admin', 'user']) , ChatController.getLatestMessageOfRoom)
 
-router.post("/detail/get-all", authorize(['director', 'admin', 'user']) , ChatController.getMessagesDetail)
+router.post("/messages/detail/get-all", authorize(['director', 'admin', 'user']) , ChatController.getMessagesDetail)
 
+router.post("/messages/unread/get-all", authorize(['director', 'admin', 'user']) , ChatController.getUnreadMessages)
+
+router.post("/room/get-by-id", authorize(['director', 'admin', 'user']) , ChatController.getRoomDetail)
 
 module.exports = router

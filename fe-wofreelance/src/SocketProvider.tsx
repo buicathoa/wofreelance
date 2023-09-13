@@ -10,7 +10,7 @@ const SocketProvider = ({ children }: any) => {
     const isLoggedIn: boolean = useSelector((state: RootState) => state.user.isLoggedIn)
     const [socket, setSocket] = useState<any>()
     useEffect(() => {
-        if (isLoggedIn || localStorage.getItem('access_token')) {
+        if (localStorage.getItem('access_token')) {
             const SOCKET_URL = "http://localhost:1203";
             const sockets = io(SOCKET_URL, {
                 auth: {

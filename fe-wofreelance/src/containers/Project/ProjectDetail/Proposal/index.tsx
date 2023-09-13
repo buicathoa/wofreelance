@@ -5,7 +5,7 @@ import { InteractionFilled, IssuesCloseOutlined } from '@ant-design/icons'
 import { AlertBanner } from '../../../../components/AlertBanner'
 
 import './style.scss'
-import { BiddingInterface, BiddingInterfaceResponse, PostInteface, ResponseFormatItem, UserInterface } from '../../../../interface'
+import { BiddingInterface, BiddingInterfaceResponse, PostInteface, ResponseFormatItem, UserInterface, latestMessageInterface } from '../../../../interface'
 import dayjs from 'dayjs'
 import { PostActions } from '../../../../reducers/listReducer/postReducer'
 import { useDispatch } from 'react-redux'
@@ -69,16 +69,22 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
     console.log('bids', bids)
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
-
+    const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
     const deleteBid = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(PostActions.deleteBid({ param, resolve, reject }));
         });
     };
 
-    const getallBid = (param: any): Promise<ResponseFormatItem> => {
+    const getMessagesDetail = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(PostActions.getallBid({ param, resolve, reject }));
+            dispatch(InteractionsActions.getMessagesDetail({ param, resolve, reject }));
+        });
+    };
+
+    const getRoomDetail = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(InteractionsActions.getRoomDetail({ param, resolve, reject }));
         });
     };
 
@@ -173,7 +179,25 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     }
 
     const handleAddInteractions = (bid: BiddingInterface) => {
-        dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, username: bid.user.username }], message_url: postItem?.post_url, message_title: postItem?.title, chat_window_status: 'open',  bidding_id: bid.id, room_id: bid.room_id }))
+        if (bid.room_id) {
+            getRoomDetail({ room_id: bid.room_id }).then((resRoom) => {
+                const payload = {
+                    page: 1,
+                    limit: 10,
+                    search_list: [
+                        {
+                            name_field: "room_id",
+                            value_search: bid.room_id
+                        }
+                    ]
+                }
+                getMessagesDetail(payload).then((resMessages: any) => {
+                    dispatch(InteractionsActions.addInteraction({ ...resRoom.data, room_id: resRoom?.data?.id, chat_window_status: 'open', messages: resMessages?.data, room_url: postItem?.post_url, room_title: postItem?.title, bidding_id: bid.id }))
+                })
+            })
+        } else {
+            dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, username: bid.user.username }], room_url: postItem?.post_url, room_title: postItem?.title, chat_window_status: 'open', bidding_id: bid.id, room_id: bid.room_id, unread_messages: 0 }))
+        }
     }
 
     const handlePagingAction = (currentPageValue: number, viewInPageValue: number) => {
@@ -190,6 +214,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                     {bids
                         ?.filter((bid) => bid.id !== bids[idxOwnBid]?.id)
                         ?.map((bid, idx) => {
+                            const unreadMess = latestMessages?.find((room) => room.messages.room_id === bid.room_id) ?? null
                             return (
                                 <div className="proposal-item" key={idx}>
                                     <div className="proposal-header">
@@ -232,6 +257,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                                                         <div className="chat-button" onClick={() => handleAddInteractions(bid)}>
                                                             <Button>Chat</Button>
                                                             <div className={`user-status ${bid.user.user_active ? 'online' : 'offline'}`}></div>
+                                                            <div className="messages-unread">{unreadMess ? unreadMess?.unread_messages : 0}</div>
                                                         </div>
                                                         <Button>Award</Button>
                                                     </div>

@@ -59,12 +59,30 @@
 
                 .avatar {
                     margin-right: calc(8 / $fdf) * $rem;
+                    position: relative;
 
                     img {
                         width: calc(48 / $fdf) * $rem;
                         height: calc(48 / $fdf) * $rem;
                         border-radius: 2px;
                         object-fit: cover;
+                    }
+
+                    .room-status {
+                        width: calc(10 / $fdf) * $rem ;
+                        height: calc(10 / $fdf) * $rem ;
+                        border-radius: 50%;
+                        position: absolute;
+                        bottom: calc(5 / $fdf) * $rem;
+                        right: calc(-5 / $fdf) * $rem;
+
+                        &.offline {
+                            background-color: #acafb1;
+                        }
+
+                        &.online {
+                            background-color: rgb(67, 206, 67);
+                        }
                     }
                 }
 
@@ -83,6 +101,7 @@
                             .sender-email {
                                 font-weight: 400;
                             }
+
                             .count-unread {
                                 margin-left: calc(16 / $fdf) * $rem ;
                                 padding: calc(4 / $fdf) * $rem calc(8 / $fdf) * $rem;
@@ -109,7 +128,8 @@
                             font-size: calc(14 / $fdf) * $rem;
                             color: $textcolor;
                             font-weight: 400;
-                            &.received{
+
+                            &.received {
                                 font-weight: 600;
                             }
                         }

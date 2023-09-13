@@ -15,6 +15,7 @@ import PortfolioReducer from "./listReducer/portfolioReducer";
 import NotificationsReducer from "./listReducer/notificationsReducer";
 import InteractionsReducer from "./listReducer/interactionReducer";
 
+const sagaMiddleware = createSagaMiddleware();
 const rootReducer = combineReducers({
     app: AppReducer,
     user: UserReducer,
@@ -29,14 +30,14 @@ const rootReducer = combineReducers({
     interactions: InteractionsReducer
 })
 
-const sagaMiddleware = createSagaMiddleware();
-// const routerMiddleware = createRouterMiddleware()
 const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false
     }).concat(sagaMiddleware),
 })
+
+// const routerMiddleware = createRouterMiddleware()
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

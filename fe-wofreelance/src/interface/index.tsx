@@ -180,7 +180,8 @@ export interface BiddingInterface {
     project_paid_type: number,
     user: UserInterface,
     budget: BudgetInterface,
-    room_id?: number
+    room_id?: number,
+    unread_messages?: number
 }
 
 export interface BiddingInterfaceResponse {
@@ -299,13 +300,34 @@ export interface CountryInterface {
     updatedAt?: Date
 }
 
+export interface MessageStateInterface {
+    id?: number,
+    message_status?: string,
+    username?: string
+}
+
+export interface MessageInterface {
+    content_text?: string,
+    createdAt?: Date,
+    id?: number,
+    content_type?: boolean,
+    updatedAt?: Date,
+    sender_info?: UserInterface,
+    messages_state?: Array<MessageStateInterface>
+}
+
 export interface InteractionReducer  {
+    id?: number,
     users: Array<UserInterface>,
+    room_url?: string,
     message_url?: string,
+    room_title?: string,
     message_title?: string,
-    chat_window_status: string, //open, hide, close,
+    chat_window_status?: string, //open, hide, close,
     bidding_id?: number,
-    room_id?: number
+    room_id?: number,
+    messages?: Array<MessageInterface>,  
+    inputValue?: string
 }
 
 export interface NotificationInterface {
@@ -412,7 +434,8 @@ export interface messageDetailInterface {
     sender_info: UserInterface,
     createdAt: Date,
     updatedAt: Date,
-    messages_state?: Array<messageStateInterface>
+    messages_state?: Array<messageStateInterface>,
+    room_id?: number
 }
 
 export interface messageStateInterface {

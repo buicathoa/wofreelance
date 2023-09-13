@@ -179,6 +179,18 @@
                                 background-color: red;
                             }
                         }
+                        .messages-unread{
+                            position: absolute;
+                            top: 50%;
+                            transform: translate(-50%, -50%);
+                            right: 3%;
+                            font-size: calc(16 / $fdf) * $rem;
+                            padding: 0 calc(6 / $fdf) * $rem;
+                            background-color: orangered;
+                            color: #ffffff;
+                            border-radius: 4px;
+                            font-weight: 600;
+                        }
                     }
                     button{
                         width: calc(110 / $fdf) * $rem;

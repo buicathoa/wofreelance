@@ -151,33 +151,18 @@ db.sockets.belongsTo(db.userprofile, {
 })
 
 
-// db.rooms.hasOne(db.bidding, {
-//   foreignKey: 'room_id',
-//   as: 'socket'
-// })
-// db.bidding.belongsTo(db.rooms, {
-//   foreignKey: 'user_id',
-// })
+db.rooms.hasOne(db.bidding, {
+  foreignKey: 'room_id',
+  as: 'room'
+})
+db.bidding.belongsTo(db.rooms, {
+  foreignKey: 'room_id',
+  as: 'room'
+})
+
 
 
 
-db.userprofile.hasMany(db.messages, {
-  foreignKey: 'sender',
-  as: 'sender_info'
-})
-db.messages.belongsTo(db.userprofile, {
-  foreignKey: 'sender',
-  as: 'sender_info'
-})
-
-db.userprofile.hasMany(db.messages, {
-  foreignKey: 'receiver_id',
-  as: 'receiver_info'
-})
-db.messages.belongsTo(db.userprofile, {
-  foreignKey: 'receiver_id',
-  as: 'receiver_info'
-})
 
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
@@ -251,7 +236,27 @@ db.rooms.hasMany(db.messages, {
 })
 db.messages.belongsTo(db.rooms, {
   foreignKey: 'room_id',
-  as: 'messages'
+  as: 'room'
+})
+
+
+db.userprofile.hasMany(db.messages, {
+  foreignKey: 'sender',
+  as: 'sender_info'
+})
+db.messages.belongsTo(db.userprofile, {
+  foreignKey: 'sender',
+  as: 'sender_info'
+})
+
+
+db.userprofile.hasMany(db.messages, {
+  foreignKey: 'receiver_id',
+  as: 'receiver_info'
+})
+db.messages.belongsTo(db.userprofile, {
+  foreignKey: 'receiver_id',
+  as: 'receiver_info'
 })
 
 // ========================================================================================== End ==========================================================================================//

@@ -44,6 +44,7 @@ function* signout(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
         const response = yield apiRequest(apiUrl.user.signout, param, 'general')
+        // yield put(UserActions.signoutSuccess(false))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

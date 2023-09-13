@@ -16,6 +16,9 @@ export function* InteractionSaga(): Generator {
     yield takeLatest(InteractionsActions.sendMessages({}).type, sendMessages)
     yield takeLatest(InteractionsActions.getAllLatestMessages({}).type, getAllLatestMessages)
     yield takeLatest(InteractionsActions.getLatestMessageOfRoom({}).type, getLatestMessageOfRoom)
+    yield takeLatest(InteractionsActions.getUnreadMessages({}).type, getUnreadMessages)
+    yield takeLatest(InteractionsActions.getMessagesDetail({}).type, getMessagesDetail)
+    yield takeLatest(InteractionsActions.getRoomDetail({}).type, getRoomDetail)
 }
 
 function* sendMessages(action: AnyAction): Generator {
@@ -38,7 +41,7 @@ function* getAllLatestMessages(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
         const response = yield apiRequest(apiUrl.interactions.getAllLatestMessages, param, 'general')
-        // yield put(InteractionsActions.getAllLatestMessagesSuccess((response as ResponseFormatItem).data))
+        yield put(InteractionsActions.getAllLatestMessagesSuccess((response as ResponseFormatItem).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
@@ -51,8 +54,9 @@ function* getAllLatestMessages(action: AnyAction): Generator {
 function* getLatestMessageOfRoom(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
-        const response:any = yield apiRequest(apiUrl.interactions.getLatestMessageOfRoom, {room_id: param.room_id}, 'general')
-        yield put(InteractionsActions.sendMessagesSuccess({...response.data, interaction_state: 'create', currentUser: param.currentUser, interaction_index: param.interaction_index}))
+        const response:any = yield apiRequest(apiUrl.interactions.getLatestMessageOfRoom, param, 'general')
+        yield put(InteractionsActions.sendMessagesSuccess(response.data))
+        
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
@@ -62,6 +66,47 @@ function* getLatestMessageOfRoom(action: AnyAction): Generator {
     }
 }
 
+function* getUnreadMessages(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response:any = yield apiRequest(apiUrl.interactions.getUnreadMessages, param, 'general')
+        yield put(InteractionsActions.getUnreadMessagesSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
+function* getMessagesDetail(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response:any = yield apiRequest(apiUrl.interactions.getMessagesDetail, param, 'general')
+        // yield put(InteractionsActions.sendMessagesSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
+function* getRoomDetail(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response:any = yield apiRequest(apiUrl.interactions.getRoomDetail, param, 'general')
+        // yield put(InteractionsActions.sendMessagesSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
 
 
 

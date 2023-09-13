@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, current } from '@reduxjs/toolkit'
 import { BiddingInterface, BudgetInterface, CurrencyInterface } from '../../interface';
 
 
@@ -44,6 +44,24 @@ const Post = createSlice({
         deleteBidSuccess: (state, actions) => {
             state.bids = [...state.bids]?.filter(bid => bid.id !== actions.payload.id)
             state.totalBids -= 1
+        },
+        updateBidRoomId: (state, actions) => {
+            const bidsClone = [...state.bids]
+            const currentBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            bidsClone[currentBid] = {...bidsClone[currentBid], room_id: actions.payload.room_id}
+            return {
+                ...state,
+                bids: bidsClone
+            }
+        },
+        userAuthenSocket: (state, actions) => {
+            const bidsClone = [...state.bids]
+            const currentBid = bidsClone?.findIndex((bid) => bid.user.id === actions.payload.user_id)
+            bidsClone[currentBid] = {...bidsClone[currentBid], user: {...bidsClone[currentBid].user, user_active: actions.payload.status === 'login' ? true : false}}
+            return {
+                ...state,
+                bids: bidsClone
+            }
         }
     })
 })

@@ -12,6 +12,7 @@ const ProfileContent = ({user}:any) => {
     const socket: any = useContext(SocketContext)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const userItem: UserInterface = useSelector((state: RootState) => state.user.user)
     const signout = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(UserActions.signout({ param, resolve, reject }));
@@ -20,7 +21,7 @@ const ProfileContent = ({user}:any) => {
 
     const handleSignout = () => {
         signout({}).then(() => {
-            socket.disconnect()
+            socket.emit("user_authen", {user_id: userItem.id, status: 'logout'})
             localStorage.removeItem('access_token');
                 navigate('/signin')
         })

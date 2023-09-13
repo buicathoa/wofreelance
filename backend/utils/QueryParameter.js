@@ -13,7 +13,6 @@ const QueryParameter = {
 
   querySort: (sort = []) => {
     let sortReturn = [];
-    sortReturn.push(['createdAt', 'ASC'])
     if (sort.length > 0) {
       for (let i of sort) {
         sortReturn.push([i.name_field, i.sort_type]);

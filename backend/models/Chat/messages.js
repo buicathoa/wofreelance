@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
   Messages.init({
     content_type: DataTypes.STRING,
     content_text: DataTypes.STRING,
-    message_title: DataTypes.STRING,
     room_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -46,8 +45,10 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    message_title_url: {
-      type: DataTypes.STRING,
+    message_position: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     sequelize,

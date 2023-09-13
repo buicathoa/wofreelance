@@ -204,7 +204,7 @@ module.exports = (socket, io) => {
       });
 
       const sender_info = await UserProfile.findOne({
-        attributes: ["id", "email", "username"],
+        attributes: ["id", "avatar_cropped", "username"],
         where: {
           id: decoded.id,
         },
@@ -212,6 +212,14 @@ module.exports = (socket, io) => {
 
       // filter to get users online in room
       await roomFound?.users?.map(async (user) => {
+        const roomName = await Users_Rooms.findOne({
+          attributes: ['room_name'],
+          where: {
+            user_id: user.dataValues.id,
+            room_id: data.room_id
+          }
+        })
+
         const room = await Rooms.findOne({
           attributes: [],
           where: {
@@ -226,7 +234,7 @@ module.exports = (socket, io) => {
                 },
               },
               as: "users",
-              attributes: ["email", "username", "user_active"],
+              attributes: ["id", "username", "user_active", "avatar_cropped"],
               through: {
                 attributes: []
               }
@@ -246,12 +254,12 @@ module.exports = (socket, io) => {
         //     },
         //   },
         // });
-        const countUnreadMess = await Messages.count({
-          where: {
-            message_status: "received",
-            receiver_id: user.dataValues.id,
-          },
-        });
+        // const countUnreadMess = await Messages.count({
+        //   where: {
+        //     message_status: "received",
+        //     receiver_id: user.dataValues.id,
+        //   },
+        // });
         const messagesResponse = await roomFound?.messages?.filter(
           (mess) => mess.dataValues.receiver_id === user.dataValues.id
         )[0];
@@ -259,12 +267,13 @@ module.exports = (socket, io) => {
           .to(user.dataValues.socket.socket_id)
           .emit(NEW_MESSAGE_RESPONSE, {
             id: roomFound.id,
-            room_name: roomFound.room_name,
+            room_name: roomName.dataValues.room_name,
             createdAt: roomFound.createdAt,
             updatedAt: roomFound.updatedAt,
-            unread_messages: countUnreadMess,
-            messages: messagesResponse,
-            sender_info: sender_info.dataValues,
+            room_title: roomFound.room_title,
+            room_url: roomFound.room_url,
+            // unread_messages: countUnreadMess,
+            messages: {...messagesResponse.dataValues, sender_info: sender_info.dataValues},
             users: userResponse,
           });
         //emit an event to all users online in room
