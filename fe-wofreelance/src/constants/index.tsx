@@ -76,7 +76,9 @@ export const apiUrl = {
             getallBid: 'bidding/get-all',
             create: 'bidding/create',
             update: 'bidding/update',
-            delete: 'bidding/delete'
+            delete: 'bidding/delete',
+            createAwardBid: 'bidding/award/create',
+            getAllPersonalBiddings: 'bidding/personal/get-all'
         }
     },
     portfolio: {
@@ -95,6 +97,7 @@ export const apiUrl = {
         getLatestMessageOfRoom: 'messages/latest/room/get-by-id',
         getUnreadMessages: 'messages/unread/get-all',
         getMessagesDetail:  'messages/detail/get-all',
-        getRoomDetail: 'room/get-by-id'
+        getRoomDetail: 'room/get-by-id',
+        seenMessage: 'messages/seen'
     }
 }

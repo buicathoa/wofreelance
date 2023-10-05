@@ -90,7 +90,7 @@ const Layout = () => {
         getUserInfo({}).then((resUser) => {
           getAllLatestMessages(filterLatestMessages).then((res) => {
             getUnreadMessages({})
-            dispatch(InteractionsActions.getAllLatestMessagesSuccess(res.data))
+            dispatch(InteractionsActions.getAllLatestMessagesSuccess({data: res?.data, currentUser: resUser?.data?.username}))
           })
         })
       }
@@ -106,6 +106,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (socket?.connected) {
+      
       socket.on("new_post_notify_response", (data: any) => {
         dispatch(UserActions.increaseNotifications({}))
         modalNotifications(
@@ -116,18 +117,29 @@ const Layout = () => {
             }).join(", ")}`, noti_url: data.noti_url
           })
       });
+
       socket.on("project_bidding_response", (data: any) => {
         dispatch(UserActions.increaseNotifications({}))
         return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
       })
+
       socket.on("new_message_response", (data: any) => {
-        const idxLatestMess = latestMessages.findIndex((mess) => mess.id === data.id)
-        const idxInteractions = interactions.findIndex((item: any) => item.room_id === data.id)
-        dispatch(InteractionsActions.addNewMessagesReceived({...data, interaction_state: idxLatestMess === -1 ? 'create' : 'update', interaction_index: idxInteractions}))
+        dispatch(InteractionsActions.addNewMessagesReceived(data))
       })
+
       socket.on("user_authen", (data: any) => {
         dispatch(InteractionsActions.userAuthenSocket(data))
         dispatch(PostActions.userAuthenSocket(data))
+      })
+
+      socket.on("seen_message_success", (data: any) => {
+        dispatch(InteractionsActions.seenMessageSuccess(data))
+      })
+
+      socket.on("award_bid_response", (data: any) => {
+        dispatch(UserActions.increaseNotifications({}))
+        dispatch(PostActions.awardBidSuccess(data))
+        return modalNotifications({ notiMess: `Congratulations! Your bid in ${data?.bid?.post?.title} has been awarded`, noti_url: data.noti_url })
       })
     }
   }, [socket])

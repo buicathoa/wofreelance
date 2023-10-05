@@ -19,4 +19,6 @@ router.post("/messages/unread/get-all", authorize(['director', 'admin', 'user'])
 
 router.post("/room/get-by-id", authorize(['director', 'admin', 'user']) , ChatController.getRoomDetail)
 
+router.post("/messages/seen", authorize(['director', 'admin', 'user']) , ChatController.seenMessage)
+
 module.exports = router

@@ -1,0 +1,85 @@
+@import "../../css/custom";
+
+.modal-assign-project {
+    width: calc(700 / $fdf) * $rem !important;
+    font-family: $roboto;
+    min-height: calc(400 / $fdf) * $rem;
+    .fixed-paid{
+        width: 60%;
+        .fixed-paid-summary{
+            font-weight: 600;
+            font-size: calc(20 / $fdf) * $rem;
+        }
+    }
+    .assign-project-description{
+        font-weight: 400;
+        font-size: calc(16 / $fdf) * $rem;
+    }
+    .assign-project{
+        margin-bottom: calc(32 / $fdf) * $rem;
+        .ant-input{
+            width: 30%;
+        }
+        &.statistics{
+            width: 60%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        span{
+            display: block;
+            font-size:  calc(16 / $fdf) * $rem;
+        }
+        .assign-project-title{
+            font-weight: 700;
+            font-size: calc(20 / $fdf) * $rem;
+            line-height: 1.4;
+            color: #2c2c2c;
+            display: flex;
+            align-items: center;
+            .tooltip-icon{
+                margin-left: calc(24 / $fdf) * $rem;
+                width: calc(16 / $fdf) * $rem;
+                height: calc(16 / $fdf) * $rem;
+                text-align: center;
+                border-radius: 50%;
+                font-weight: 500;
+                border: 1px solid #0f0e0e;
+                font-size: calc(12 / $fdf) * $rem;
+                height: fit-content;
+                cursor: pointer;
+            }
+            &.header-text{
+                color: calc(24 / $fdf) * $rem;
+            }
+        }
+
+        .amount-paid-project{
+            .ant-radio-group{
+                .wrap{
+                    margin-bottom: calc(12 / $fdf) * $rem;
+                }
+            }
+        }
+    }
+    .assign-project-footer{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        // width: 70%;
+        .assign-project-footer-left{
+            color: #e60278;
+            font-size: calc(16 / $fdf) * $rem;
+            &:hover{
+                text-decoration: underline;
+            }
+        }
+        button{
+            &.paid{
+                color: #ffffff;
+                font-weight: 500;
+                background-color: #e60278;
+            }
+        }
+    }
+}

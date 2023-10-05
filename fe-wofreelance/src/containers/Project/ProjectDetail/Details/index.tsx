@@ -1,5 +1,5 @@
 /* eslint-disable react/no-danger-with-children */
-import { Button, Card, Col, Form, Input, Rate, Row } from 'antd'
+import { Button, Card, Col, Form, Input, InputNumber, Rate, Row } from 'antd'
 import React, { useContext, useEffect, useState } from 'react'
 import { ClockCircleFilled, FlagFilled, MailFilled, SmileFilled, EnvironmentFilled } from '@ant-design/icons'
 import { AlertBanner } from '../../../../components/AlertBanner'
@@ -55,6 +55,12 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
             {
                 required: true
             }
+        ],
+
+        weekly_limit: [
+            {
+                required: true
+            }
         ]
     }
 
@@ -88,11 +94,11 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
     const onSubmitForm = (values: any) => {
         dispatch(AppActions.openLoading(true))
         if (modifyBid === 'edit') {
-            updateBid({ ...values, id: formValues!.id }).then(() => {
+            updateBid({ ...values, project_paid_type: postItem?.project_paid_type, id: formValues!.id }).then(() => {
                 setActiveTab('2')
             })
         } else {
-            biddingPost({ ...values, post_id: postItem!?.id, user_id: postItem?.user?.id }).then((res) => {
+            biddingPost({ ...values, project_paid_type: postItem?.project_paid_type, post_id: postItem!?.id, user_id: postItem?.user?.id }).then((res) => {
                 socket.emit("project_bidding", {
                     user_id: postItem?.user?.id,
                     post_id: postItem!?.id,
@@ -140,7 +146,7 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
                                 <div className="detail-project-skills">
                                     <div className="title">Skill Required</div>
                                     <div className="list-skills">
-                                        {postItem?.list_skills.map((skill, idx) => {
+                                        {postItem?.list_skills?.map((skill, idx) => {
                                             return (
                                                 <span key={idx}>{skill.name}</span>
                                             )
@@ -164,20 +170,20 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
                                     {postItem?.project_paid_type === 'hourly' ?
                                         <>
                                             <div className="bidding-rate">
-                                                <Form.Item name="hourly_rate" rules={validateSchema.hourly_rate} className="custom-form-item" label="Hourly Rate">
-                                                    <Input placeholder='Hourly Rate' className='form-input' type="number" suffix={postItem?.budget?.currency?.name} prefix={postItem?.budget?.currency?.short_name} />
+                                                <Form.Item name="hourly_rate" rules={validateSchema.hourly_rate} className="custom-form-item has-suffix" label="Hourly Rate">
+                                                    <InputNumber placeholder='Hourly Rate' className='form-input' type="number" addonAfter={postItem?.budget?.currency?.name} addonBefore={postItem?.budget?.currency?.short_name} />
                                                 </Form.Item>
-                                                <Form.Item name="delivered_time" rules={validateSchema.delivered_time} className="custom-form-item" label="This project will be delivered in">
-                                                    <Input placeholder='This project will be delivered in' className='form-input' suffix="Hrs" prefix={postItem?.budget?.currency?.short_name} />
+                                                <Form.Item name="weekly_limit" rules={validateSchema.weekly_limit} className="custom-form-item has-suffix" label="Weekly limit">
+                                                    <InputNumber type="number" placeholder='Weekly limit' className='form-input' addonAfter="Hours" />
                                                 </Form.Item>
                                             </div>
                                         </> : <>
                                             <div className="bidding-rate">
-                                                <Form.Item name="bidding_amount" rules={validateSchema.bidding_amount} className="custom-form-item" label="Bid amount">
-                                                    <Input placeholder='Bid amount' className='form-input' type="number" suffix={postItem?.budget?.currency?.name} prefix={postItem?.budget?.currency?.short_name} />
+                                                <Form.Item name="bidding_amount" rules={validateSchema.bidding_amount} className="custom-form-item has-suffix" label="Bid amount">
+                                                    <InputNumber placeholder='Bid amount' className='form-input' type="number" addonBefore={postItem?.budget?.currency?.name} />
                                                 </Form.Item>
-                                                <Form.Item name="delivered_time" rules={validateSchema.delivered_time} className="custom-form-item" label="Delivery time">
-                                                    <Input placeholder='Delivery time' className='form-input' suffix="Days" prefix="$" />
+                                                <Form.Item name="delivered_time" rules={validateSchema.delivered_time} className="custom-form-item has-suffix" label="This project will be delivered in">
+                                                    <InputNumber placeholder='This project will be delivered in' className='form-input' addonBefore={postItem?.budget?.currency?.short_name} />
                                                 </Form.Item>
                                             </div>
 

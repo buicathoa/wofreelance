@@ -6,7 +6,8 @@ const myEmitter = require("../myEmitter");
 const { findIndexUser, findUser } = require("../globalVariable");
 const { Socket } = require("socket.io");
 const UserProfile = db.userprofile;
-const UserLoggedIn = db.user_loggedin;
+const Messages_Status = db.messages_status;
+const Posts = db.posts;
 const Notifications = db.notifications;
 const User_Notifications = db.user_notifications;
 const Rooms = db.rooms;
@@ -15,6 +16,8 @@ const Skillset = db.jobskillset;
 const Sockets = db.sockets;
 const Bidding = db.bidding;
 const Messages = db.messages;
+// const User_Biddings = db.user_bidding;
+const BidAwarded = db.bidaward;
 
 const sequelize = db.sequelize;
 
@@ -25,12 +28,15 @@ module.exports = (socket, io) => {
     PROJECT_BIDDING_RESPONSE,
     NEW_MESSAGE,
     NEW_MESSAGE_RESPONSE,
+    SEEN_MESSAGE,
+    SEEN_MESSAGE_SUCCESS,
+    AWARD_BID,
+    AWARD_BID_RESPONSE,
   } = CONSTANT.WS_EVENT;
 
   socket.on(NEW_POST_NOTIFY, async (data) => {
     let transaction = await sequelize.transaction();
     try {
-      console.log(io);
       const skills = data.skills.map((skill) => {
         return skill.value;
       });
@@ -43,7 +49,7 @@ module.exports = (socket, io) => {
         noti_type: "post",
         noti_title: data.title,
         noti_content: `${data.project_detail}: ${skills_name.join(", ")}`,
-        noti_url: data.noti_url,
+        noti_url: data.post_url,
       });
 
       // finding user matching skills except user create
@@ -70,7 +76,7 @@ module.exports = (socket, io) => {
       });
 
       //add notification type received to each user who were found in prev step
-      userMatchingSkills.forEach(async (user) => {
+      await userMatchingSkills.forEach(async (user) => {
         await User_Notifications.create({
           notification_id: notifications.id,
           user_id: user.id,
@@ -100,7 +106,6 @@ module.exports = (socket, io) => {
           .to(userOnline.socket_id)
           .emit("new_post_notify_response", data);
       });
-
       // send notification to online user
       await transaction.commit();
     } catch (err) {
@@ -158,15 +163,7 @@ module.exports = (socket, io) => {
     const transaction = await sequelize.transaction();
     // payload: room_id, content_type, content_text,
     try {
-      //Find mems in room
-      const countMemsinRoom = await Users_Rooms.count({
-        where: {
-          room_id: data.room_id,
-        },
-      });
-
       const decoded = jwt_decode(socket.handshake.auth.token);
-
       //emit an event to all users online to display window chat
 
       const roomFound = await Rooms.findOne({
@@ -197,7 +194,7 @@ module.exports = (socket, io) => {
           {
             model: Messages,
             as: "messages",
-            limit: countMemsinRoom,
+            limit: 1,
             order: [["createdAt", "DESC"]],
           },
         ],
@@ -213,12 +210,12 @@ module.exports = (socket, io) => {
       // filter to get users online in room
       await roomFound?.users?.map(async (user) => {
         const roomName = await Users_Rooms.findOne({
-          attributes: ['room_name'],
+          attributes: ["room_name"],
           where: {
             user_id: user.dataValues.id,
-            room_id: data.room_id
-          }
-        })
+            room_id: data.room_id,
+          },
+        });
 
         const room = await Rooms.findOne({
           attributes: [],
@@ -228,41 +225,31 @@ module.exports = (socket, io) => {
           include: [
             {
               model: UserProfile,
-              where: {
-                [Op.not]: {
-                  id: user.dataValues.id,
-                },
-              },
               as: "users",
               attributes: ["id", "username", "user_active", "avatar_cropped"],
               through: {
-                attributes: []
-              }
+                attributes: [],
+              },
+              include: [
+                {
+                  model: Messages_Status,
+                  as: "status_info",
+                  attributes: [
+                    "id",
+                    "message_status",
+                    "createdAt",
+                    "updatedAt",
+                  ],
+                },
+              ],
             },
           ],
         });
 
         const userResponse = room?.dataValues?.users?.map((item) => {
-          return item.dataValues
-        })
+          return item.dataValues;
+        });
 
-        // const usersResponse = await UserProfile.findAll({
-        //   attributes: ["email", "username", "user_active"],
-        //   where: {
-        //     [Op.not]: {
-        //       id: decoded.id,
-        //     },
-        //   },
-        // });
-        // const countUnreadMess = await Messages.count({
-        //   where: {
-        //     message_status: "received",
-        //     receiver_id: user.dataValues.id,
-        //   },
-        // });
-        const messagesResponse = await roomFound?.messages?.filter(
-          (mess) => mess.dataValues.receiver_id === user.dataValues.id
-        )[0];
         await socket.broadcast
           .to(user.dataValues.socket.socket_id)
           .emit(NEW_MESSAGE_RESPONSE, {
@@ -273,7 +260,10 @@ module.exports = (socket, io) => {
             room_title: roomFound.room_title,
             room_url: roomFound.room_url,
             // unread_messages: countUnreadMess,
-            messages: {...messagesResponse.dataValues, sender_info: sender_info.dataValues},
+            messages: {
+              ...roomFound?.messages[0].dataValues,
+              sender_info: sender_info.dataValues,
+            },
             users: userResponse,
           });
         //emit an event to all users online in room
@@ -282,5 +272,130 @@ module.exports = (socket, io) => {
     } catch (err) {
       await transaction.rollback();
     }
+  });
+
+  socket.on(SEEN_MESSAGE, async (data) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const decoded = jwt_decode(socket.handshake.auth.token);
+
+      const userOnl = await Rooms.findOne({
+        where: {
+          id: data.room_id,
+        },
+        include: [
+          {
+            model: UserProfile,
+            attributes: ["id"],
+            as: "users",
+            where: {
+              id: {
+                [Op.ne]: decoded.id,
+              },
+            },
+            include: [
+              {
+                model: Sockets,
+                attributes: ["socket_id"],
+                as: "socket",
+              },
+            ],
+          },
+        ],
+      });
+
+      await userOnl?.users?.map(async (u) => {
+        await socket.broadcast
+          .to(u.socket.socket_id)
+          .emit(SEEN_MESSAGE_SUCCESS, data);
+      });
+
+      await transaction.commit();
+      return true;
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  });
+
+  socket.on(AWARD_BID, async (data) => {
+    sequelize.transaction({ autocommit: false }).then(async (transaction) => {
+      try {
+        const userFound = await Bidding.findOne(
+          {
+            where: {
+              id: data.bidding_id,
+            },
+          },
+          { transaction: transaction }
+        );
+
+        const userOnline = await Sockets.findOne(
+          {
+            attributes: ["socket_id"],
+            where: {
+              user_id: userFound.dataValues.user_id,
+            },
+          },
+          { transaction: transaction }
+        );
+
+        const bidAwarded = await BidAwarded.findOne(
+          {
+            // attributes: [],
+            where: {
+              bidding_id: data.bidding_id,
+            },
+            include: [
+              {
+                model: Bidding,
+                as: "bid",
+                attributes: ["id"],
+                include: {
+                  model: Posts,
+                  attributes: ["title"],
+                  as: "post",
+                },
+              },
+            ],
+          },
+          { transaction: transaction }
+        );
+
+        if (userOnline?.dataValues) {
+          //increase notifications of users
+          const notifications = await Notifications.create(
+            {
+              noti_title: `Congratulations! Your bid in ${bidAwarded?.dataValues?.bid?.title}
+            was awarded`,
+              noti_type: "post",
+              noti_content: "",
+              noti_url: "insights/bids",
+            },
+            { transaction: transaction }
+          );
+
+          await User_Notifications.create(
+            {
+              notification_id: notifications.id,
+              user_id: userFound?.user_id,
+              noti_status: "received",
+            },
+            { transaction: transaction }
+          );
+
+          await socket.broadcast
+            .to(userOnline?.dataValues?.socket_id)
+            .emit(AWARD_BID_RESPONSE, {
+              ...bidAwarded.dataValues,
+              noti_url: "insights/bids",
+            });
+        }
+
+        await transaction.commit();
+      } catch (err) {
+        await transaction.rollback();
+      }
+    });
   });
 };

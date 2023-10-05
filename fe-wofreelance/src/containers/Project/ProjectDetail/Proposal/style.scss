@@ -100,6 +100,8 @@
 
                                 img {
                                     margin-right: calc(4 / $fdf) * $rem;
+                                    width: calc(40 / $fdf) * $rem;
+                                    height: calc(30 / $fdf) * $rem;
                                 }
                             }
                         }
@@ -160,6 +162,7 @@
                 .proposal-button{
                     display: flex;
                     justify-content: flex-end;
+                    flex-wrap: wrap;
                     .chat-button{
                         position: relative;
                         .user-status{
@@ -193,19 +196,27 @@
                         }
                     }
                     button{
-                        width: calc(110 / $fdf) * $rem;
+                        width: auto;
                         height: calc(45 / $fdf) * $rem;
                         border-radius: 2px;
                         font-weight: 500;
                         font-size: calc(16 / $fdf) * $rem;
-                        &:first-child{
+                        &:not(:last-child) {
+                            margin-bottom: calc(8 / $fdf) * $rem;
+                        }
+                        &.chat{
                             background-color:#f7f8f9;
                             color: #3d4a5d;
                             font-size: calc(16 / $fdf) * $rem;
                             border: 1px solid #bcc5d3;
                             margin-right: calc(8 / $fdf) * $rem;
+                            width: 7rem;
                         }
-                        &:nth-child(2) {
+                        &.award-bid {
+                            margin-left: calc(8 / $fdf) * $rem;
+                            
+                        }
+                        &.award {
                             margin-left: calc(8 / $fdf) * $rem;
                             background-color:$maincolor;
                             color: #ffffff;

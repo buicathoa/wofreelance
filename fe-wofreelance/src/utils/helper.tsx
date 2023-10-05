@@ -72,7 +72,7 @@ export const renderFileIcon = (fileType: string) => {
     case 'jpg' || 'jpeg':
       icon = jpgIcon;
       break
-    case  'mp3':
+    case 'mp3':
       icon = mp3Icon
       break
     case 'mp4':
@@ -102,7 +102,7 @@ export const renderFileType = (fileType: string) => {
       return `https://cdn2.f-cdn.com/img/profile-portfolio-article.gif?v=051c69ab89c6ba83097ba9cd42721147&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
     case 'audio':
       return `https://cdn3.f-cdn.com/img/profile-portfolio-audio.gif?v=f5325ffbf3d30381a64b23afbd6afbc8&amp;m=6&amp;buildVersion=e07b38719b740e528387bf8ddd9cf209e6a1881c`
-    case 'code': 
+    case 'code':
       return `https://cdn5.f-cdn.com/img/profile-portfolio-code.gif?v=7d191b1a610559904733d57294d756c2&amp;m=6&amp;buildVersion=8daf52a3ea5ccb1830cc08bb3755b66668a124d2`
     case 'others':
       return `https://cdn2.f-cdn.com/img/profile-portfolio-file.gif?v=e066efaa9edd5c74656d0da961798cda&amp;m=6&amp;buildVersion=8daf52a3ea5ccb1830cc08bb3755b66668a124d2`
@@ -116,13 +116,13 @@ export const renderTypeOfContent = (path: string) => {
   const listAudio = ['mp3']
   const listDocs = ['vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'docx', 'txt', 'pdf']
   let contentType
-  if(listImg.includes(path)) {
+  if (listImg.includes(path)) {
     contentType = 'image'
-  } else if(listVideo.includes('path')){
+  } else if (listVideo.includes('path')) {
     contentType = 'video'
-  } else if(listAudio.includes(path)){
+  } else if (listAudio.includes(path)) {
     contentType = 'audio'
-  } else if(listDocs.includes(path)){
+  } else if (listDocs.includes(path)) {
     contentType = 'article'
   } else {
     contentType = 'not_allowed'
@@ -132,10 +132,10 @@ export const renderTypeOfContent = (path: string) => {
 
 export const renderRoomImage = (users: Array<UserInterface>, currentUser: UserInterface) => {
   let roomImg: any
-  if(users.length <= 2) {
+  if (users?.length <= 2) {
     roomImg = users?.find((u) => u.username !== currentUser.username)?.avatar_cropped!
     return <img src={roomImg} alt="" />
-  } else if(users.length > 2) {
+  } else if (users?.length > 2) {
     const remainUsers = users?.filter((u) => u.username !== currentUser.username)
     roomImg = <div className="img-wrapper">
       <img src={remainUsers[0]?.avatar_cropped} alt="" />
@@ -143,4 +143,9 @@ export const renderRoomImage = (users: Array<UserInterface>, currentUser: UserIn
     </div>
     return roomImg
   }
+}
+
+export const toggleUserMessState = (interactions: any, currentUser: number) => {
+  const messState = interactions?.users?.find((u: UserInterface) => u.id === currentUser)?.status_info?.message_status
+  return messState
 }

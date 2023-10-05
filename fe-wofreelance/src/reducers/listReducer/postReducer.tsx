@@ -7,7 +7,8 @@ interface postReducer {
     currencies: Array<CurrencyInterface>,
     budgets: Array<BudgetInterface>,
     bids: Array<BiddingInterface>,
-    totalBids: number
+    totalBids: number,
+    personalBids: Array<BiddingInterface>
 }
 
 const initialState: postReducer = {
@@ -15,7 +16,8 @@ const initialState: postReducer = {
         currencies: [],
         budgets: [],
         bids: [],
-        totalBids: 0
+        totalBids: 0,
+        personalBids: []
 }
 
 const Post = createSlice({
@@ -61,6 +63,44 @@ const Post = createSlice({
             return {
                 ...state,
                 bids: bidsClone
+            }
+        },
+
+        createAwardBid: (state, actions) => {},
+        createAwardBidSuccess: (state, actions) => {
+            let bidsClone = [...state.bids]
+            const idxCurrentBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            if(idxCurrentBid !== -1) {
+                bidsClone[idxCurrentBid] = {...bidsClone[idxCurrentBid], award: actions.payload}
+                bidsClone = bidsClone?.map((bid) => {
+                    if(bid.id !== actions.payload.bidding_id) {
+                        return {...bid, award: null}
+                    } else {
+                        return {...bid}
+                    }
+                })
+            }
+            return {
+                ...state,
+                bids: bidsClone
+            }
+        },
+        
+        getAllPersonalBiddings: (state, actions) => {},
+        getAllPersonalBiddingsSuccess: (state, actions) => {
+            return {
+                ...state,
+                personalBids: actions.payload
+            }
+        },
+        awardBidSuccess: (state, actions) => {
+            const personalBidsClone  = [...state.personalBids]
+            const {bid, ...others} = actions.payload
+            const idxBid = personalBidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            personalBidsClone[idxBid] = {...personalBidsClone[idxBid], award: others}
+            return {
+                ...state,
+                personalBids: personalBidsClone
             }
         }
     })

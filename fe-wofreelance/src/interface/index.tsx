@@ -110,6 +110,13 @@ export interface ProfileDetailInterface {
     setPercent: React.Dispatch<React.SetStateAction<number>>
 }
 
+export interface MessageStatus {
+    id?: number,
+    message_status?: string,
+    createdAt?: Date,
+    updatedAt?: Date
+}
+
 export interface UserInterface {
     id?: number,
     email?: string,
@@ -152,7 +159,8 @@ export interface UserInterface {
     current_time?: string,
     noti_count?: number,
     user_active?: boolean,
-    noti_mess?: number
+    noti_mess?: number,
+    status_info?: MessageStatus
 }
 
 export interface BudgetInterface {
@@ -177,11 +185,12 @@ export interface BiddingInterface {
     describe_proposal: string,
     createdAt?: Date,
     updatedAt?: Date,
-    project_paid_type: number,
+    project_paid_type: string,
     user: UserInterface,
     budget: BudgetInterface,
     room_id?: number,
-    unread_messages?: number
+    unread_messages?: number,
+    award?: BiddingInterface | null
 }
 
 export interface BiddingInterfaceResponse {
@@ -326,8 +335,9 @@ export interface InteractionReducer  {
     chat_window_status?: string, //open, hide, close,
     bidding_id?: number,
     room_id?: number,
-    messages?: Array<MessageInterface>,  
-    inputValue?: string
+    messages: Array<MessageInterface> ,  
+    inputValue?: string,
+    total?: number
 }
 
 export interface NotificationInterface {
@@ -422,7 +432,7 @@ export interface latestMessageInterface {
     users: Array<UserInterface>,
     is_online?: boolean,
     is_active?: boolean,
-    unread_messages?: number
+    unread_messages?: number,
 }
 
 export interface messageDetailInterface {

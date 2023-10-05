@@ -1,0 +1,37 @@
+@import "../../../css/custom";
+
+
+.modal-detail-bidaward-container {
+    padding: calc(24 / $fdf) * $rem;
+
+    .ant-form {
+        .ant-row {
+            .ant-col-12 {
+                padding-right: calc(16 / $fdf) * $rem;
+
+                &:nth-child(2n) {
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            font-size: calc(16 / $fdf) * $rem;
+            height: calc(40 / $fdf) * $rem;
+            display: flex;
+            align-items: center;
+            width: auto;
+
+            &:nth-child(2) {
+                margin-left: calc(8 / $fdf) * $rem;
+                background-color: $maincolor;
+                color: #ffffff;
+            }
+        }
+    }
+}

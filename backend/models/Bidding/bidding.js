@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: () => {
         if(this.project_paid_type === 'fixed_price') {
-          return true
+          return false
         }
       }
     },
@@ -26,15 +26,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: () => {
         if(this.project_paid_type === 'hourly') {
-          return true
+          return false
         }
       }
     },
     weekly_limit: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: () => {
         if(this.project_paid_type === 'hourly') {
-          return true
+          return false
         }
       }
     },
@@ -48,10 +48,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     project_paid_type: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         isIn: {
-          args: [['hourly','fixed_price']],
-          msg: 'Must be paid by hour or fixed price'
+          args: [['hourly','fixed']],
+          msg: 'Must be paid by hour or fixed'
         }
       }
     },
@@ -59,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: () => {
         if(this.project_paid_type === 'fixed_price') {
-          return true
+          return false
         }
       }
     },
@@ -69,6 +70,24 @@ module.exports = (sequelize, DataTypes) => {
         model: 'rooms',
         key: 'id'
       }
+    },
+    bidding_status: {
+      type: DataTypes.STRING,
+      defaultValue: 'pending',
+      validate: {
+        isIn: {
+          args: [['pending','success', 'rejected']],
+          msg: 'Args must be in pending, success or rejected'
+        }
+      }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'userprofiles',
+        key: 'id'
+      },
+      allowNull: false
     },
     describe_proposal: DataTypes.STRING
   }, {

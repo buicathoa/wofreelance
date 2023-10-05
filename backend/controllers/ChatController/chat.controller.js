@@ -57,6 +57,14 @@ const ChatController = {
     } catch (err) {
       return handleError(res, err);
     }
+  },
+  seenMessage: async (req, res) => {
+    try {
+      const result = await ChatService.seenMessage(req, res);
+      return handleSuccess(res, result)
+    } catch (err) {
+      return handleError(res, err);
+    }
   }
 };
 

@@ -10,6 +10,7 @@ import Lists from '../containers/Lists'
 import UserProfile from '../containers/User'
 import { Post } from '../containers/Project/Post'
 import { ProjectDetail } from '../containers/Project/ProjectDetail'
+import BidInsights from '../containers/BidInsights'
 
 export const routerNotSidebar = [
     {
@@ -57,5 +58,10 @@ export const routerSidebar = [
         exact: true,
         element: <ProjectDetail />,
         path: '/posts/:post_detail'
+    },
+    {
+        exact: true,
+        element: <BidInsights />,
+        path: '/insights/bids'
     }
 ]

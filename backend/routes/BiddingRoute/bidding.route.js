@@ -14,6 +14,14 @@ router.post("/create", authorize(['director', 'admin', 'user']), BiddingControll
 router.post("/update", authorize(['director', 'admin', 'user']), BiddingController.updateBidding)
 router.post("/delete", authorize(['director', 'admin', 'user']), BiddingController.deleteBidding)
 
+router.post("/personal/get-all", authorize(['director', 'admin', 'user']), BiddingController.getAllPersonalBidding),
+
+router.post("/award/create", authorize(['director', 'admin', 'user']), BiddingController.createAwardBid)
+router.post("/award/update", authorize(['director', 'admin', 'user']), BiddingController.updateAwardBid)
+router.post("/award/delete", authorize(['director', 'admin', 'user']), BiddingController.deleteAwardBid)
+router.post("/award/accept", authorize(['director', 'admin', 'user']), BiddingController.acceptAwardBid)
+
+
 
 // router.post("/create", authorize(['director', 'admin', 'user']), BudgetService.createBudgets)
 

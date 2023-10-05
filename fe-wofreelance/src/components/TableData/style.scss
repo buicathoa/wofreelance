@@ -1,0 +1,66 @@
+@import "../../css/custom";
+
+.table-data-wrapper{
+    box-shadow: 0 1px 3px #12151b29;
+    border-radius: 4px;
+    table{
+        width: 100%;
+        thead{
+            th{
+                border-bottom: 1px solid $bordercolor;
+                padding: calc(16 / $fdf) * $rem;
+                text-align: left;
+                font-size: calc(20 / $fdf) * $rem;
+            }
+        }
+        tbody{
+            &.empty{
+                position: relative;
+                height: calc(180 / $fdf) * $rem;
+                .ant-empty{
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    .ant-empty-image{
+                        height: calc(90 / $fdf) * $rem;
+                        svg{
+                            font-size: calc(90 / $fdf) * $rem;
+                        }                    
+                    }
+                    .ant-empty-description{
+                        font-size: calc(20 / $fdf) * $rem;
+                    }
+                }
+            }
+            tr{
+                td{
+                    border-bottom: 1px solid $bordercolor;
+                    padding: calc(16 / $fdf) * $rem;
+                    text-align: left;
+                    font-size: calc(18 / $fdf) * $rem;
+                    &.action-button{
+                        cursor: pointer;
+                        &.arrow-show{
+                            .anticon{
+                                transform: rotate(-180deg);
+                                transition: transform ease 0.3s;
+                            }
+                        }
+                        &.arrow-hide{
+                            .anticon{
+                                transform: rotate(0deg);
+                                transition: transform ease 0.3s;
+                            }
+                        }
+                    }
+                }
+                &:last-child{
+                    td{
+                        border-bottom: unset;
+                    }
+                }
+            }
+        }
+    }
+}

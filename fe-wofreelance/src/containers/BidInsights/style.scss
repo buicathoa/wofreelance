@@ -1,0 +1,61 @@
+@import "../../css/custom";
+
+
+.bid-insights-wrapper{
+    padding: calc(36 / $fdf) * $rem calc(24 / $fdf) * $rem;
+    background-color: #f7f8f9;
+    min-height: calc(100vh - 28rem);
+    table{
+        td{
+            a{
+                color: rgb(38, 162, 250)
+            }
+        }
+        tbody{
+            .award-bid-buttons{
+                display: flex;
+                justify-content: center;
+                button{
+                    font-size: calc(16 / $fdf) * $rem;
+                    height: calc(40 / $fdf) * $rem;
+                    display: flex;
+                    align-items: center;
+                    width: auto;
+                    &:first-child {
+                        background-color: $maincolor;
+                        color: #ffffff;
+                        margin-right:  calc(8 / $fdf) * $rem;
+                    }
+                }
+            }
+        }
+    }
+    .table-detail-post{
+        color: #2c2c2c;
+        .detail-post-label{
+            font-size: calc(20 / $fdf) * $rem;
+            font-weight: 600;
+            margin-bottom: calc(12 / $fdf) * $rem;
+        }
+        .detail-post-left{
+            padding-right: calc(16 / $fdf) * $rem;
+        }
+        .detail-post-item{
+            margin-bottom: calc(16 / $fdf) * $rem;
+        }
+        .detail-post-description{
+            font-size: calc(20 / $fdf) * $rem;
+            font-weight: 400;
+        }
+        .detail-post-skills{
+            display: flex;
+            flex-wrap: wrap;
+            .detail-post-skill-item{
+                font-size: calc(18 / $fdf) * $rem;
+                padding: calc(8 / $fdf) * $rem;
+                border-radius: calc(12 / $fdf) * $rem;
+                border: 1px solid #5f5d5d;
+            }
+        }
+    }
+}

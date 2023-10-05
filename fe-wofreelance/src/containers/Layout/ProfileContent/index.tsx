@@ -36,7 +36,7 @@ const ProfileContent = ({user}:any) => {
                         <li><Link to={`u/${user.username}`}>View profile</Link></li>
                         <li><Link to="#">Membership</Link></li>
                         <li><Link to="#">Account analytics</Link></li>
-                        <li><Link to="#">Bid Insights</Link></li>
+                        <li><Link to="/insights/bids">Bid Insights</Link></li>
                         <li><Link to="#">Settings</Link></li>
                     </ul>
                 </div>

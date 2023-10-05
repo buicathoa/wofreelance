@@ -47,7 +47,8 @@
         .messages-list {
             padding: 0 calc(12 / $fdf) * $rem;
             padding-bottom: calc(16 / $fdf) * $rem;
-
+            display: flex;
+            flex-direction: column-reverse;
             .message-item {
                 padding: calc(12 / $fdf) * $rem;
                 display: flex;
@@ -130,7 +131,7 @@
                             font-weight: 400;
 
                             &.received {
-                                font-weight: 600;
+                                font-weight: 750;
                             }
                         }
 

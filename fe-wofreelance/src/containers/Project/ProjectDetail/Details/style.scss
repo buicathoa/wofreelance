@@ -118,7 +118,15 @@
 
                         .bidding-rate {
                             display: flex;
-
+                            .ant-input-number-group-wrapper{
+                                &.form-input{
+                                    border: unset;
+                                    padding: 0;
+                                    .ant-input-number{
+                                        border: 1px solid #d9d9d9;
+                                    }
+                                }
+                            }
                             .ant-form-item {
                                 width: 40%;
 

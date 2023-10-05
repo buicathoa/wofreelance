@@ -33,7 +33,7 @@ module.exports = (socket, io) => {
     USER_AUTHEN
   } = CONSTANT.WS_EVENT;
 
-  myEmitter.on(TOKEN, async (token) => {
+  socket.on(TOKEN, async (token) => {
     const decoded = jwt_decode(token);
     const user = await UserProfile.findOne({
       where: {
@@ -52,83 +52,58 @@ module.exports = (socket, io) => {
     const user = findUser(user_id);
     socket.emit("user_status_result", user ? [{ ...user }] : []);
   }),
-    // socket.on(USER_SIGNIN, async (user_id) => {
-    //   const roomHasUsers = await Users_Rooms.findAll({
-    //     attributes: ["room_id"],
-    //     where: {
-    //       user_id: user_id,
-    //     },
-    //   });
 
-    //   const allUsersInRoomPromises = roomHasUsers.dataValues.map(async (roomId) => {
-    //     return await UserProfile.findAll({
-    //       attributes: ["id"],
-    //       where: {
-    //         id: {
-    //           [Op.ne]: user_id,
-    //         },
-    //       },
-    //       include: [
-    //         {
-    //           model: Rooms,
-    //           attributes: [],
-    //           where: {
-    //             id: roomId
-    //           }
-    //         },
-    //       ],
-    //     });
-    //   });
-
-    //   const allUsersInRooms = await Promise.all(allUsersInRoomPromises)
-    //   console.log(allUsersInRooms)
-    // });
   socket.on(USER_AUTHEN, async(data) => {
-    const decoded = jwt_decode(socket.handshake.auth.token);
-    //send notice to others related
-    const roomsRelated = await Users_Rooms.findAll({
-      attributes: ["room_id"],
-      where: {
-        user_id: data.user_id,
-      },
-    });
-
-    const usersPromises = await roomsRelated.map(async (roomId) => {
-      return await UserProfile.findAll({
-        attributes: ["id"],
-        where: {
-          id: {
-            [Op.ne]: data.user_id,
+    try {
+        const decoded = jwt_decode(socket.handshake.auth.token);
+        //send notice to others related
+        const roomsRelated = await Users_Rooms.findAll({
+          attributes: ["room_id"],
+          where: {
+            user_id: data.user_id,
           },
-          user_active: true
-        },
-        include: [
-          {
-            model: Rooms,
-            attributes: [],
+        });
+    
+        const usersPromises = await roomsRelated.map(async (roomId) => {
+          return await UserProfile.findAll({
+            attributes: ["id"],
             where: {
-              id: roomId.room_id,
+              id: {
+                [Op.ne]: data.user_id,
+              },
+              user_active: true
             },
+            include: [
+              {
+                model: Rooms,
+                attributes: [],
+                where: {
+                  id: roomId.room_id,
+                },
+    
+                as: "rooms",
+                through: {
+                  attributes: [],
+                },
+              },
+              {
+                model: Sockets,
+                as: "socket",
+              },
+            ],
+          });
+        });
+    
+        const usersFound = await Promise.all(usersPromises);
+        usersFound.map((user) => {
+          user.map((u) => {
+            socket.broadcast.to(u.socket.socket_id).emit("user_authen", { user_id: decoded.id, status: data.status });
+          })
+        });
+    } catch (err) {
+      throw err
+    }
 
-            as: "rooms",
-            through: {
-              attributes: [],
-            },
-          },
-          {
-            model: Sockets,
-            as: "socket",
-          },
-        ],
-      });
-    });
-
-    const usersFound = await Promise.all(usersPromises);
-    usersFound.map((user) => {
-      user.map((u) => {
-        socket.broadcast.to(u.socket.socket_id).emit("user_authen", { user_id: decoded.id, status: data.status });
-      })
-    });
   });
 
   socket.on(USER_RECONNECT, (token) => {

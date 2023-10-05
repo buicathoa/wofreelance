@@ -77,12 +77,15 @@ function ChatWindowFrame() {
               {latestMessages?.length > 0 ? (
                 latestMessages?.map((interaction, index) => {
                   const imgReturn = renderRoomImage(interaction?.users, user)
+                  const roomStatus = interaction?.users
+                            ?.filter((item) => item.username !== user.username)
+                            ?.some((item) => item.user_active)
                   return (
                     <div className={`message-item ${interaction?.messages?.message_status}`} key={index} onClick={() => handleOpenChatWindow(interaction)}>
                       <div className="message-item-left">
                         <div className="message-item-avatar">
                           {imgReturn}
-                          <div className={`user-status ${interaction?.is_online && 'online'}`}></div>
+                          <div className={`user-status ${roomStatus ? 'online' : 'offline'}`}></div>
                         </div>
                         <div className="message-item-infor">
                           <div className="message-item-name">{interaction?.room_name}</div>

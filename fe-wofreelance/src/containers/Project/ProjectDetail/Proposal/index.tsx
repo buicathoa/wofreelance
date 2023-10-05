@@ -19,6 +19,8 @@ import { ModalConfirm } from '../../../../components/ModalConfirm'
 import { openSuccess } from '../../../../components/Notifications'
 import { PaginationDivide } from '../../../../components/Pagination'
 import { InteractionsActions } from '../../../../reducers/listReducer/interactionReducer'
+import { AssignProjectComponent } from '../../../../components/AssignProjectComponent'
+import DetailBidInsightsModal from '../../../BidInsights/DetailBidInsightsModal'
 interface componentInterface {
     postItem?: PostInteface,
     setModifyBid: React.Dispatch<React.SetStateAction<string>>,
@@ -37,6 +39,10 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     const [recordSelectedID, setrecordSelectedID] = useState<number>(0)
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
     const [idxOwnBid, setIdxOwnBid] = useState<number>(-1)
+    const [visibleAssignProject, setVisibleAssignProject] = useState(false)
+    const [bidSelected, setBidSelected] = useState<number>()
+    const [visibleAwardBid, setVisibleAwardBid] = useState(false)
+    const [awardBidRecord, setAwardBidRecord] = useState({})
 
     const validateMessages = {
         required: 'This field is required'
@@ -67,9 +73,9 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
 
     const bids: Array<BiddingInterface> = useSelector((state: RootState) => state.post.bids)
     const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
-    console.log('bids', bids)
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
     const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
+
     const deleteBid = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(PostActions.deleteBid({ param, resolve, reject }));
@@ -122,7 +128,28 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
         })
     }
 
-    const renderProposal = () => {
+    const renderBidAmount = (bidItem: BiddingInterface) => {
+        switch (bidItem?.project_paid_type) {
+            case 'hourly': {
+                return (
+                    <div className="proposal-right">
+                        <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bidItem?.hourly_rate} {postItem?.budget?.currency?.name}</div>
+                        <div className="amount-time">per hour</div>
+                    </div>
+                )
+            }
+            default: {
+                return (
+                    <div className="proposal-right">
+                        <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bidItem?.bidding_amount} {postItem?.budget?.currency?.name}</div>
+                        <div className="amount-time">in {bidItem?.delivered_time} days</div>
+                    </div>
+                )
+            }
+        }
+    }
+
+    const renderMyProposal = () => {
         if (idxOwnBid !== -1) {
             return (
                 <div className="own-proposal">
@@ -156,10 +183,8 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                                 </div>
 
                             </div>
-                            <div className="proposal-right">
-                                <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bids[idxOwnBid]?.hourly_rate}&nbsp;{postItem?.budget?.currency?.name}</div>
-                                <div className="amount-time">in {bids[idxOwnBid]?.delivered_time} days</div>
-                            </div>
+                            {renderBidAmount(bids[idxOwnBid])}
+
                         </div>
                         <div className="proposal-summary">
                             <div className="proposal-summary-left" dangerouslySetInnerHTML={{ __html: ((bids[idxOwnBid]?.describe_proposal)?.replace(/\n/g, '<br>')) || '' }}></div>
@@ -196,7 +221,8 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                 })
             })
         } else {
-            dispatch(InteractionsActions.addInteraction({ users: [{ id: bid.user.id, user_active: bid.user.user_active, username: bid.user.username }], room_url: postItem?.post_url, room_title: postItem?.title, chat_window_status: 'open', bidding_id: bid.id, room_id: bid.room_id, unread_messages: 0 }))
+            const usersCombine = [{ id: user?.id, user_active: user?.user_active, username: user?.username }, { id: bid.user.id, user_active: bid.user.user_active, username: bid.user.username }]
+            dispatch(InteractionsActions.addInteraction({ users: usersCombine, room_url: postItem?.post_url, room_title: postItem?.title, chat_window_status: 'open', bidding_id: bid.id, room_id: bid.room_id, unread_messages: 0 }))
         }
     }
 
@@ -204,9 +230,19 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
         console.log('hoho')
     }
 
+    const handleAwardVisible = (bid: BiddingInterface) => {
+        setVisibleAssignProject(true)
+        setBidSelected(bid.id)
+    }
+
+    const handleOpenAward = (bid: any) => {
+        setVisibleAwardBid(true)
+        setAwardBidRecord({...bid?.award, currency_name: bid?.currency_name, currency_short_name: bid?.currency_short_name})
+    }
+
     return (
         <div className="proposal-wrapper">
-            {renderProposal()}
+            {renderMyProposal()}
             {bids
                 ?.filter((bid) => bid.id !== bids[idxOwnBid]?.id).length > 0 &&
                 <div className="other-proposals">
@@ -244,8 +280,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                                             <div className={`user-status ${bid?.user?.user_active ? 'active' : 'deactive'}`}></div>
                                         </div>
                                         <div className="proposal-right">
-                                            <div className="amount-bid">{postItem?.budget?.currency?.short_name}{bid?.hourly_rate}&nbsp;{postItem?.budget?.currency?.name}</div>
-                                            <div className="amount-time">in {bid?.delivered_time} days</div>
+                                            {renderBidAmount(bid)}
                                         </div>
                                     </div>
                                     <div className="proposal-summary">
@@ -255,11 +290,12 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                                                 user.id === postItem?.user.id ? (
                                                     <div className="proposal-button">
                                                         <div className="chat-button" onClick={() => handleAddInteractions(bid)}>
-                                                            <Button>Chat</Button>
+                                                            <Button className="chat">Chat</Button>
                                                             <div className={`user-status ${bid.user.user_active ? 'online' : 'offline'}`}></div>
                                                             <div className="messages-unread">{unreadMess ? unreadMess?.unread_messages : 0}</div>
                                                         </div>
-                                                        <Button>Award</Button>
+                                                        {bid?.award && <Button className="award-bid" onClick={() => handleOpenAward(bid)}>Award of Bid</Button>}
+                                                        {!bid?.award && <Button onClick={() => handleAwardVisible(bid)} className="award">Award</Button>}
                                                     </div>
                                                 ) : (
                                                     <>
@@ -283,6 +319,14 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                 setVisible={setIsOpenModalConfirm}
                 onConfirm={onConfirm}
             />
+            <AssignProjectComponent 
+                visible={visibleAssignProject}
+                setVisible={setVisibleAssignProject}
+                recordSelected={bidSelected}
+                post={postItem}
+            />
+
+            <DetailBidInsightsModal visible={visibleAwardBid} setVisible={setVisibleAwardBid} recordSelected={awardBidRecord} setrecordSelected={setAwardBidRecord} isOwner={user?.username !== postItem?.user?.id}/>
 
         </div>
     )

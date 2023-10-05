@@ -23,12 +23,21 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: {
         isIn: {
-          args: [['hourly','fixed_price']],
-          msg: 'Must be paid by hour or fixed price'
+          args: [['hourly','fixed']],
+          msg: 'Must be paid by hour or fixed'
         }
       }
     },
-    post_status: DataTypes.STRING, //not_received: nhận được thông báo nhưng chưa bấm vào chuông, received: Nhận được thông báo và bấm vào chuông, seen
+    post_status: {
+      type: DataTypes.STRING,
+      defaultValue: 'open',
+      validate: {
+        isIn: {
+          args: [['open','closed']],
+          msg: 'Args must open or closed'
+        }
+      }
+    },
     file: DataTypes.STRING,
     post_type: DataTypes.STRING,
     user_id: {

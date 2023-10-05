@@ -68,7 +68,6 @@ const Auth = () => {
       if (res.code === 200) {
         localStorage.setItem('access_token', res.data.token)
         navigate('/dashboard')
-        // socket.emit("user_signin", res.data.data.id)
       } else {
         openError(res.err.response.data.message)
       }

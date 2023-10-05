@@ -19,14 +19,15 @@ export function* InteractionSaga(): Generator {
     yield takeLatest(InteractionsActions.getUnreadMessages({}).type, getUnreadMessages)
     yield takeLatest(InteractionsActions.getMessagesDetail({}).type, getMessagesDetail)
     yield takeLatest(InteractionsActions.getRoomDetail({}).type, getRoomDetail)
+    yield takeLatest(InteractionsActions.seenMessage({}).type, seenMessage)
 }
 
 function* sendMessages(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
-        const response:any = yield apiRequest(apiUrl.interactions.sendMessage, param.param, 'general')
-        if(param.param.room_id) {
-            yield put(InteractionsActions.sendMessagesSuccess({...response.data, interaction_state: 'update', interaction_index: param.interaction_index}))
+        const response:any = yield apiRequest(apiUrl.interactions.sendMessage, param, 'general')
+        if(param.room_id) {
+            yield put(InteractionsActions.sendMessagesSuccess(response.data))
         }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
@@ -41,7 +42,6 @@ function* getAllLatestMessages(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
         const response = yield apiRequest(apiUrl.interactions.getAllLatestMessages, param, 'general')
-        yield put(InteractionsActions.getAllLatestMessagesSuccess((response as ResponseFormatItem).data))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
@@ -83,8 +83,11 @@ function* getUnreadMessages(action: AnyAction): Generator {
 function* getMessagesDetail(action: AnyAction): Generator {
     const { param, resolve, reject } = action.payload
     try {
+        const roomID = param?.search_list?.find((item: any) => item.name_field === 'room_id')?.value_search
         const response:any = yield apiRequest(apiUrl.interactions.getMessagesDetail, param, 'general')
-        // yield put(InteractionsActions.sendMessagesSuccess((response as ResponseFormatItem).data))
+        if(param?.page > 1) {
+            yield put(InteractionsActions.getMessagesDetailSuccess({data: response.data, room_id: roomID}))
+        }
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }
@@ -99,6 +102,20 @@ function* getRoomDetail(action: AnyAction): Generator {
     try {
         const response:any = yield apiRequest(apiUrl.interactions.getRoomDetail, param, 'general')
         // yield put(InteractionsActions.sendMessagesSuccess((response as ResponseFormatItem).data))
+        yield put(AppActions.openLoading(false))
+        if (resolve) yield resolve(response)
+    }
+    catch (err) {
+        yield put(AppActions.openLoading(false))
+        if (reject) yield reject(err)
+    }
+}
+
+function* seenMessage(action: AnyAction): Generator {
+    const { param, resolve, reject } = action.payload
+    try {
+        const response:any = yield apiRequest(apiUrl.interactions.seenMessage, {room_id: param.room_id}, 'general')
+        yield put(InteractionsActions.seenMessageSuccess(param))
         yield put(AppActions.openLoading(false))
         if (resolve) yield resolve(response)
     }

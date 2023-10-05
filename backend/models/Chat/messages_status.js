@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Messages extends Model {
+  class Messages_Status extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,18 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Messages.init({
-    content_type: DataTypes.STRING,
-    content_text: DataTypes.STRING,
-    room_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'rooms',
-        key: 'id'
-      }
-    },
-    sender: {
+  Messages_Status.init({
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -32,9 +22,35 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
+    message_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'messages',
+        key: 'id'
+      }
+    },
+    message_status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isIn: {
+          args: [['seen', 'received']],
+          msg: 'Must be in seen or received',
+        },
+      }
+    },
+    room_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'rooms',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
-    modelName: 'Messages',
+    modelName: 'Messages_Status',
   });
-  return Messages;
+  return Messages_Status;
 };

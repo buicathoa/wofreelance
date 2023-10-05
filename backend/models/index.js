@@ -64,6 +64,7 @@ db.messages = require("./Chat/messages")(sequelize, DataTypes)
 //category: IT-Sofware, BA, Marketing...
 db.jobcategories = require("./JobCategory/jobcategories")(sequelize, DataTypes)
 db.bidding = require("./Bidding/bidding")(sequelize, DataTypes)
+db.bidaward = require("./Bidding/bidaward")(sequelize, DataTypes)
 
 
 //skillset: javascript, react,...
@@ -105,6 +106,9 @@ db.user_loggedin = require("./UserLoggedIn/userloggedin")(sequelize, DataTypes)
 
 // Junction table between users and rooms
 db.users_rooms = require("./Chat/users_rooms")(sequelize, DataTypes)
+
+// Junction table between users and rooms
+db.messages_status = require("./Chat/messages_status")(sequelize, DataTypes)
 // =============================================================================== One to One Relationships =================================================================//
 
 db.userroles.hasOne(db.userprofile, {
@@ -162,7 +166,14 @@ db.bidding.belongsTo(db.rooms, {
 
 
 
-
+db.bidding.hasOne(db.bidaward, {
+  foreignKey: 'bidding_id',
+  as: 'award'
+})
+db.bidaward.belongsTo(db.bidding, {
+  foreignKey: 'bidding_id',
+  as: 'bid'
+})
 
 // =============================================================================== One to Many Relationship =============================================================================== // 
 
@@ -226,7 +237,7 @@ db.posts.hasMany(db.bidding, {
 })
 db.bidding.belongsTo(db.posts, {
   foreignKey: 'post_id',
-  as: 'biddings'
+  as: 'post'
 })
 
 
@@ -250,13 +261,36 @@ db.messages.belongsTo(db.userprofile, {
 })
 
 
-db.userprofile.hasMany(db.messages, {
-  foreignKey: 'receiver_id',
-  as: 'receiver_info'
+db.messages.hasMany(db.messages_status, {
+  foreignKey: 'message_id',
+  as: 'status'
 })
-db.messages.belongsTo(db.userprofile, {
-  foreignKey: 'receiver_id',
-  as: 'receiver_info'
+db.messages_status.belongsTo(db.messages, {
+  foreignKey: 'message_id',
+  as: 'status'
+})
+
+
+
+
+db.userprofile.hasMany(db.bidding, {
+  foreignKey: 'user_id',
+  as: 'bidding'
+})
+db.bidding.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'user'
+})
+
+
+
+db.userprofile.hasOne(db.messages_status, {
+  foreignKey: 'user_id',
+  as: 'status_info'
+})
+db.messages_status.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'status_info'
 })
 
 // ========================================================================================== End ==========================================================================================//
@@ -370,19 +404,6 @@ db.userprofile.belongsToMany(db.notifications, {
 
 
 
-db.userprofile.belongsToMany(db.bidding, {
-  through: db.user_bidding,
-  foreignKey: 'user_id',
-  otherKey: 'bidding_id',
-  as: 'bidding'
-})
-db.bidding.belongsToMany(db.userprofile, {
-  through: db.user_bidding,
-  foreignKey: 'bidding_id',
-  otherKey: 'user_id',
-  as: 'user'
-})
-
 
 db.userprofile.belongsToMany(db.rooms, {
   through: db.users_rooms,
@@ -396,6 +417,20 @@ db.rooms.belongsToMany(db.userprofile, {
   otherKey: 'user_id',
   as: 'users'
 })
+
+
+// db.messages.belongsToMany(db.userprofile, {
+//   through: db.messages_status,
+//   foreignKey: 'message_id',
+//   otherKey: 'user_id',
+//   as: 'user'
+// })
+// db.userprofile.belongsToMany(db.messages, {
+//   through: db.messages_status,
+//   foreignKey: 'user_id',
+//   otherKey: 'message_id',
+//   as: 'message'
+// })
 
 // ========================================================================================== End ==========================================================================================//
 

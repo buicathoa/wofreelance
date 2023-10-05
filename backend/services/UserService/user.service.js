@@ -35,7 +35,6 @@ const store = require("store");
 const dayjs = require("dayjs");
 const { io } = require("../../server");
 const { removeUserOnline, getSocketState } = require("../../globalVariable");
-const EventEmitter = require("../../myEmitter");
 const myEmitter = require("../../myEmitter");
 const myModule = require("./../../wsHandler/userSocket");
 // const returnDataSocket = require("../../wsHandler/returnDataSocket");
@@ -86,7 +85,6 @@ const userService = {
 
   loginUser: async (req, res, socket, io) => {
     const { email, password, account_type } = req.body;
-    const { USER_SIGNIN, USER_SIGNOUT, ADD_USER_INFO } = CONSTANT.WS_EVENT;
     try {
       //second solution
       const user = await UserProfile.findOne({
@@ -210,10 +208,12 @@ const userService = {
   },
 
   logoutUser: async (req, res) => {
-    const decoded = jwt_decode(req.headers.authorization);
-    const { USER_SIGNIN, USER_SIGNOUT } = CONSTANT.WS_EVENT;
     let transaction = await sequelize.transaction();
     try {
+      const decoded = jwt_decode(req.headers.authorization);
+      const { USER_AUTHEN } = CONSTANT.WS_EVENT;
+      const token = (req.headers.authorization).split(' ')[1]
+
       await UserProfile.update(
         {
           token: null,
@@ -241,6 +241,7 @@ const userService = {
         }
       );
 
+      // await myEmitter.emit(USER_AUTHEN, {user_id: decoded.id, status: 'logout', token: token })
       transaction.commit();
       return true;
     } catch (err) {

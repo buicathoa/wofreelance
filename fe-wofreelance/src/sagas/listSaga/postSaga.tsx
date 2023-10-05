@@ -22,6 +22,9 @@ export function* PostSaga(): Generator {
     yield takeLatest(PostActions.biddingPost({}).type, biddingPost)
     yield takeLatest(PostActions.updateBid({}).type, updateBid)
     yield takeLatest(PostActions.deleteBid({}).type, deleteBid)
+
+    yield takeLatest(PostActions.createAwardBid({}).type, createAwardBid)
+    yield takeLatest(PostActions.getAllPersonalBiddings({}).type, getAllPersonalBiddings)
 }
 
     function* createPost(action: AnyAction): Generator {
@@ -111,3 +114,34 @@ export function* PostSaga(): Generator {
             if (reject) yield reject(err)
         }
     } 
+
+    function* createAwardBid(action: AnyAction): Generator {
+        const { param, resolve, reject } = action.payload
+        try {
+            const response = yield apiRequest(apiUrl.post.bidding.createAwardBid, param, 'general')
+            yield put(PostActions.createAwardBidSuccess((response as ResponseFormatItem).data))
+            yield put(AppActions.openLoading(false))
+            if (resolve) yield resolve(response)
+        }
+        catch (err: any) {
+            yield put(AppActions.openLoading(false))
+            openError({notiMess: err.response.data.message})
+            if (reject) yield reject(err)
+        }
+    } 
+
+    function* getAllPersonalBiddings(action: AnyAction): Generator {
+        const { param, resolve, reject } = action.payload
+        try {
+            const response = yield apiRequest(apiUrl.post.bidding.getAllPersonalBiddings, param, 'general')
+            yield put(PostActions.getAllPersonalBiddingsSuccess((response as ResponseFormatItem).data))
+            yield put(AppActions.openLoading(false))
+            if (resolve) yield resolve(response)
+        }
+        catch (err: any) {
+            yield put(AppActions.openLoading(false))
+            openError({notiMess: err.response.data.message})
+            if (reject) yield reject(err)
+        }
+    }
+    

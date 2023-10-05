@@ -94,9 +94,8 @@ const PostService = {
         throw new ClientError("Bad request.")
       }
       //send notification to client with socket
-
       await transaction.commit()
-      return {...newPost.dataValues, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
+      return {...newPost.dataValues, skills: list_skills, post_url: `posts/${(title).toLowerCase().replaceAll(' ', '-')}-${newPost?.dataValues?.id}`}
       // return result
     } catch (err) {
       await transaction.rollback()

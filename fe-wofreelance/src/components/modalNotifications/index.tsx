@@ -17,7 +17,7 @@ export function modalNotifications({notiMess, description, noti_url}: modalNotif
             duration: 2,
             icon: <ProjectOutlined />,
             onClick: () => {
-                window.location.replace(noti_url)
+                window.location.replace(`/${noti_url}`)
             }
         })
     )
