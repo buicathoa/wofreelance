@@ -222,6 +222,12 @@
                             color: #ffffff;
                             border: 1px solid $maincolor;
                         }
+                        &.edit{
+                            margin-left: calc(8 / $fdf) * $rem;
+                            background-color:$maincolor;
+                            color: #ffffff;
+                            border: 1px solid $maincolor;
+                        }
                     }
                 }
             }

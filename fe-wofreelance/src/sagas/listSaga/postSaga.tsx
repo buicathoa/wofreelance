@@ -24,6 +24,9 @@ export function* PostSaga(): Generator {
     yield takeLatest(PostActions.deleteBid({}).type, deleteBid)
 
     yield takeLatest(PostActions.createAwardBid({}).type, createAwardBid)
+    yield takeLatest(PostActions.updateAwardBid({}).type, updateAwardBid)
+    yield takeLatest(PostActions.deleteAwardBid({}).type, deleteAwardBid)
+
     yield takeLatest(PostActions.getAllPersonalBiddings({}).type, getAllPersonalBiddings)
 }
 
@@ -128,7 +131,37 @@ export function* PostSaga(): Generator {
             openError({notiMess: err.response.data.message})
             if (reject) yield reject(err)
         }
-    } 
+    }
+
+    function* updateAwardBid(action: AnyAction): Generator {
+        const { param, resolve, reject } = action.payload
+        try {
+            const response = yield apiRequest(apiUrl.post.bidding.updateAwardBid, param, 'general')
+            yield put(PostActions.updateAwardBidSuccess((response as ResponseFormatItem).data))
+            yield put(AppActions.openLoading(false))
+            if (resolve) yield resolve(response)
+        }
+        catch (err: any) {
+            yield put(AppActions.openLoading(false))
+            openError({notiMess: err.response.data.message})
+            if (reject) yield reject(err)
+        }
+    }  
+
+    function* deleteAwardBid(action: AnyAction): Generator {
+        const { param, resolve, reject } = action.payload
+        try {
+            const response = yield apiRequest(apiUrl.post.bidding.deleteAwardBid, param, 'general')
+            yield put(PostActions.deleteAwardBidSuccess(param))
+            yield put(AppActions.openLoading(false))
+            if (resolve) yield resolve(response)
+        }
+        catch (err: any) {
+            yield put(AppActions.openLoading(false))
+            openError({notiMess: err.response.data.message})
+            if (reject) yield reject(err)
+        }
+    }
 
     function* getAllPersonalBiddings(action: AnyAction): Generator {
         const { param, resolve, reject } = action.payload

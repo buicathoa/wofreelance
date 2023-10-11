@@ -85,6 +85,47 @@ const Post = createSlice({
                 bids: bidsClone
             }
         },
+
+        updateAwardBid: (state, actions) => {},
+        updateAwardBidSuccess: (state, actions) => {
+            let bidsClone = [...state.bids]
+            let personalBidsClone = [...state.personalBids]
+
+            const idxCurrentBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            const idxCurrentPersonalBid = personalBidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            if(idxCurrentBid !== -1) {
+                bidsClone[idxCurrentBid] = {...bidsClone[idxCurrentBid], award: {...bidsClone[idxCurrentBid]?.award,...actions.payload} }
+            }
+            if(idxCurrentPersonalBid !== -1) {
+                personalBidsClone[idxCurrentPersonalBid] = {...personalBidsClone[idxCurrentPersonalBid], award: {...personalBidsClone[idxCurrentPersonalBid]?.award, ...actions.payload}}
+            }
+            return {
+                ...state,
+                bids: bidsClone,
+                personalBids: personalBidsClone
+            }
+        },
+        
+        deleteAwardBid: (state, actions) => {},
+        deleteAwardBidSuccess: (state, actions) => {
+            let bidsClone = [...state.bids]
+            let personalBidsClone = [...state.personalBids]
+
+            const idxCurrentBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+            const idxCurrenPersonalBid = personalBidsClone?.findIndex((bid) => bid?.id === actions.payload.bidding_id)
+            if(idxCurrentBid !== -1) {
+                bidsClone[idxCurrentBid] = {...bidsClone[idxCurrentBid], award: null }
+            }
+
+            if(idxCurrenPersonalBid !== -1) {
+                personalBidsClone[idxCurrenPersonalBid] = {...personalBidsClone[idxCurrenPersonalBid], award: null}
+            }
+            return {
+                ...state,
+                bids: bidsClone,
+                personalBids: personalBidsClone
+            }
+        },
         
         getAllPersonalBiddings: (state, actions) => {},
         getAllPersonalBiddingsSuccess: (state, actions) => {
@@ -93,16 +134,39 @@ const Post = createSlice({
                 personalBids: actions.payload
             }
         },
-        awardBidSuccess: (state, actions) => {
+        awardBidResponse: (state, actions) => {
             const personalBidsClone  = [...state.personalBids]
+            const bidsClone = [...state.bids]
             const {bid, ...others} = actions.payload
-            const idxBid = personalBidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
-            personalBidsClone[idxBid] = {...personalBidsClone[idxBid], award: others}
+            if(actions?.payload?.status === 'create' || actions?.payload?.status === 'update') {
+                const idxPersonalBid = personalBidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+                const idxBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
+
+                if(idxPersonalBid !== -1) {
+                    personalBidsClone[idxPersonalBid] = {...personalBidsClone[idxPersonalBid], award: others}
+                }
+                
+                if(idxBid !== -1) {
+                    bidsClone[idxBid] = {...bidsClone[idxBid], award: others}
+                }
+            } else {
+                const idxBidAward = personalBidsClone?.findIndex((bid) => bid.award)
+                const idxBid = bidsClone?.findIndex((bid) => bid.id === actions?.payload?.bidding_id)
+
+                if(idxBidAward !== -1) {
+                    personalBidsClone[idxBidAward] = {...personalBidsClone[idxBidAward], award: null}
+                }
+                if(idxBid !== -1) {
+                    bidsClone[idxBid] = {...bidsClone[idxBid], award: null}
+                }
+            }
             return {
                 ...state,
-                personalBids: personalBidsClone
+                personalBids: personalBidsClone,
+                bids: bidsClone
             }
-        }
+        },
+
     })
 })
 

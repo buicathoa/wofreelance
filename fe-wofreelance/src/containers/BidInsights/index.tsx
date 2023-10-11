@@ -69,8 +69,10 @@ const BidInsights = () => {
   const handleShowAward = (award: any) => {
     console.log(award)
     setVisibleAwardBid(true)
-    setAwardBidRecord(award?.award)
+    setAwardBidRecord(award)
   }
+
+  console.log('personalBids', personalBids)
 
   const renderTableBody = () => {
     return personalBids?.map((data: any, idxData: number) => {
@@ -98,23 +100,23 @@ const BidInsights = () => {
               }
             })}
           </tr>
-          <tr>
-            {data?.award ? (
-              titleHeader?.map((header, idx) => {
-                if (header?.key === 'actions') {
-                  return <td key={idx}>
-                    <div className="award-bid-buttons">
-                      <Button onClick={() => handleShowAward(data)}>View detail</Button>
-                    </div>
-                  </td>
-                } else {
-                  return (
-                    <td key={idx}>{data?.award[header?.key]}</td>
-                  )
-                }
-              })
-            ) : null}
-          </tr>
+          {data?.award && <tr className="award-bid">
+            {titleHeader?.map((header, idx) => {
+              if (header?.key === 'actions') {
+                return <td key={idx}>
+                  <div className="award-bid-buttons">
+                    <Button onClick={() => handleShowAward(data)}>View detail</Button>
+                  </div>
+                </td>
+              } else if(header?.key === 'post_title') {
+                return <td key={idx}>AWARD OF THE BID</td>
+              } else {
+                return (
+                  <td key={idx}>{data?.award[header?.key]}</td>
+                )
+              }
+            })}
+          </tr>}
           {recordsShow?.includes(data.id) &&
             <tr>
               <td colSpan={8}>
@@ -160,7 +162,7 @@ const BidInsights = () => {
   return (
     <div className="bid-insights-wrapper">
       <TableData titleHeader={titleHeader} tableData={personalBids} renderTableBody={renderTableBody} />
-      <DetailBidInsightsModal visible={visibleAwardBid} setVisible={setVisibleAwardBid} recordSelected={awardBidRecord} setrecordSelected={setAwardBidRecord} isOwner={false}/>
+      <DetailBidInsightsModal visible={visibleAwardBid} setVisible={setVisibleAwardBid} recordSelected={{ ...awardBidRecord?.award, post_id: awardBidRecord?.post?.id, bidding_id: awardBidRecord?.id }} setrecordSelected={setAwardBidRecord} isOwner={false} />
     </div>
   )
 }

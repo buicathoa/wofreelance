@@ -2,27 +2,36 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('BidAwards', {
+    await queryInterface.createTable('Notifications', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      bidding_id: {
+      noti_title: {
+        type: Sequelize.STRING
+      },
+      noti_type: {
+        type: Sequelize.STRING
+      },
+      noti_content: {
+        type: Sequelize.STRING
+      },
+      noti_url: {
+        type: Sequelize.STRING
+      },
+      noti_status: {
+        type: Sequelize.STRING
+      },
+      user_id: {
         type: Sequelize.INTEGER
       },
-      bidding_amount: {
-        type: Sequelize.INTEGER
+      createdAt: {
+        type: Sequelize.DATE
       },
-      hourly_rate: {
-        type: Sequelize.INTEGER
-      },
-      weekly_limit: {
-        type: Sequelize.INTEGER
-      },
-      delivered_time: {
-        type: Sequelize.INTEGER
+      updatedAt: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('BidAwards');
+    await queryInterface.dropTable('Notifications');
   }
 };

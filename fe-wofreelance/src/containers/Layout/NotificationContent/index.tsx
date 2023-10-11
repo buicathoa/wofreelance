@@ -52,22 +52,20 @@ const NotificationContent = ({ notifications }: NotificationContent) => {
             }
             <div className={`notification-lists ${notiType === 'recent' ? '' : 'hidden'}`}>
                 {notifications.length > 0 ? notifications?.map((noti: NotificationInterface, idx: number) => {
-                    if (noti.noti_type === 'post') {
-                        return (
-                            <div className="notification-item" key={idx} onClick={() => handleToggleNotification(noti)}>
-                                <div className="notification-item-left">
-                                    <div className="notification-image">
-                                        <BellTwoTone />
-                                    </div>
-                                    <div className="notification-content">
-                                        <div className="title">{noti.noti_title}</div>
-                                        <div className="content">{noti.noti_content}</div>
-                                    </div>
+                    return (
+                        <div className="notification-item" key={idx} onClick={() => handleToggleNotification(noti)}>
+                            <div className="notification-item-left">
+                                <div className="notification-image">
+                                    <BellTwoTone />
                                 </div>
-                                {noti?.noti_status === 'received' && <div className="read" />}
+                                <div className="notification-content">
+                                    <div className="title">{noti.noti_title}</div>
+                                    <div className="content">{noti.noti_content}</div>
+                                </div>
                             </div>
-                        )
-                    }
+                            {noti?.noti_status === 'received' && <div className="read" />}
+                        </div>
+                    )
                 }) : <Empty/>}
             </div>
             <div className={`saved-notification ${notiType === 'saved' ? '' : 'hidden'}`}>

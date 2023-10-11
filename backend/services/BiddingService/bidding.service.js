@@ -17,7 +17,6 @@ const Bidding = db.bidding;
 // const User_Bidding = db.user_bidding;
 const Posts = db.posts;
 const Notifications = db.notifications;
-const User_Notifications = db.user_notifications;
 const Countries = db.countries;
 const Budgets = db.budgets;
 
@@ -72,7 +71,7 @@ const BiddingService = {
           {
             model: Posts,
             as: "post",
-            attributes: ['id'],
+            attributes: ["id"],
             include: [
               {
                 model: Budgets,
@@ -101,8 +100,12 @@ const BiddingService = {
       });
       const response =
         result?.map((bid) => {
-          const {post, ...other} = bid.dataValues
-          return { ...other, currency_name:  post.budget.currency.name, currency_short_name: post.budget.currency.short_name};
+          const { post, ...other } = bid.dataValues;
+          return {
+            ...other,
+            currency_name: post.budget.currency.name,
+            currency_short_name: post.budget.currency.short_name,
+          };
         }) ?? [];
 
       return { items: response, totalRecord: totalRecord };
@@ -168,64 +171,7 @@ const BiddingService = {
             },
           ],
         });
-
-        //increase the noti_count in user_profiles
-        const userFound = await UserProfile.findOne({
-          attributes: ["username"],
-          where: {
-            id: decoded.id,
-          },
-        });
-
-        await UserProfile.increment(
-          "noti_count",
-          {
-            by: 1,
-            where: {
-              id: req.body.user_id,
-            },
-          },
-          { transaction: transaction }
-        );
-
-        //Finding this post
-        const postFound = await Posts.findOne(
-          {
-            where: {
-              id: req.body.post_id,
-            },
-          },
-          { transaction: transaction }
-        );
-
-        const notifications = await Notifications.create(
-          {
-            noti_type: "post",
-            noti_title: `${userFound.username} bid to your post.`,
-            noti_content: req?.body?.describe_proposal,
-            noti_url: postFound.post_url,
-          },
-          { transaction: transaction }
-        );
-
-        await User_Notifications.create(
-          {
-            notification_id: notifications.id,
-            user_id: req.body.user_id,
-            noti_status: "received",
-          },
-          { transaction: transaction }
-        );
       }
-
-      // const token = req.headers.authorization?.split(" ")[1];
-      // await myEmitter.emit(PROJECT_BIDDING, {
-      //   user_id: req.body.user_id,
-      //   post_id: req.body.post_id,
-      //   url: req.body.url,
-      //   describe_proposal: req.body.describe_proposal,
-      //   token: token
-      // })
       const response = {
         ...result.dataValues,
         user: result.user.dataValues,
@@ -398,7 +344,13 @@ const BiddingService = {
         const { budget, ...others } = othersPosts;
         return {
           ...restBid,
-          award: restBid?.award?.dataValues ? {...restBid?.award?.dataValues, currency_name: budget?.currency?.name, currency_short_name: budget?.currency?.short_name} : null,
+          award: restBid?.award?.dataValues
+            ? {
+                ...restBid?.award?.dataValues,
+                currency_name: budget?.currency?.name,
+                currency_short_name: budget?.currency?.short_name,
+              }
+            : null,
           client_info: {
             country_name: user?.country?.country_name,
             country_official_name: user?.country?.country_name,
@@ -417,75 +369,55 @@ const BiddingService = {
     try {
       //check awardbid was created or not
       const decoded = jwt_decode(req.headers.authorization);
-      let result
+      let result;
       const bidFound = await Bidding.findOne({
-        attributes: ['user_id'],
+        attributes: ["user_id"],
         where: {
-          id: req.body.bidding_id
+          id: req.body.bidding_id,
         },
         include: [
           {
             model: Posts,
-            as: 'post',
-            attributes: ['user_id', 'id']
-          }
-        ]
-      })
+            as: "post",
+            attributes: ["user_id", "id"],
+          },
+        ],
+      });
 
       const awardBidFound = await AwardBid.findOne({
         attributes: [],
         where: {
-          bidding_id: req.body.bidding_id
+          post_id: req.body.post_id,
         },
         include: [
           {
             model: Bidding,
-            as: 'bid',
-            attributes: ['user_id']
-          }
-        ]
-      })
+            as: "bid",
+            attributes: ["user_id"],
+          },
+        ],
+      });
+
       // award not exist + ensure that the post belong to user = decoded.id
 
       // award exist + ensure that post belong to user as well + the user who bid the post !== decoded.id (remove the award-bid previous)
 
       // else => throw error "bid before"
-      
-      if(bidFound.post.user_id === decoded.id) {
-        if(!awardBidFound && req.body.post_id === bidFound?.post?.id) {
-          
-          const allBidsBelongToPost = await Bidding.findAll({
-            attributes: ['id'],
-            where: {
-              post_id: req.body.post_id
-            }
-          })
-          
+
+      if (bidFound.post.user_id === decoded.id) {
+        if (!awardBidFound && req.body.post_id === bidFound?.post?.id) {
+          result = await AwardBid.create({ ...req.body });
+        } else {
           await AwardBid.destroy({
             where: {
-              bidding_id: {
-                [Op.in]: allBidsBelongToPost?.map((bid) => bid.id)
-              }
-            }
-          })
-
-          result = await AwardBid.create({...req.body})
-
-        } else {
-
-          result = await AwardBid.update(
-            {
-              ...req.body
+              post_id: req.body.post_id,
             },
-            {
-              where: {
-                bidding_id: req.body.bidding_id
-              }
-            }
-          )
+          });
+
+          result = await AwardBid.create({ ...req.body });
         }
       } else {
-        throw new Error("You aren't owner of the post.")
+        throw new Error("You aren't owner of the post.");
       }
 
       return result;
@@ -496,23 +428,31 @@ const BiddingService = {
 
   updateAwardBid: async (req, res) => {
     try {
-      const result  = await AwardBid.update(
-        req.body.project_paid_type === 'hourly' ? {
-          hourly_rate: req.body.hourly_rate,
-          weekly_limit: req.body.weekly_limit
-        } : {
-          bidding_amount: req.body.bidding_amount,
-          delivered_time: req.body.delivered_time
-        },
+      await AwardBid.update(
+        req.body.project_paid_type === "hourly"
+          ? {
+              hourly_rate: req.body.hourly_rate,
+              weekly_limit: req.body.weekly_limit,
+            }
+          : {
+              bidding_amount: req.body.bidding_amount,
+              delivered_time: req.body.delivered_time,
+            },
         {
           where: {
-            id: req.body.id
-          }
+            id: req.body.id,
+          },
         }
-      )
-      return result
+      );
+
+      const result = await AwardBid.findOne({
+        where: {
+          id: req.body.id,
+        },
+      });
+      return result;
     } catch (err) {
-      throw err
+      throw err;
     }
   },
 
@@ -520,68 +460,81 @@ const BiddingService = {
     try {
       await AwardBid.destroy({
         where: {
-          id: req.body.id
-        }
-      })
-      return true
+          bidding_id: req.body.bidding_id,
+        },
+      });
+      return true;
     } catch (err) {
-      throw err
+      throw err;
     }
   },
 
   acceptAwardBid: async (req, res) => {
     const transaction = await sequelize.transaction({ autocommit: false });
     try {
-      await AwardBid.destroy({
-        id: req.body.awardbid_id
-      }, {transaction: transaction}),
-      
-      //find the bid to update bidding_status to success
-      await Bidding.update(
-        {
-          bidding_status: 'success'
+      //find current award bid
+      const awardBidFound = await AwardBid.findOne({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'id', 'bidding_id']
         },
-        {
-          where: {
-            id: req.body.bidding_id
-          }
-        }, {transaction: transaction}
-      )
+        id: req.body.awardbid_id
+      })
+
+        //find the bid to update bidding_status and append award to bid
+        await Bidding.update(
+          {
+            ...awardBidFound.dataValues,
+            bidding_status: 'success'
+          },
+          {
+            where: {
+              id: req.body.bidding_id,
+            },
+          },
+          { transaction: transaction }
+        );
+
+        //remove awardbid out of table
+        await AwardBid.destroy(
+          {
+            id: req.body.awardbid_id,
+          },
+          { transaction: transaction }
+        );
 
       //find the others bid to update bidding_status to rejected
       const othersBid = await Bidding.findAll({
         where: {
           id: {
-            [Op.ne]: req.body.bididng_id
-          }
-        }
-      })
+            [Op.ne]: req.body.bididng_id,
+          },
+        },
+      });
 
       const IdsAllOthersBid = othersBid?.dataValues?.map((bid) => {
-        return bid.id
-      })
+        return bid.id;
+      });
 
       await Bidding.update(
         {
-          bidding_status: 'rejected'
+          bidding_status: "rejected",
         },
         {
           where: {
             id: {
-              [Op.in]: IdsAllOthersBid
-            }
-          }
+              [Op.in]: IdsAllOthersBid,
+            },
+          },
         }
-      )
+      );
 
-      await transaction.commit()
-      return true
+      await transaction.commit();
+      return true;
     } catch (err) {
-      await transaction.rollback()
-      throw err
+      await transaction.rollback();
+      throw err;
     }
-  }
-
+  },
 };
 
 module.exports = BiddingService;

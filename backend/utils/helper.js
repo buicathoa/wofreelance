@@ -2,6 +2,8 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { ClientError } = require("../errors");
 const path = require("path");
+const db = require("../models");
+const Notifications = db.notifications
 // const { Province, District, Ward } = require("./models/LocationModel");
 // const { Province, District, Ward } = require("./models/location");
 const cloudinary = require("cloudinary").v2;
@@ -86,6 +88,59 @@ const emailTemplate = (mailTo, user_id, image) => {
 </div>`;
 };
 
+const findNotificationItem = async (condition) => {
+  let result
+  const notification = await Notifications.findOne({...condition})
+  if(!notification){
+    result = false
+  } else {
+    result = notification
+  }
+  return result
+}
+
+const modifyNotification = async (payload) => {
+  const {noti_found, ...others} = payload
+  let result
+  if(noti_found) {
+    switch(payload.noti_type){
+      case 'bid_post':
+        await Notifications.update(
+          {
+            noti_title: `${others?.username} and ${
+              others.countBid - 1
+            } others bid to your post`,
+          },
+          {
+            where: {
+              id: noti_found.id,
+            },
+          }
+        );
+      
+      case 'assign_post': {}
+          await Notifications.update(
+            {
+              noti_title: others.noti_title
+            },
+            {
+              where: {
+                id: noti_found.id
+              }
+            }
+          )
+    }
+    result = await Notifications.findOne({
+      where: {
+        id: noti_found.id
+      }
+    })
+  } else {
+    result = await Notifications.create(others)
+  }
+  return result
+}
+
 // const genLocation = async (address_detail, province_id, district_id, ward_id) => {
 //   let provinceName;
 //   let districtName;
@@ -115,5 +170,7 @@ module.exports = {
   checkRole,
   emailTemplate,
   returnApiGetTimeAndLocation,
+  findNotificationItem,
+  modifyNotification,
   cloudinary,
 };

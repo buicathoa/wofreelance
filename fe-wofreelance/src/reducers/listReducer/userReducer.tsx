@@ -51,7 +51,9 @@ const User = createSlice({
             state.user = {...state.user, noti_count: 0}
         },
         increaseNotifications: (state, actions) => {
-            state.user = {...state.user, noti_count: state.user.noti_count! + 1}
+            if(!actions.payload.noti_found || state.user.noti_count === 0) {
+                state.user = {...state.user, noti_count: state.user.noti_count! + 1}
+            }
         },
         getNewNotiMessSuccess: (state, actions) => {
             state.user = {...state.user, noti_mess: actions.payload}

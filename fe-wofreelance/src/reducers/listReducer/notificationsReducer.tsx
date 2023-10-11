@@ -17,6 +17,9 @@ const Notifications = createSlice({
         getAllNotificationsSuccess: (state, actions) => {
             state.notifications = actions.payload;
         },
+        receiveNotiResponse: (state, actions) => {
+            state.notifications = [actions.payload, ...state.notifications]
+        },
         updateNotification: (state, actions) => {},
         updateNotificationSuccess: (state, actions) => {
             const notificationsClone = [...state.notifications]

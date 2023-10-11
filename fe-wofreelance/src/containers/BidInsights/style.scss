@@ -12,6 +12,7 @@
             }
         }
         tbody{
+            border-bottom: unset;
             .award-bid-buttons{
                 display: flex;
                 justify-content: center;
@@ -26,6 +27,12 @@
                         color: #ffffff;
                         margin-right:  calc(8 / $fdf) * $rem;
                     }
+                }
+            }
+            tr{
+                &.award-bid{
+                    border: none;
+                    background-color: $bordercolor;
                 }
             }
         }

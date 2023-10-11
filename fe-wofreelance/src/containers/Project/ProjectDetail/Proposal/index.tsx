@@ -191,8 +191,8 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                             <div className="proposal-summary-right">
                                 <div className="time-response-message">Replies within a few hours</div>
                                 <div className="proposal-button">
-                                    <Button onClick={() => handleRemoveBidding(bids[idxOwnBid])}>Retract</Button>
-                                    <Button onClick={() => handleEditProposal()}>Edit</Button>
+                                    <Button className="retract" onClick={() => handleRemoveBidding(bids[idxOwnBid])}>Retract</Button>
+                                    <Button className="edit" onClick={() => handleEditProposal()}>Edit</Button>
                                 </div>
                                 {dayjs(bids[idxOwnBid]?.createdAt).diff(dayjs(bids[idxOwnBid]?.updatedAt)) ? <div className="proposal-status">Editted</div> : null}
                             </div>
@@ -237,7 +237,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
 
     const handleOpenAward = (bid: any) => {
         setVisibleAwardBid(true)
-        setAwardBidRecord({...bid?.award, currency_name: bid?.currency_name, currency_short_name: bid?.currency_short_name})
+        setAwardBidRecord({...bid?.award, currency_name: bid?.currency_name, currency_short_name: bid?.currency_short_name, bidding_id: bid?.id})
     }
 
     return (
@@ -326,7 +326,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                 post={postItem}
             />
 
-            <DetailBidInsightsModal visible={visibleAwardBid} setVisible={setVisibleAwardBid} recordSelected={awardBidRecord} setrecordSelected={setAwardBidRecord} isOwner={user?.username !== postItem?.user?.id}/>
+            <DetailBidInsightsModal visible={visibleAwardBid} setVisible={setVisibleAwardBid} recordSelected={{...awardBidRecord, post_id: postItem?.id}} setrecordSelected={setAwardBidRecord} isOwner={user?.username !== postItem?.user?.id}/>
 
         </div>
     )

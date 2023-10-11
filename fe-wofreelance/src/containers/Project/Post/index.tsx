@@ -82,7 +82,6 @@ export const Post = () => {
     };
 
     const debounceText = useDebounce(valueSearch, 500)
-    console.log('debounceText', debounceText)
     useEffect(() => {
         getCurrencies({})
     }, [])

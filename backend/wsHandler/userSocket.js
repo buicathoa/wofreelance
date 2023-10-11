@@ -17,7 +17,6 @@ const Rooms = db.rooms;
 const Users_Rooms = db.users_rooms;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
-const User_Notifications = db.user_notifications;
 const Sockets = db.sockets;
 
 module.exports = (socket, io) => {

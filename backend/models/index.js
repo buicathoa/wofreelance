@@ -89,9 +89,6 @@ db.user_educations = require("./userModel/user_education")(sequelize, DataTypes)
 // Junction table skillset and portfolio
 db.portfolio_skillset = require("./Portfolio/portfolio_skillset")(sequelize, DataTypes)
 
-// Junction table between notifications and user
-db.user_notifications = require("./Notifications/user_notifications")(sequelize, DataTypes)
-
 
 // Junction table between bidding and user
 db.user_bidding = require("./userModel/user_bidding")(sequelize, DataTypes)
@@ -173,6 +170,18 @@ db.bidding.hasOne(db.bidaward, {
 db.bidaward.belongsTo(db.bidding, {
   foreignKey: 'bidding_id',
   as: 'bid'
+})
+
+
+
+
+db.userprofile.hasOne(db.messages_status, {
+  foreignKey: 'user_id',
+  as: 'status_info'
+})
+db.messages_status.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'status_info'
 })
 
 // =============================================================================== One to Many Relationship =============================================================================== // 
@@ -284,13 +293,15 @@ db.bidding.belongsTo(db.userprofile, {
 
 
 
-db.userprofile.hasOne(db.messages_status, {
+
+db.userprofile.hasMany(db.notifications, {
   foreignKey: 'user_id',
-  as: 'status_info'
+  as: 'notification'
 })
-db.messages_status.belongsTo(db.userprofile, {
+
+db.notifications.belongsTo(db.userprofile, {
   foreignKey: 'user_id',
-  as: 'status_info'
+  as: 'user'
 })
 
 // ========================================================================================== End ==========================================================================================//
@@ -385,22 +396,6 @@ db.jobskillset.belongsToMany(db.portfolio, {
   as: 'portfolios'
 })
 
-
-
-
-
-db.notifications.belongsToMany(db.userprofile, {
-  through: db.user_notifications,
-  foreignKey: 'notification_id',
-  otherKey: 'user_id',
-  as: 'user'
-})
-db.userprofile.belongsToMany(db.notifications, {
-  through: db.user_notifications,
-  foreignKey: 'user_id',
-  otherKey: 'notification_id',
-  as: 'notifications'
-})
 
 
 

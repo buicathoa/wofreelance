@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
     project_paid_type: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    post_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'posts',
+        key: 'id'
+      }
     }
   }, {
     sequelize,

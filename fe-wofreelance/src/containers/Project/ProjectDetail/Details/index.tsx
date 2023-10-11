@@ -25,6 +25,8 @@ interface componentInterface {
 }
 
 export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModifyBid, formValues, setformValues }: componentInterface) => {
+    
+    console.log('postItem', postItem)
     const [form] = Form.useForm()
     const socket: any = useContext(SocketContext)
     const dispatch = useDispatch()
@@ -102,8 +104,7 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
                 socket.emit("project_bidding", {
                     user_id: postItem?.user?.id,
                     post_id: postItem!?.id,
-                    url: postItem?.post_url,
-                    describe_proposal: values?.describe_proposal
+                    bidding_id: res?.data?.id
                 })
                 setIdxOwnBid(totalBids + 1)
                 setActiveTab('2')

@@ -27,10 +27,20 @@
             align-items: center;
             width: auto;
 
-            &:nth-child(2) {
+            &:nth-child(3) {
                 margin-left: calc(8 / $fdf) * $rem;
                 background-color: $maincolor;
                 color: #ffffff;
+            }
+
+            &:nth-child(2) {
+                margin-left: calc(8 / $fdf) * $rem;
+                background-color: $bordercolor;
+                color: #ffffff;
+                font-weight: 600;
+                &:hover{
+                    border: 1px solid $bordercolor;
+                }
             }
         }
     }

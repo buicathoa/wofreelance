@@ -90,7 +90,7 @@ export const AssignProjectComponent = ({ visible, setVisible, recordSelected, po
         }
 
         createAwardBid(payload).then(() => {
-            socket.emit('award_bid', { bidding_id: bidFound?.id, post_id: post?.id })
+            socket.emit('award_bid', { bidding_id: bidFound?.id, post_id: post?.id, status: 'create', isOwner: true })
             setVisible(false)
         })
     }
@@ -153,7 +153,7 @@ export const AssignProjectComponent = ({ visible, setVisible, recordSelected, po
                             </Radio.Group>
                         </div>
                         <Form.Item name={amountPaidSelected === 'hours_per_week' ? 'weekly_limit' : 'max_weekly_bill'} label={amountPaidSelected === 'hours_per_week' ? 'Maximum hours/week' : 'Maximum Weekly Bill'} className="assign-project correspond-amount-paid custom-form-item has-suffix" rules={validateSchema.hours_per_week}>
-                            <InputNumber defaultValue={amountPaidSelected === 'hours_per_week' ? bidFound?.weekly_limit : 40} addonAfter={amountPaidSelected === 'hours_per_week' ? '' : post?.budget?.currency?.name} value={40} className='form-input' />
+                            <InputNumber defaultValue={amountPaidSelected === 'hours_per_week' ? bidFound?.weekly_limit : 40} addonAfter={amountPaidSelected === 'hours_per_week' ? 'Hours' : post?.budget?.currency?.name} value={40} className='form-input' />
                         </Form.Item>
                         <div className="assign-project statistics">
                             <span className='assign-project-title'>Hourly Rate<span className="tooltip-icon">i</span></span>

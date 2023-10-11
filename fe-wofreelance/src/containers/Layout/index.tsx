@@ -80,7 +80,7 @@ const Layout = () => {
   const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
   const interactions: Array<InteractionReducer> = useSelector((state: RootState) => state.interactions.interactions)
 
-  console.log('interactions', interactions)
+  console.log('notifications', notifications)
   useEffect(() => {
     if (socket?.connected) {
       if (!checkLocalStorage('access_token')) {
@@ -108,7 +108,7 @@ const Layout = () => {
     if (socket?.connected) {
       
       socket.on("new_post_notify_response", (data: any) => {
-        dispatch(UserActions.increaseNotifications({}))
+        dispatch(UserActions.increaseNotifications(data))
         modalNotifications(
           {
             notiMess: data.title, description: `Here the latest project matching your skills: ${data.project_detail}\
@@ -119,7 +119,7 @@ const Layout = () => {
       });
 
       socket.on("project_bidding_response", (data: any) => {
-        dispatch(UserActions.increaseNotifications({}))
+        dispatch(UserActions.increaseNotifications(data))
         return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
       })
 
@@ -137,9 +137,11 @@ const Layout = () => {
       })
 
       socket.on("award_bid_response", (data: any) => {
-        dispatch(UserActions.increaseNotifications({}))
-        dispatch(PostActions.awardBidSuccess(data))
-        return modalNotifications({ notiMess: `Congratulations! Your bid in ${data?.bid?.post?.title} has been awarded`, noti_url: data.noti_url })
+        dispatch(UserActions.increaseNotifications(data))
+        debugger
+        // dispatch(NotificationsActions.receiveNotiResponse(data.notification))
+        dispatch(PostActions.awardBidResponse(data))
+        return modalNotifications({ notiMess: data?.notification?.noti_title, noti_url: data.notification?.noti_url })
       })
     }
   }, [socket])
@@ -152,7 +154,7 @@ const Layout = () => {
     if (openNoti) {
       setOpenNoti(false)
     } else {
-      getAllNotifications({}).then(() => {
+      getAllNotifications({page: 1, limit: 10}).then(() => {
         if (user.noti_count! > 0) {
           updateUser({ noti_count: 0 }).then(() => {
             dispatch(UserActions.updateNoticountSuccess({}))
