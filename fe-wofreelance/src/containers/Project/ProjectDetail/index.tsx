@@ -11,13 +11,7 @@ import { Proposal } from './Proposal'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../reducers/rootReducer'
 
-interface filterData {
-    post_id?: number,
-    page: number,
-    limit: number,
-    search_list: Array<any>,
-    sorts: Array<any>
-}
+
 
 export const ProjectDetail = () => {
     const { TabPane } = Tabs
@@ -28,20 +22,11 @@ export const ProjectDetail = () => {
     const [activeTab, setActiveTab] = useState<string>('1')
     const [modifyBid, setModifyBid] = useState<string>('add')
     const [formValues, setformValues] = useState({})
-    const [filterData, setfilterData] = useState<filterData>({
-        page: 1,
-        limit: 10,
-        search_list: [],
-        sorts: []
-    })
+
 
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
 
-    const getallBid = (param: any): Promise<ResponseFormatItem> => {
-        return new Promise((resolve, reject) => {
-            dispatch(PostActions.getallBid({ param, resolve, reject }));
-        });
-    };
+
 
     const getPostDetail = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
@@ -50,7 +35,7 @@ export const ProjectDetail = () => {
     };
 
     useEffect(() => {
-        if (user?.id && activeTab === '1') {
+        if (activeTab === '1') {
             getPostDetail({
                 route: post_detail
             }).then((res) => {
@@ -67,20 +52,9 @@ export const ProjectDetail = () => {
                     responseString = `BIDDINGS ENDS IN ${Math.floor(hourRemain)} DAYS, ${Math.floor(minutesRemain)} HOURS`
                 }
                 setBiddingEnd(responseString)
-
-                const dataFilter = {
-                    ...filterData, post_id: res.data.id, sorts: [
-                        {
-                            name_field: 'createdAt',
-                            sort_type: 'DESC'
-                        }
-                    ]
-                }
-                setfilterData(dataFilter)
-                getallBid(dataFilter)
             })
         }
-    }, [user])
+    }, [activeTab])
 
     const onChangeTab = (key: string) => {
         setActiveTab(key)
@@ -130,11 +104,11 @@ export const ProjectDetail = () => {
                             <Proposal
                                 postItem={postItem}
                                 setModifyBid={setModifyBid}
+                                activeTab={activeTab}
                                 setActiveTab={setActiveTab}
                                 formValues={formValues}
-                                setformValues={setformValues} 
-                                filterData={filterData}
-                                setfilterData={setfilterData}/>
+                                setformValues={setformValues}
+                            />
                         </TabPane>
                     </Tabs>
                 </div>

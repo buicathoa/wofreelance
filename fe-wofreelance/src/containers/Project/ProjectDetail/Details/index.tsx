@@ -70,6 +70,9 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
     const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
     const bids: Array<BiddingInterface> = useSelector((state: RootState) => state.post.bids)
     const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
+    
+    console.log('bids', bids)
+    
     const biddingPost = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
             dispatch(PostActions.biddingPost({ param, resolve, reject }));
@@ -165,7 +168,7 @@ export const Details = ({ postItem, biddingEnd, setActiveTab, modifyBid, setModi
                                 </div>
                                 <div className="attachments"></div>
                             </div>
-                            {((postItem?.user?.username !== user?.username && bids.findIndex((bid) => bid.user.id === user.id) === -1) || modifyBid === 'edit') && <div className="detail-project-bidding">
+                            {((postItem?.user?.username !== user?.username && !postItem?.is_bid) || modifyBid === 'edit') && <div className="detail-project-bidding">
                                 <Card title="Place a Bid on this Project">
                                     <div className="alert-message">You will be able to edit your bid until the project is awarded to someone.</div>
                                     {postItem?.project_paid_type === 'hourly' ?

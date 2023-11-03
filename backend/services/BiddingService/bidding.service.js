@@ -115,6 +115,70 @@ const BiddingService = {
     }
   },
 
+  getBiddingById: async (req, res) => {
+    try {
+      const result = await Bidding.findOne({
+        where: {
+          id: req.body.bidding_id
+        },
+        attributes: {
+          exclude: ["post_id"],
+        },
+        include: [
+          {
+            model: UserProfile,
+            as: "user",
+            attributes: [
+              "id",
+              "username",
+              "first_name",
+              "last_name",
+              "title",
+              "avatar_cropped",
+              "createdAt",
+              "user_active",
+            ],
+            include: [
+              {
+                model: Countries,
+                as: "country",
+              },
+            ],
+          },
+          {
+            model: AwardBid,
+            as: "award",
+            attributes: {
+              exclude: ["bidding_id"],
+            },
+          },
+          {
+            model: Posts,
+            as: "post",
+            attributes: ["id"],
+            include: [
+              {
+                model: Budgets,
+                as: "budget",
+                attributes: ["currency_id"],
+                include: [
+                  {
+                    model: Currency,
+                    as: "currency",
+                    attributes: ["name", "short_name"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+      return result
+    } catch (err) {
+      throw err
+    }
+  },
+
   createBidding: async (req, res) => {
     const decoded = jwt_decode(req.headers.authorization);
     const transaction = await sequelize.transaction({ autocommit: false });
@@ -371,7 +435,7 @@ const BiddingService = {
       const decoded = jwt_decode(req.headers.authorization);
       let result;
       const bidFound = await Bidding.findOne({
-        attributes: ["user_id"],
+        attributes: ["user_id", "bidding_status"],
         where: {
           id: req.body.bidding_id,
         },
@@ -381,11 +445,20 @@ const BiddingService = {
             as: "post",
             attributes: ["user_id", "id"],
           },
+          // {
+          //   model: AwardBid,
+          //   as: 'award',
+          //   attributes: ['bidding_status']
+          // }
         ],
       });
 
+      if(bidFound?.bidding_status === 'awarded') {
+        throw new Error("You had awarded this bid before")
+      }
+
       const awardBidFound = await AwardBid.findOne({
-        attributes: [],
+        attributes: ['bidding_id'],
         where: {
           post_id: req.body.post_id,
         },
@@ -420,7 +493,7 @@ const BiddingService = {
         throw new Error("You aren't owner of the post.");
       }
 
-      return result;
+      return {...result.dataValues, previous_bidding_id: awardBidFound?.bidding_id ?? null};
     } catch (err) {
       throw err;
     }
@@ -477,56 +550,66 @@ const BiddingService = {
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'id', 'bidding_id']
         },
-        id: req.body.awardbid_id
+        where: {
+          id: req.body.awardbid_id
+        }
       })
 
         //find the bid to update bidding_status and append award to bid
         await Bidding.update(
           {
             ...awardBidFound.dataValues,
-            bidding_status: 'success'
+            bidding_status: 'awarded'
           },
           {
             where: {
               id: req.body.bidding_id,
             },
+            transaction: transaction
           },
-          { transaction: transaction }
         );
 
         //remove awardbid out of table
-        await AwardBid.destroy(
+        await AwardBid.update(
           {
-            id: req.body.awardbid_id,
+            is_done: true
           },
-          { transaction: transaction }
+          {
+            where: {
+              id: req.body.awardbid_id,
+            },
+            transaction: transaction
+          },
         );
 
       //find the others bid to update bidding_status to rejected
       const othersBid = await Bidding.findAll({
         where: {
           id: {
-            [Op.ne]: req.body.bididng_id,
+            [Op.ne]: req.body.bidding_id,
           },
+          post_id: awardBidFound?.dataValues?.post_id
         },
+        transaction: transaction
       });
 
-      const IdsAllOthersBid = othersBid?.dataValues?.map((bid) => {
-        return bid.id;
-      });
-
-      await Bidding.update(
-        {
-          bidding_status: "rejected",
-        },
-        {
-          where: {
-            id: {
-              [Op.in]: IdsAllOthersBid,
+      if(othersBid.length > 0) {
+        await Bidding.update(
+          {
+            bidding_status: "rejected",
+          },
+          {
+            where: {
+              id: {
+                [Op.in]: othersBid?.dataValues?.map((bid) => {
+                  return bid.id;
+                }),
+              },
             },
+            transaction: transaction
           },
-        }
-      );
+        );
+      }
 
       await transaction.commit();
       return true;

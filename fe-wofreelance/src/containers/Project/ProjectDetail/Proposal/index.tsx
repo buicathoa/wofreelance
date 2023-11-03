@@ -21,17 +21,25 @@ import { PaginationDivide } from '../../../../components/Pagination'
 import { InteractionsActions } from '../../../../reducers/listReducer/interactionReducer'
 import { AssignProjectComponent } from '../../../../components/AssignProjectComponent'
 import DetailBidInsightsModal from '../../../BidInsights/DetailBidInsightsModal'
+import { toggleUserMessState } from '../../../../utils/helper'
 interface componentInterface {
     postItem?: PostInteface,
     setModifyBid: React.Dispatch<React.SetStateAction<string>>,
     setActiveTab: React.Dispatch<React.SetStateAction<string>>,
     formValues: any,
     setformValues: React.Dispatch<React.SetStateAction<any>>,
-    filterData: any,
-    setfilterData: any
+    activeTab: string
 }
 
-export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, setformValues, filterData, setfilterData }: componentInterface) => {
+interface filterData {
+    post_id?: number,
+    page: number,
+    limit: number,
+    search_list: Array<any>,
+    sorts: Array<any>
+}
+
+export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, setformValues, activeTab }: componentInterface) => {
     const [form] = Form.useForm()
     const socket: any = useContext(SocketContext)
     const dispatch = useDispatch()
@@ -43,6 +51,12 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     const [bidSelected, setBidSelected] = useState<number>()
     const [visibleAwardBid, setVisibleAwardBid] = useState(false)
     const [awardBidRecord, setAwardBidRecord] = useState({})
+    const [filterData, setfilterData] = useState<filterData>({
+        page: 1,
+        limit: 10,
+        search_list: [],
+        sorts: []
+    })
 
     const validateMessages = {
         required: 'This field is required'
@@ -72,6 +86,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
     }
 
     const bids: Array<BiddingInterface> = useSelector((state: RootState) => state.post.bids)
+    console.log('bids', bids)
     const totalBids: number = useSelector((state: RootState) => state.post.totalBids)
     const user: UserInterface = useSelector((state: RootState) => state.user.user)
     const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
@@ -94,16 +109,42 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
         });
     };
 
+    const seenMessage = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(InteractionsActions.seenMessage({ param, resolve, reject }));
+        });
+    };
+
+    const getallBid = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(PostActions.getallBid({ param, resolve, reject }));
+        });
+    };
+
+
     useEffect(() => {
         form.resetFields()
     }, [formValues])
 
     useEffect(() => {
-        if (bids.length > 0) {
-            const idxBid = bids.findIndex((bid) => bid.user.id === user.id)
-            setIdxOwnBid(idxBid)
+        if(activeTab === '2') {
+            const dataFilter = {
+                ...filterData, post_id: postItem?.id, sorts: [
+                    {
+                        name_field: 'createdAt',
+                        sort_type: 'DESC'
+                    }
+                ]
+            }
+            setfilterData(dataFilter)
+            getallBid(dataFilter).then((res) => {
+                if (res?.data?.items.length > 0) {
+                    const idxBid = res?.data?.items?.findIndex((bid: BiddingInterface) => bid.user.id === user.id)
+                    setIdxOwnBid(idxBid)
+                }
+            })
         }
-    }, [bids])
+    }, [activeTab])
 
     const handleEditProposal = () => {
         setModifyBid('edit')
@@ -209,6 +250,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                 const payload = {
                     page: 1,
                     limit: 10,
+                    skip: 0,
                     search_list: [
                         {
                             name_field: "room_id",
@@ -217,7 +259,17 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                     ]
                 }
                 getMessagesDetail(payload).then((resMessages: any) => {
-                    dispatch(InteractionsActions.addInteraction({ ...resRoom.data, room_id: resRoom?.data?.id, chat_window_status: 'open', messages: resMessages?.data, room_url: postItem?.post_url, room_title: postItem?.title, bidding_id: bid.id }))
+                    const latestMessFound = latestMessages.find((mess) => mess.id === bid.room_id)
+                    const messState = toggleUserMessState(latestMessFound, user.id!)  
+                    
+                    if(messState === 'received') {
+                        seenMessage({room_id: bid.room_id, user_id: user.id}).then(() => {
+                            socket.emit('seen_message', { room_id: bid.room_id, user_id: user.id })
+                            dispatch(InteractionsActions.addInteraction({ ...resRoom.data, room_id: resRoom?.data?.id, chat_window_status: 'open', messages: resMessages?.data?.messages.reverse(), total: resMessages?.data?.total, room_url: postItem?.post_url, room_title: postItem?.title, bidding_id: bid.id }))
+                        })
+                    } else {
+                        dispatch(InteractionsActions.addInteraction({ ...resRoom.data, room_id: resRoom?.data?.id, chat_window_status: 'open', messages: resMessages?.data?.messages.reverse(), total: resMessages?.data?.total, room_url: postItem?.post_url, room_title: postItem?.title, bidding_id: bid.id }))
+                    }
                 })
             })
         } else {
@@ -294,7 +346,7 @@ export const Proposal = ({ postItem, setModifyBid, setActiveTab, formValues, set
                                                             <div className={`user-status ${bid.user.user_active ? 'online' : 'offline'}`}></div>
                                                             <div className="messages-unread">{unreadMess ? unreadMess?.unread_messages : 0}</div>
                                                         </div>
-                                                        {bid?.award && <Button className="award-bid" onClick={() => handleOpenAward(bid)}>Award of Bid</Button>}
+                                                        {bid?.award && <Button className={`award-bid ${bid?.bidding_status === 'awarded' ? 'award' : ''}`} onClick={() => handleOpenAward(bid)}>Award of Bid</Button>}
                                                         {!bid?.award && <Button onClick={() => handleAwardVisible(bid)} className="award">Award</Button>}
                                                     </div>
                                                 ) : (

@@ -256,9 +256,19 @@ const PostService = {
   getPostByRoute: async (req, res) => {
     try{
       const {route} = req.body;
+      const decoded = jwt_decode(req.headers.authorization);
+
       const result = await Post.findOne({
         attributes: {
-          exclude: ['project_budget', "user_id"]
+          exclude: ['project_budget', "user_id"],
+          include: [
+            [
+              sequelize.literal(
+                `(SELECT EXISTS (SELECT user_id FROM biddings WHERE biddings.user_id = ${decoded.id}))`
+              ),
+              "is_bid",
+            ],
+          ]
         },
         where: {
           post_url: {
@@ -321,9 +331,8 @@ const PostService = {
           // }
         ]
       })
-      const response = {...result?.dataValues, biddings: result?.dataValues?.biddings?.map((bid) => {
-        return {...bid.dataValues, user: bid.dataValues.user[0]}
-      }) ?? []}
+      const response = {...result?.dataValues, is_bid: result?.dataValues?.is_bid === 0 ? false : true}
+
       return response
     } catch(err) {
       throw err;

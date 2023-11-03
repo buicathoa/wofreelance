@@ -80,7 +80,6 @@ const Layout = () => {
   const latestMessages: Array<latestMessageInterface> = useSelector((state: RootState) => state.interactions.latestMessages)
   const interactions: Array<InteractionReducer> = useSelector((state: RootState) => state.interactions.interactions)
 
-  console.log('notifications', notifications)
   useEffect(() => {
     if (socket?.connected) {
       if (!checkLocalStorage('access_token')) {
@@ -120,6 +119,7 @@ const Layout = () => {
 
       socket.on("project_bidding_response", (data: any) => {
         dispatch(UserActions.increaseNotifications(data))
+        dispatch(PostActions.biddingResponse(data))
         return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
       })
 
@@ -138,8 +138,6 @@ const Layout = () => {
 
       socket.on("award_bid_response", (data: any) => {
         dispatch(UserActions.increaseNotifications(data))
-        debugger
-        // dispatch(NotificationsActions.receiveNotiResponse(data.notification))
         dispatch(PostActions.awardBidResponse(data))
         return modalNotifications({ notiMess: data?.notification?.noti_title, noti_url: data.notification?.noti_url })
       })

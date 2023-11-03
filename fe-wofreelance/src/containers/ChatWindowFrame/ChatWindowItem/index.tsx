@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useState, useRef, useEffect } from "react";
+import { useContext, useState, useRef, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Input, Spin, message } from "antd";
 import { DashOutlined, ArrowsAltOutlined, PhoneOutlined, CloseOutlined, LinkOutlined, AudioOutlined, SmileOutlined, LikeTwoTone } from '@ant-design/icons'
@@ -30,6 +30,7 @@ function ChatWindowItem({ interactionItem, index }: ChatWindowItemInterface) {
   const [windowItemSelected, setwindowItemSelected] = useState<any>({})
   const [isGetNewMessage, setIsGetNewMessage] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -97,7 +98,6 @@ function ChatWindowItem({ interactionItem, index }: ChatWindowItemInterface) {
 
   const handleMoveToProfilePage = (e: any, item: InteractionReducer) => {
     e.stopPropagation()
-    console.log(item)
   }
 
   const handlePressEnter = (event: any, item: InteractionReducer, index: number) => {

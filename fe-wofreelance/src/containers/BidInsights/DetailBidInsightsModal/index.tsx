@@ -11,10 +11,12 @@ import { useAppDispatch } from '../../../reducers/hook';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../reducers/rootReducer';
 import { PostActions } from '../../../reducers/listReducer/postReducer';
-import { ResponseFormatItem } from '../../../interface';
+import { BiddingInterface, ResponseFormatItem } from '../../../interface';
 import { SocketContext } from '../../../SocketProvider';
 import { ModalConfirm } from '../../../components/ModalConfirm';
 import { AppActions } from '../../../reducers/listReducer/appReducer';
+import { modalNotifications } from '../../../components/modalNotifications';
+import _ from 'lodash';
 // import { SocketContext, socket } from '../../SocketContext';
 
 
@@ -30,6 +32,7 @@ const DetailBidInsightsModal = ({ visible, setVisible, recordSelected, setrecord
 
   const socket: any = useContext(SocketContext)
   const [form] = Form.useForm()
+  const location = useLocation()
   const dispatch = useAppDispatch()
   const [visibleAwardBid, setVisibleAwardBid] = useState<boolean>(false)
   const [awardBidRecord, setAwardBidRecord] = useState<any>({})
@@ -37,12 +40,14 @@ const DetailBidInsightsModal = ({ visible, setVisible, recordSelected, setrecord
   const [formValues, setformValues] = useState<any>({})
   const [isChangeAward, setIsChangeAward] = useState(false)
   const [visibleModalConfirm, setVisibleModalConfirm] = useState(false)
+  const [isAward, setIsAward] = useState(false)
 
   const validateMessages = {
     required: 'This field is required'
   }
 
-  console.log('formValues', formValues)
+  const personalBids: any = useSelector((state: RootState) => state.post.personalBids)
+  const bids: any = useSelector((state: RootState) => state.post.bids)
 
 
   const validateSchema = {
@@ -80,27 +85,54 @@ const DetailBidInsightsModal = ({ visible, setVisible, recordSelected, setrecord
     });
   };
 
+  const acceptAwardBid = (param: any): Promise<ResponseFormatItem> => {
+    return new Promise((resolve, reject) => {
+      dispatch(PostActions.acceptAwardBid({ param, resolve, reject }));
+    });
+  };
+
   useEffect(() => {
     form.resetFields()
   }, [formValues])
 
   useEffect(() => {
     if (recordSelected) {
+      let bid: BiddingInterface | any = {};
+      let award = false
+      if (location?.pathname?.includes('insights/bids')) {
+        bid = personalBids?.find((item: BiddingInterface) => item.id === recordSelected?.bidding_id)
+      } else if (location?.pathname?.includes('posts')) {
+        bid = bids?.find((item: BiddingInterface) => item.id === recordSelected?.bidding_id)
+      }
+      if (!_.isEmpty(bid)) {
+        award = bid?.bidding_status === 'awarded' ? true : false
+      }
+      setIsAward(award)
       setformValues(recordSelected)
     }
   }, [recordSelected])
 
-  console.log('recordSelected', recordSelected)
-
-  const handleChangeAward = (e: any) => {
-    setIsChangeAward(e.target.checked)
-  }
-
   const onSubmitForm = (values: any) => {
-    updateAwardBid({ ...values, project_paid_type: formValues?.project_paid_type, id: formValues?.id }).then(() => {
-      socket.emit('award_bid', { bidding_id: recordSelected?.bidding_id, post_id: formValues?.post_id, status: 'update', isOwner: isOwner })
-      setVisible(false)
-    })
+    if (isOwner) {
+      updateAwardBid({ ...values, project_paid_type: formValues?.project_paid_type, id: formValues?.id }).then(() => {
+        socket.emit('award_bid', { bidding_id: recordSelected?.bidding_id, post_id: formValues?.post_id, status: 'update', isOwner: isOwner })
+        setVisible(false)
+      })
+    } else {
+      const payload = {
+        bidding_id: recordSelected?.bidding_id,
+        awardbid_id: recordSelected?.id
+      }
+      acceptAwardBid(payload).then(() => {
+        socket.emit('award_bid', { bidding_id: recordSelected?.bidding_id, post_id: formValues?.post_id, status: 'awarded', isOwner: isOwner })
+        setVisible(false)
+        if (isOwner) {
+          return modalNotifications({ notiMess: 'Congratulations!', description: 'Your project has been assigned' })
+        } else {
+          return modalNotifications({ notiMess: 'Congratulations!', description: 'Now you are in the project' })
+        }
+      })
+    }
   }
 
   const onConfirmCancel = () => {
@@ -144,34 +176,40 @@ const DetailBidInsightsModal = ({ visible, setVisible, recordSelected, setrecord
           <Row>
             <Col span={12}>
               <Form.Item name="bidding_amount" label="Bidding Amount" className="custom-form-item has-suffix" rules={validateSchema.bidding_amount}>
-                <InputNumber type="number" placeholder='Bidding Amount' className='form-input' addonBefore={recordSelected?.currency_short_name} addonAfter={recordSelected?.currency_name} disabled={recordSelected?.project_paid_type === 'hourly' ? true : false} />
+                <InputNumber type="number" placeholder='Bidding Amount' className='form-input' addonBefore={recordSelected?.currency_short_name} addonAfter={recordSelected?.currency_name} disabled={recordSelected?.project_paid_type === 'fixed' && (isChangeAward || isOwner) ? false : true} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="delivered_time" label="Delivered in" className="custom-form-item has-suffix" rules={validateSchema.bidding_amount}>
-                <InputNumber placeholder='Delivered in' className='form-input' addonAfter="Days" disabled={recordSelected?.project_paid_type === 'hourly' ? true : false} />
+                <InputNumber placeholder='Delivered in' className='form-input' addonAfter="Days" disabled={recordSelected?.project_paid_type === 'fixed' && (isChangeAward || isOwner) ? false : true} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="hourly_rate" label="Hourly rate" className="custom-form-item has-suffix" rules={validateSchema.bidding_amount}>
-                <InputNumber placeholder='Hourly rate' className='form-input' addonBefore={recordSelected?.currency_short_name} addonAfter={recordSelected?.currency_name} disabled={recordSelected?.project_paid_type === 'hourly' ? false : true} />
+                <InputNumber placeholder='Hourly rate' className='form-input' addonBefore={recordSelected?.currency_short_name} addonAfter={recordSelected?.currency_name} disabled={recordSelected?.project_paid_type === 'hourly' && (isChangeAward || isOwner) ? false : true} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="weekly_limit" label="Weekly limit" className="custom-form-item has-suffix" rules={validateSchema.bidding_amount}>
-                <InputNumber placeholder='Weekly limit' className='form-input' addonAfter="Hours" disabled={recordSelected?.project_paid_type === 'hourly' ? false : true} />
+                <InputNumber placeholder='Weekly limit' className='form-input' addonAfter="Hours" disabled={recordSelected?.project_paid_type === 'hourly' && (isChangeAward || isOwner) ? false : true} />
               </Form.Item>
             </Col>
           </Row>
-          {!isOwner && <Form.Item name="agree" className="custom-form-item" valuePropName="checked">
+          {/* {!isOwner && <Form.Item className="custom-form-item" valuePropName="checked">
             <Checkbox className='form-checkbox' onChange={handleChangeAward}>Change Award</Checkbox>
-          </Form.Item>}
+          </Form.Item>} */}
         </Form>
-        <div className="form-footer">
-          <Button className="detail-bid-modal-footer" onClick={onConfirmCancel}>Cancel</Button>
-          <Button className="detail-bid-modal-footer" onClick={handleDenyandDeleteBidAward}>{isOwner ? 'Delete' : 'Deny'}</Button>
-          <Button className="detail-bid-modal-footer" form="detail_bid_insights" key="submit" htmlType="submit">{isOwner ? 'Update' : 'Agree'}</Button>
-        </div>
+        {isAward ?
+          (<div className="form-footer">
+            <Button className="detail-bid-modal-footer" onClick={onConfirmCancel}>Cancel</Button>
+          </div>)
+          :
+          (<div className="form-footer">
+            <Button className="detail-bid-modal-footer" onClick={onConfirmCancel}>Cancel</Button>
+            <Button className="detail-bid-modal-footer" onClick={handleDenyandDeleteBidAward}>{isOwner ? 'Delete' : 'Deny'}</Button>
+            <Button className="detail-bid-modal-footer" form="detail_bid_insights" key="submit" htmlType="submit">{isOwner ? 'Update' : 'Accept'}</Button>
+          </div>)
+        }
       </Modal>
       <ModalConfirm
         title={'Confirm'}

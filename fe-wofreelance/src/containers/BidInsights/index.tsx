@@ -78,7 +78,7 @@ const BidInsights = () => {
     return personalBids?.map((data: any, idxData: number) => {
       return (
         <>
-          <tr key={idxData}>
+          <tr key={idxData} className={data['bidding_status'] === 'awarded' ? 'awarded' : ''}>
             {titleHeader?.map((header, idxHeader) => {
               if (header?.key === 'post_title') {
                 return (
@@ -95,7 +95,7 @@ const BidInsights = () => {
               }
               else {
                 return (
-                  <td key={idxHeader}>{data[header?.key]}</td>
+                  <td key={idxHeader} className={data[header?.key] === 'awarded' ? 'awarded-td' : ''}>{data[header?.key]}</td>
                 )
               }
             })}
@@ -118,7 +118,7 @@ const BidInsights = () => {
             })}
           </tr>}
           {recordsShow?.includes(data.id) &&
-            <tr>
+            <tr className="detail">
               <td colSpan={8}>
                 <Row className="table-detail-post">
                   <Col span={14}>

@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         model: 'posts',
         key: 'id'
       }
+    },
+    is_done: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,

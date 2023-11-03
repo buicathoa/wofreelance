@@ -10,6 +10,7 @@ const authorize = require('../../middlewares/authorize');
 const BudgetService = require('../../services/BudgetService/budget.service');
 
 router.post("/get-all", authorize(['director', 'admin', 'user']), BiddingController.getAllBidding)
+router.post("/get-by-id", authorize(['director', 'admin', 'user']), BiddingController.getBiddingById)
 router.post("/create", authorize(['director', 'admin', 'user']), BiddingController.createBidding)
 router.post("/update", authorize(['director', 'admin', 'user']), BiddingController.updateBidding)
 router.post("/delete", authorize(['director', 'admin', 'user']), BiddingController.deleteBidding)

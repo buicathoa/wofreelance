@@ -1,63 +1,101 @@
 @import "../../css/custom";
 
 
-.bid-insights-wrapper{
+.bid-insights-wrapper {
     padding: calc(36 / $fdf) * $rem calc(24 / $fdf) * $rem;
     background-color: #f7f8f9;
     min-height: calc(100vh - 28rem);
-    table{
-        td{
-            a{
+
+    table {
+        td {
+            a {
                 color: rgb(38, 162, 250)
             }
         }
-        tbody{
+
+        thead {
+            tr {
+                th {
+                    text-align: center;
+                }
+            }
+        }
+
+        tbody {
             border-bottom: unset;
-            .award-bid-buttons{
+
+            .award-bid-buttons {
                 display: flex;
                 justify-content: center;
-                button{
+
+                button {
                     font-size: calc(16 / $fdf) * $rem;
                     height: calc(40 / $fdf) * $rem;
                     display: flex;
                     align-items: center;
                     width: auto;
+
                     &:first-child {
                         background-color: $maincolor;
                         color: #ffffff;
-                        margin-right:  calc(8 / $fdf) * $rem;
+                        margin-right: calc(8 / $fdf) * $rem;
                     }
                 }
             }
-            tr{
-                &.award-bid{
+
+            tr {
+                &.award-bid {
                     border: none;
                     background-color: $bordercolor;
+                   
                 }
+
+                &.detail {
+                    td{
+                        text-align: left !important;
+                    }
+                }
+
+                &.awarded {
+                    background-color: rgb(235, 231, 231);
+
+                    .awarded-td {
+                        color: rgb(4, 195, 125);
+                        font-weight: 600;
+                    }
+                }
+
             }
         }
     }
-    .table-detail-post{
+
+    .table-detail-post {
         color: #2c2c2c;
-        .detail-post-label{
+
+        .detail-post-label {
             font-size: calc(20 / $fdf) * $rem;
             font-weight: 600;
             margin-bottom: calc(12 / $fdf) * $rem;
         }
-        .detail-post-left{
+
+        .detail-post-left {
             padding-right: calc(16 / $fdf) * $rem;
         }
-        .detail-post-item{
+
+        .detail-post-item {
             margin-bottom: calc(16 / $fdf) * $rem;
         }
-        .detail-post-description{
+
+        .detail-post-description {
             font-size: calc(20 / $fdf) * $rem;
             font-weight: 400;
         }
-        .detail-post-skills{
+
+        .detail-post-skills {
             display: flex;
             flex-wrap: wrap;
-            .detail-post-skill-item{
+
+            .detail-post-skill-item {
                 font-size: calc(18 / $fdf) * $rem;
                 padding: calc(8 / $fdf) * $rem;
                 border-radius: calc(12 / $fdf) * $rem;

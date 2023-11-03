@@ -47,6 +47,15 @@ const Post = createSlice({
             state.bids = [...state.bids]?.filter(bid => bid.id !== actions.payload.id)
             state.totalBids -= 1
         },
+
+        getBiddingByIdSuccess: (state, actions) => {
+            const bidsClone = []
+            return {
+                ...state,
+                state.
+            }
+        },
+
         updateBidRoomId: (state, actions) => {
             const bidsClone = [...state.bids]
             const currentBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
@@ -126,6 +135,38 @@ const Post = createSlice({
                 personalBids: personalBidsClone
             }
         },
+
+        acceptAwardBid: (state, actions) => {},
+        acceptAwardBidSuccess: (state, actions) => {
+            const bidsClone: Array<any> = [...state.bids]?.map((bid) => {
+                console.log([...state.bids])
+                if(bid.id === actions.payload.bidding_id) {
+                    return {...bid, bidding_status: 'awarded'}
+                } else {
+                    if(bid?.award) {
+                        return {...bid, bidding_status: 'rejected'}
+                    }
+                }
+            })
+
+            const personalBidsClone: Array<any> = [...state.personalBids]?.map((bid) => {
+                console.log([...state.bids])
+                if(bid.id === actions.payload.bidding_id) {
+                    return {...bid, bidding_status: 'awarded'}
+                } else {
+                    if(bid?.award) {
+                        return {...bid, bidding_status: 'rejected'}
+                    } else {
+                        return {...bid}
+                    }
+                }
+            })
+            return {
+                ...state,
+                bids: bidsClone,
+                personalBids: personalBidsClone
+            }
+        },
         
         getAllPersonalBiddings: (state, actions) => {},
         getAllPersonalBiddingsSuccess: (state, actions) => {
@@ -135,12 +176,13 @@ const Post = createSlice({
             }
         },
         awardBidResponse: (state, actions) => {
-            const personalBidsClone  = [...state.personalBids]
-            const bidsClone = [...state.bids]
+            let personalBidsClone  = [...state.personalBids]
+            let bidsClone = [...state.bids]
             const {bid, ...others} = actions.payload
+
+            const idxBid = bidsClone?.findIndex((bid) => bid.id === actions?.payload?.bidding_id)
             if(actions?.payload?.status === 'create' || actions?.payload?.status === 'update') {
                 const idxPersonalBid = personalBidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
-                const idxBid = bidsClone?.findIndex((bid) => bid.id === actions.payload.bidding_id)
 
                 if(idxPersonalBid !== -1) {
                     personalBidsClone[idxPersonalBid] = {...personalBidsClone[idxPersonalBid], award: others}
@@ -149,9 +191,8 @@ const Post = createSlice({
                 if(idxBid !== -1) {
                     bidsClone[idxBid] = {...bidsClone[idxBid], award: others}
                 }
-            } else {
+            } else if(actions?.payload?.status === 'removed'){
                 const idxBidAward = personalBidsClone?.findIndex((bid) => bid.award)
-                const idxBid = bidsClone?.findIndex((bid) => bid.id === actions?.payload?.bidding_id)
 
                 if(idxBidAward !== -1) {
                     personalBidsClone[idxBidAward] = {...personalBidsClone[idxBidAward], award: null}
@@ -159,6 +200,22 @@ const Post = createSlice({
                 if(idxBid !== -1) {
                     bidsClone[idxBid] = {...bidsClone[idxBid], award: null}
                 }
+            } else if(actions?.payload?.status === 'awarded'){
+                personalBidsClone = personalBidsClone?.map(bid => {
+                    if(bid?.id === actions?.payload?.bidding_id) {
+                        return {...bid, bidding_status: 'awarded'}
+                    } else {
+                        return {...bid, bidding_status: 'rejected'}
+                    }
+                })
+
+                bidsClone = bidsClone?.map(bid => {
+                    if(bid?.id === actions?.payload?.bidding_id) {
+                        return {...bid, bidding_status: 'awarded'}
+                    } else {
+                        return {...bid, bidding_status: 'rejected'}
+                    }
+                })
             }
             return {
                 ...state,

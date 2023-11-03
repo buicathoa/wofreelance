@@ -3,7 +3,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { ClientError } = require("../errors");
 const path = require("path");
 const db = require("../models");
-const Notifications = db.notifications
+const Notifications = db.notifications;
+const UserProfile = db.userprofile
 // const { Province, District, Ward } = require("./models/LocationModel");
 // const { Province, District, Ward } = require("./models/location");
 const cloudinary = require("cloudinary").v2;
@@ -90,7 +91,9 @@ const emailTemplate = (mailTo, user_id, image) => {
 
 const findNotificationItem = async (condition) => {
   let result
-  const notification = await Notifications.findOne({...condition})
+  const notification = await Notifications.findOne({
+    where: condition
+  })
   if(!notification){
     result = false
   } else {
@@ -101,44 +104,69 @@ const findNotificationItem = async (condition) => {
 
 const modifyNotification = async (payload) => {
   const {noti_found, ...others} = payload
-  let result
-  if(noti_found) {
-    switch(payload.noti_type){
-      case 'bid_post':
-        await Notifications.update(
-          {
-            noti_title: `${others?.username} and ${
-              others.countBid - 1
-            } others bid to your post`,
-          },
-          {
-            where: {
-              id: noti_found.id,
-            },
-          }
-        );
-      
-      case 'assign_post': {}
+  let result;
+  try {
+    const userFound = await UserProfile?.findOne({
+      attributes: ['noti_count'],
+      where: {
+        id: payload?.user_id
+      },
+    })
+  
+    if(userFound?.noti_found === 0) {
+      await UserProfile.increment("noti_count", {
+        by: 1,
+        where: { id: payload?.user_id },
+      });
+    }
+  
+    if(noti_found) {
+      switch(payload.noti_type){
+        case 'bid_post':
           await Notifications.update(
             {
-              noti_title: others.noti_title
+              noti_title: `${others?.username} and ${
+                others.countBid - 1
+              } others bid to your post`,
             },
             {
               where: {
-                id: noti_found.id
-              }
+                id: noti_found.id,
+              },
             }
-          )
-    }
-    result = await Notifications.findOne({
-      where: {
-        id: noti_found.id
+          );
+        
+        case 'assign_post': {}
+            await Notifications.update(
+              {
+                noti_title: others.noti_title
+              },
+              {
+                where: {
+                  id: noti_found.id
+                }
+              }
+            )
       }
-    })
-  } else {
-    result = await Notifications.create(others)
+      result = await Notifications.findOne({
+        where: {
+          id: noti_found.id
+        }
+      })
+    } else {
+      let payloadUpdate = {};
+      if(payload?.id) {
+        const {id, ...restPayload} = payload
+        payloadUpdate = restPayload
+      } else {
+        payloadUpdate = others
+      }
+      result = await Notifications.create(payloadUpdate)
+    }
+    return result
+  } catch (err) { 
+    throw err
   }
-  return result
 }
 
 // const genLocation = async (address_detail, province_id, district_id, ward_id) => {

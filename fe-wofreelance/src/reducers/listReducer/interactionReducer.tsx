@@ -32,25 +32,27 @@ const Interactions = createSlice({
             const idxCurrentFocus = [...state.interactions]?.findIndex((interaction) => interaction.chat_window_status === 'focus')
             state.interactions[idxCurrentFocus] = { ...state.interactions[idxCurrentFocus], chat_window_status: 'open' }
             if (idxCurrentInteraction === -1) {
-                state.interactions = [...state.interactions, { ...actions.payload, chat_window_status: 'focus' }]
+                state.interactions = [...state.interactions, { ...actions.payload, chat_window_status: 'focus', messages: actions.payload.messages }]
             } else {
                 state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], ...actions.payload, chat_window_status: 'focus' }
             }
         },
         modifyInteraction: (state, actions) => {
             let idxCurrentInteraction = -1
-
             if (!actions?.payload?.room_id) {
-                idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => (_.isEqual([...interaction?.users]?.sort((a: any, b: any) => a.id! - b.id!), [...actions?.payload.users]?.sort((a: any, b: any) => a.id - b.id)) && interaction?.room_title === actions?.payload?.room_title))
+                idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => interaction.bidding_id === actions?.payload?.bidding_id)
+                // idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => (_.isEqual([...interaction?.users]?.sort((a: any, b: any) => a.id! - b.id!), [...actions?.payload.users]?.sort((a: any, b: any) => a.id - b.id)) && interaction?.room_title === actions?.payload?.room_title))
             } else {
                 idxCurrentInteraction = [...state.interactions]?.findIndex((interaction: any) => interaction.room_id === actions.payload.room_id)
             }
             const idxCurrentFocus = [...state.interactions]?.findIndex((interaction) => interaction.chat_window_status === 'focus')
-            if (idxCurrentInteraction === idxCurrentFocus) {
-                state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], chat_window_status: actions.payload.chat_window_status }
-            } else {
+            if (idxCurrentInteraction !== idxCurrentFocus) {
                 state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], chat_window_status: actions.payload.chat_window_status }
                 state.interactions[idxCurrentFocus] = { ...state.interactions[idxCurrentFocus], chat_window_status: 'open' }
+            } else {
+                if(actions.payload.chat_window_status === 'hidden') {
+                    state.interactions[idxCurrentInteraction] = { ...state.interactions[idxCurrentInteraction], chat_window_status: actions.payload.chat_window_status }
+                }
             }
         },
 

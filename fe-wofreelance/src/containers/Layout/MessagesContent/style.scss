@@ -52,15 +52,16 @@
             .message-item {
                 padding: calc(12 / $fdf) * $rem;
                 display: flex;
-
                 &:hover {
                     background-color: $hovercolor;
                     cursor: pointer;
                 }
-
+                
                 .avatar {
-                    margin-right: calc(8 / $fdf) * $rem;
+                    margin-right: calc(16 / $fdf) * $rem;
                     position: relative;
+                    width: calc(48 / $fdf) * $rem;
+                    height: calc(48 / $fdf) * $rem;
 
                     img {
                         width: calc(48 / $fdf) * $rem;

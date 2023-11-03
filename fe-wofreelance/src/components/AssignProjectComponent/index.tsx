@@ -89,8 +89,8 @@ export const AssignProjectComponent = ({ visible, setVisible, recordSelected, po
             payload = { bidding_id: bidFound?.id, project_paid_type: bidFound?.project_paid_type, hourly_rate: bidFound?.hourly_rate, weekly_limit: weeklyLimit, post_id: post?.id }
         }
 
-        createAwardBid(payload).then(() => {
-            socket.emit('award_bid', { bidding_id: bidFound?.id, post_id: post?.id, status: 'create', isOwner: true })
+        createAwardBid(payload).then((res) => {
+            socket.emit('award_bid', { bidding_id: bidFound?.id, post_id: post?.id, status: 'create', isOwner: true, previous_bidding_id: res?.data?.previous_bidding_id })
             setVisible(false)
         })
     }
@@ -162,7 +162,7 @@ export const AssignProjectComponent = ({ visible, setVisible, recordSelected, po
                         <div className="assign-project statistics">
                             <span className='assign-project-title'>{amountPaidSelected === 'hours_per_week' ? 'Maximium Weekly Bill' : 'Hours per week'}<span className="tooltip-icon">i</span></span>
                             <span className="assign-project-description">
-                                {amountPaidSelected === 'hours_per_week' ? `${post?.budget?.currency?.short_name}${valueAfterChange?.hourly_rate * valueAfterChange?.weekly_limit} ${post?.budget?.currency?.name}` : `${(valueAfterChange?.max_weekly_bill ?? 40) / valueAfterChange?.hourly_rate} hours`}
+                                {amountPaidSelected === 'hours_per_week' ? `${post?.budget?.currency?.short_name}${valueAfterChange?.hourly_rate * valueAfterChange?.weekly_limit} ${post?.budget?.currency?.name}` : `${Math.round((valueAfterChange?.max_weekly_bill ?? 40) / valueAfterChange?.hourly_rate * 100) / 100} hours`}
                             </span>
                         </div>
                         <div className="assign-project assign-project-description">

@@ -190,7 +190,8 @@ export interface BiddingInterface {
     budget: BudgetInterface,
     room_id?: number,
     unread_messages?: number,
-    award?: BiddingInterface | null
+    award?: BiddingInterface | null,
+    bidding_status: string
 }
 
 export interface BiddingInterfaceResponse {
@@ -213,7 +214,8 @@ export interface PostInteface {
     list_skills: Array<SkillsetInterface>,
     user: UserInterface,
     budget: BudgetInterface,
-    biddings: Array<BiddingInterface>
+    biddings: Array<BiddingInterface>,
+    is_bid?: boolean
 }
 
 export interface CurrencyInterface {
@@ -433,6 +435,7 @@ export interface latestMessageInterface {
     is_online?: boolean,
     is_active?: boolean,
     unread_messages?: number,
+    room_title?: string
 }
 
 export interface messageDetailInterface {

@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'pending',
       validate: {
         isIn: {
-          args: [['pending','success', 'rejected']],
+          args: [['pending','awarded', 'rejected']],
           msg: 'Args must be in pending, success or rejected'
         }
       }

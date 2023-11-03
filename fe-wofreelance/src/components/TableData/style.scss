@@ -37,7 +37,7 @@
                 td{
                     border-bottom: 1px solid $bordercolor;
                     padding: calc(16 / $fdf) * $rem;
-                    text-align: left;
+                    text-align: center;
                     font-size: calc(18 / $fdf) * $rem;
                     &.action-button{
                         cursor: pointer;

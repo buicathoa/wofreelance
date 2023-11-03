@@ -241,11 +241,19 @@ const ChatService = {
       });
       const response = latestMessages?.rooms?.map((item) => {
         const { Users_Rooms, ...others } = item.dataValues;
-        const { unread_messages, ...othersObj } = others.messages[0]?.dataValues
+        let restObjResult = {}
+        let unreadMessagesResult = 0;
+
+        if(others.messages.length > 0) {
+          const { unread_messages, ...othersObj } = others.messages[0]?.dataValues;
+          restObjResult = othersObj
+          unreadMessagesResult = unread_messages
+        }
+        // const { unread_messages, ...othersObj } = others.messages[0]?.dataValues
         return {
           ...others,
-          messages: othersObj ?? {},
-          unread_messages: others?.messages[0].dataValues.unread_messages
+          messages:restObjResult,
+          unread_messages: unreadMessagesResult
         };
       });
       return response;
@@ -343,7 +351,15 @@ const ChatService = {
     const transaction = await sequelize.transaction();
     try {
       const { page, limit, search_list, sorts, skip } = req.body;
-      const whereMessages = QueryParameter.querySearch(search_list);
+      let roomQuery;
+      const restSearch = search_list?.map((item) => {
+        if(item?.name_field === 'room_id') {
+          roomQuery = {room_id: item?.value_search}
+        } else {
+          return item
+        }
+      })
+      const whereMessages = restSearch?.filter(item => item).length ? QueryParameter.querySearch(restSearch) : null;
       const sortMessages = QueryParameter.querySort([
         { name_field: "createdAt", sort_type: "DESC" },
       ]);
@@ -356,7 +372,12 @@ const ChatService = {
         }
       })
       const messagesDetail = await Messages.findAll({
-        where: whereMessages,
+        where: whereMessages ? {
+          ...roomQuery,
+          ...whereMessages
+        } : {
+          ...roomQuery
+        },
         attributes: [
           "id",
           "content_text",

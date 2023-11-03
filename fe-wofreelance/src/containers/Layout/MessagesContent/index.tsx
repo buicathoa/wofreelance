@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import { live_chat } from '../../../assets'
 
 import './style.scss'
@@ -66,6 +66,46 @@ const MessagesContent = ({ visible }: MessagesContentInterface) => {
         })
     }
 
+    // const renderRoomName = (interaction: any) => {
+    //     let roomName = ''
+    //     if(interaction?.room_title) {
+    //         if(interaction?.room_title?.length > 16) {
+    //             roomName = `${interaction.room_title?.slice(0, 16)}...`
+    //         } else {
+    //             roomName = interaction?.room_title
+    //         }
+    //     } else {
+    //         if(interaction?.room_name) {
+    //             if(interaction?.room_name?.length > 16) {
+    //                 roomName = `${interaction.room_name?.slice(0, 16)}...`
+    //             } else {
+    //                 roomName = interaction?.room_name
+    //             }
+    //         }
+    //     }
+    //     return roomName
+    // }
+
+    const renderRoomName = useCallback((interaction: any) => {
+        let roomName = ''
+        if(interaction?.room_title) {
+            if(interaction?.room_title?.length > 16) {
+                roomName = `${interaction.room_title?.slice(0, 16)}...`
+            } else {
+                roomName = interaction?.room_title
+            }
+        } else {
+            if(interaction?.room_name) {
+                if(interaction?.room_name?.length > 16) {
+                    roomName = `${interaction.room_name?.slice(0, 16)}...`
+                } else {
+                    roomName = interaction?.room_name
+                }
+            }
+        }
+        return roomName
+      }, [latestMessages]);
+
     return (
         <div className="message-content-wrapper">
             <div className="message-content-header">
@@ -96,7 +136,9 @@ const MessagesContent = ({ visible }: MessagesContentInterface) => {
                                     </div>
                                     <div className="message-item-content">
                                         <div className="sender-info">
-                                            <div className={`sender-name`}>{interaction.room_name}{interaction?.unread_messages !== 0 && <span className="count-unread">{interaction?.unread_messages}</span>}</div>
+                                            <div className={`sender-name`}>
+                                            {renderRoomName(interaction)}
+                                            {interaction?.unread_messages !== 0 && <span className="count-unread">{interaction?.unread_messages}</span>}</div>
                                             <div className="message-latest-time">{dayjs(interaction.messages.createdAt).tz('Asia/Ho_Chi_Minh').format('dddd D H:mm')}</div>
                                         </div>
                                         <div className="message-info">

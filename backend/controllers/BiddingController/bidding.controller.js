@@ -19,6 +19,15 @@ const BiddingController = {
     }
   },
 
+  getBiddingById: async (req, res) => {
+    try {
+      const biddings = await BiddingService.getBiddingById(req, res);
+      return handleSuccess(res, biddings, { message: "success" });
+    } catch (err) {
+      return handleError(res, err);
+    }
+  },
+
   createBidding: async (req, res) => {
     try {
       const biddings = await BiddingService.createBidding(req, res);

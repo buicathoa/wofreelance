@@ -80,6 +80,7 @@ export const apiUrl = {
             createAwardBid: 'bidding/award/create',
             updateAwardBid: 'bidding/award/update',
             deleteAwardBid: 'bidding/award/delete',
+            acceptAwardBid: 'bidding/award/accept',
             getAllPersonalBiddings: 'bidding/personal/get-all'
         }
     },

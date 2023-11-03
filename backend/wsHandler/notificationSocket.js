@@ -122,6 +122,7 @@ module.exports = (socket, io) => {
         where: {
           id: decoded.id,
         },
+        transaction: transaction
       });
 
       const postInfo = await Posts.findOne({
@@ -139,6 +140,7 @@ module.exports = (socket, io) => {
             },
           },
         ],
+        transaction: transaction
       });
 
       //Finding user who own this post and active
@@ -147,6 +149,7 @@ module.exports = (socket, io) => {
         where: {
           user_id: data.user_id,
         },
+        transaction: transaction
       });
 
       //Count the bid of this post
@@ -154,6 +157,7 @@ module.exports = (socket, io) => {
         where: {
           post_id: data.post_id,
         },
+        transaction: transaction
       });
 
       //increase notifications
@@ -163,7 +167,7 @@ module.exports = (socket, io) => {
         noti_status: "received",
       });
 
-      await modifyNotification({
+      const notifyFound = await modifyNotification({
         noti_found: notiFound,
         noti_type: "bid_post",
         ...postInfo.dataValues,
@@ -193,6 +197,7 @@ module.exports = (socket, io) => {
               )}... `
             : `${userBid.username} and ${countBid - 1} others bid to your post`,
           url: postInfo?.post_url,
+          bidding_id: data?.bidding_id
         });
       await transaction.commit();
     } catch (err) {
@@ -364,11 +369,11 @@ module.exports = (socket, io) => {
     sequelize.transaction({ autocommit: false }).then(async (transaction) => {
       try {
         //Find the user who bid the post
-        const biddingFound = await Bidding.findOne(
+        const allBiddings = await Bidding.findAll(
           {
             attributes: ["user_id", "id"],
             where: {
-              id: data.bidding_id,
+              post_id: data.post_id,
             },
             include: [
               {
@@ -390,47 +395,55 @@ module.exports = (socket, io) => {
                   },
                 ],
               },
+              {
+                model: UserProfile,
+                as: "user",
+                attributes: ["id"],
+                include: [
+                  {
+                    model: Sockets,
+                    as: "socket",
+                    attributes: ["socket_id"],
+                  },
+                ],
+              },
             ],
           },
           { transaction: transaction }
         );
 
+        const biddingFound = allBiddings?.find(
+          (bidding) => bidding?.dataValues?.id === data?.bidding_id
+        );
+
         //Find bid award
         const bidAwarded = await BidAwarded.findOne({
           where: {
-            bidding_id: data.bidding_id,
-          },
-          include: [{ model: Bidding, as: "bid", attributes: ["user_id"] }],
-        });
-
-        //Find all users who bid the post
-        const usersBidPost = await Posts.findOne({
-          attributes: ["user_id"],
-          where: {
-            id: data.post_id,
+            post_id: data.post_id,
           },
           include: [
             {
               model: Bidding,
-              as: "biddings",
-              attributes: ["user_id"],
+              as: "bid",
+              attributes: ["user_id", "id"],
+              include: [
+                {
+                  model: UserProfile,
+                  as: "user",
+                  attributes: ["id"],
+                  include: [
+                    {
+                      model: Sockets,
+                      as: "socket",
+                      attributes: ["socket_id"],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         });
 
-        //Find all users who bid the post are already online
-        const usersBidOnline = await Sockets.findAll({
-          attributes: ["socket_id", "user_id"],
-          where: {
-            user_id: {
-              [Op.in]: usersBidPost?.biddings?.map((bid) => {
-                return bid.user_id;
-              }),
-            },
-          },
-        });
-
-        //increase notifications of users
         const patternNotification = {
           noti_type: "assign_post",
           noti_content: "",
@@ -438,16 +451,20 @@ module.exports = (socket, io) => {
         };
 
         const renderNotiTitle = (status) => {
-          let result = ''
-          if(status === 'create') {
-            result = `Congratulations! Your bid in ${biddingFound?.post?.title} has been awarded`
-          } else if(status === 'update') {
-            result = `Your awarded in ${biddingFound?.post?.title} has been updated`
+          let result = "";
+          console.log(allBiddings);
+
+          if (status === "create") {
+            result = `Congratulations! Your bid in ${biddingFound?.post?.title} has been awarded`;
+          } else if (status === "update") {
+            result = `Your awarded in ${biddingFound?.post?.title} has been updated`;
+          } else if (status === "awarded") {
+            result = `Your bid in ${biddingFound?.post?.title} has been ${data?.isOwner ? 'accepted' : 'awarded'}`;
           } else {
-            result = `Your awarded in ${biddingFound?.post?.title} has been removed`
+            result = `Your awarded in ${biddingFound?.post?.title} has been ${data?.isOwner ? 'removed' : 'denied'}`;
           }
-          return result
-        }
+          return result;
+        };
 
         const result =
           data?.status === "removed" || data?.status === "denied"
@@ -463,75 +480,111 @@ module.exports = (socket, io) => {
                 post_title: biddingFound?.post?.title,
               };
 
-        //if the owner of the post
-        if (data.isOwner) {
-
-          await usersBidOnline?.map(async (u) => {
-            //if user's award equal to user's bid
-            if (u.user_id === biddingFound?.user_id) {
-              //find the notification of the user who will be sent the socket noti
-              const notiFound = await findNotificationItem({
-                noti_type: "assign_post",
-                noti_status: "received",
-                user_id: u.user_id,
-              });
-
-              const notifications = await modifyNotification({noti_found: notiFound, ...patternNotification, noti_title: renderNotiTitle(data?.status), user_id: u.user_id})
-
-              socket.broadcast.to(u?.socket_id).emit(AWARD_BID_RESPONSE, {
-                ...result,
-                notification: notifications.dataValues,
-                status: data?.status,
-                noti_found: notiFound
-              });
-            } else if (
-              //if user's award is not equal to user's bid => send socket noti remove to others users
-              u.user_id !== biddingFound?.user_id &&
-              bidAwarded?.bid?.user_id === biddingFound?.user_id
+        if(data?.isOwner) {
+          for (const bidding of allBiddings) {
+            if (
+              bidding?.id === bidAwarded?.bidding_id &&
+              bidding?.user?.socket?.socket_id
             ) {
               const notiFound = await findNotificationItem({
                 noti_type: "assign_post",
                 noti_status: "received",
-                user_id: u.user_id,
+                user_id: bidAwarded?.bid?.user?.id,
               });
-
-              const notifications = await modifyNotification({noti_found: notiFound, ...patternNotification, noti_title: renderNotiTitle('removed'),user_id: u.user_id})
-
-              socket.broadcast.to(u?.socket_id).emit(AWARD_BID_RESPONSE, {
-                ...bidAwarded.dataValues,
-                notification: notifications.dataValues,
-                status: "removed",
-                noti_found: notiFound
+  
+              const notifications = await modifyNotification({
+                noti_found: notiFound,
+                ...patternNotification,
+                noti_title: renderNotiTitle(data?.status),
+                user_id: bidAwarded?.bid?.user?.id,
               });
+              socket.broadcast
+                .to(bidding?.user?.socket?.socket_id)
+                .emit(AWARD_BID_RESPONSE, {
+                  ...result,
+                  notification: notifications.dataValues,
+                  status: data?.status,
+                  noti_found: notiFound,
+                });
+            } else {
+              if (
+                (data?.previous_bidding_id &&
+                  data?.previous_bidding_id === bidding?.id &&
+                  bidding?.user?.socket?.socket_id) ||
+                data?.status === "removed"
+              ) {
+                const notiFound = await findNotificationItem({
+                  noti_type: "assign_post",
+                  noti_status: "received",
+                  user_id: bidding?.user?.id,
+                });
+  
+                const notifications = await modifyNotification({
+                  noti_found: notiFound,
+                  ...patternNotification,
+                  noti_title: renderNotiTitle("removed"),
+                  user_id: bidding?.user?.id,
+                });
+  
+                socket.broadcast
+                  .to(bidding?.user?.socket?.socket_id)
+                  .emit(AWARD_BID_RESPONSE, {
+                    ...result,
+                    notification: notifications.dataValues,
+                    status: "removed",
+                    noti_found: notiFound,
+                  });
+              }
             }
-          });
+          }
         } else {
-          const userBidPostSocket = await Sockets.findOne({
-            attributes: ["socket_id", "user_id"],
+          const postOwner = await Posts.findOne({
+            attributes: [],
             where: {
-              user_id: usersBidPost?.user_id,
+              id: data?.post_id
             },
-          });
+            include: [
+              {
+                model: UserProfile,
+                as: 'user',
+                attributes: ['id'],
+                include: [
+                  {
+                    model: Sockets,
+                    as: 'socket',
+                    attributes: ['socket_id']
+                  }
+                ]
+              }
+            ]
+          })
 
           const notiFound = await findNotificationItem({
             noti_type: "assign_post",
             noti_status: "received",
-            user_id: u.user_id,
-          }); 
+            user_id: data?.status !== 'removed' && data?.status !== 'awarded' ? bidAwarded?.bid?.user?.id : postOwner?.user?.id,
+          });
 
-          const notifications = await modifyNotification({noti_found: notiFound, ...patternNotification, user_id: u.user_id, noti_title: renderNotiTitle(data?.status)})
+          const notifications = await modifyNotification({
+            noti_found: notiFound,
+            ...patternNotification,
+            noti_title: renderNotiTitle(data?.status),
+            user_id: data?.status !== 'removed' && data?.status !== 'awarded' ? bidAwarded?.bid?.user?.id : postOwner?.user?.id,
+          });
 
           socket.broadcast
-            .to(userBidPostSocket?.socket_id)
-            .emit(AWARD_BID_RESPONSE, {
-              ...result,
-              notification: notifications.dataValues,
-              status: data?.status,
-              noti_found: notiFound
-            });
+                .to(postOwner?.user?.socket?.socket_id)
+                .emit(AWARD_BID_RESPONSE, {
+                  ...result,
+                  notification: notifications.dataValues,
+                  status: data?.status,
+                  noti_found: notiFound,
+                });
         }
+
         await transaction.commit();
       } catch (err) {
+        console.log('err ne', err)
         await transaction.rollback();
       }
     });
