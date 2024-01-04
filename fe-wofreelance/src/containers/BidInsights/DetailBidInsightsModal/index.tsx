@@ -13,12 +13,11 @@ import { RootState } from '../../../reducers/rootReducer';
 import { PostActions } from '../../../reducers/listReducer/postReducer';
 import { BiddingInterface, ResponseFormatItem } from '../../../interface';
 import { SocketContext } from '../../../SocketProvider';
-import { ModalConfirm } from '../../../components/ModalConfirm';
 import { AppActions } from '../../../reducers/listReducer/appReducer';
 import { modalNotifications } from '../../../components/modalNotifications';
 import _ from 'lodash';
 // import { SocketContext, socket } from '../../SocketContext';
-
+const ModalConfirm = React.lazy(() => import('components/ModalConfirm'));
 
 interface DetailBidInsightsModalInterface {
   visible: boolean,

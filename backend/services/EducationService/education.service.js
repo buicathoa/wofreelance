@@ -31,10 +31,10 @@ const EducationService = {
     let newEducation;
     let education;
     try {
-      const checkRole = await validateRole.create(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        User_Education
       );
       if (checkRole === 1) {
         newEducation = await User_Education.create({
@@ -78,6 +78,13 @@ const EducationService = {
                   order: [["updatedAt", "DESC"]],
                   // order: [["updatedAt", "DESC"]],
                 },
+                include: [
+                  {
+                    model: Countries,
+                    as: 'country',
+                    attributes: ['country_official_name']
+                  }
+                ]
               },
             ],
           });
@@ -92,6 +99,7 @@ const EducationService = {
       return {
         ...user_education.dataValues,
         university_name: other.dataValues.university_name,
+        country: other.country.country_official_name
       };
       // return result
     } catch (err) {
@@ -104,10 +112,10 @@ const EducationService = {
     const decoded = jwt_decode(req.headers.authorization);
     let education;
     try {
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        User_Education
       );
       if (checkRole === 1) {
         const { user_id, id, ...other } = req.body;
@@ -153,6 +161,13 @@ const EducationService = {
                 order: [["updatedAt", "DESC"]],
                 // order: [["updatedAt", "DESC"]],
               },
+              include: [
+                {
+                  model: Countries,
+                  as: 'country',
+                  attributes: ['country_official_name']
+                }
+              ]
             },
           ],
         });
@@ -165,6 +180,7 @@ const EducationService = {
       return {
         ...user_education.dataValues,
         university_name: other.dataValues.university_name,
+        country: other.country.country_official_name
       };
     } catch (err) {
       throw err;
@@ -175,10 +191,10 @@ const EducationService = {
     try {
       let education = {};
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.id,
-        UserProfiles
+        User_Education
       );
       if (checkRole === 1) {
         education = await User_Education.destroy({
@@ -200,6 +216,17 @@ const EducationService = {
   getAllEducationUser: async (req, res) => {
     try {
       const decoded = jwt_decode(req.headers.authorization);
+      const responsex = User_Education?.findAll({
+        where: {
+          user_id: decoded.id
+        },
+        include: [
+          {
+            model: Universities
+          }
+        ]
+      })
+
       const user_educations = await UserProfiles.findOne({
         attributes: [],
         where: {
@@ -242,7 +269,7 @@ const EducationService = {
           university_name: other.university_name,
         };
       });
-      return response;
+      return responsex;
     } catch (err) {
       throw err;
     }

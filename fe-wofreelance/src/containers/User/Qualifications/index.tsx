@@ -1,44 +1,50 @@
 import React, { useEffect, useState } from 'react'
-import './style.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { QualificationInterface, ResponseFormatItem, UserInterface } from '../../../interface';
-import { UserActions } from '../../../reducers/listReducer/userReducer';
-import { RootState } from '../../../reducers/rootReducer';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import LayoutBottomProfile from '../../../components/LayoutBottom/LayoutBottomProfile';
-import { Button, Card, Col, Rate, Row, Form, Input, DatePicker, Checkbox, Popover } from 'antd';
 import {
     EllipsisOutlined
 } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import { certifications } from '../../../assets';
-import { QualifycationActions } from '../../../reducers/listReducer/qualificationReducer';
+import { Button, Card, Col, Row, Form, Input, DatePicker, Popover } from 'antd';
 import dayjs from 'dayjs';
 
-interface Qualifications {
+import { delete_icon } from 'assets';
+import { QualificationInterface, ResponseFormatItem, UserInterface } from 'interface';
+
+import { RootState } from 'reducers/rootReducer';
+import { AppActions } from 'reducers/listReducer/appReducer';
+import { UserActions } from 'reducers/listReducer/userReducer';
+
+import './style.scss'
+interface QualificationsInteface {
     modify: boolean
 }
 
-const Qualifications = ({modify}: Qualifications) => {
+const ModalConfirm = React.lazy(() => import('components/ModalConfirm'));
+
+const Qualifications = ({modify}: QualificationsInteface) => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
     const [form] = Form.useForm()
 
+    const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
     const [modifyStatus, setModifyStatus] = useState<string>('')
-    const [recordSelected, setrecordSelected] = useState({})
+    const [recordSelected, setrecordSelected] = useState<QualificationInterface>({})
     const [formValues, setformValues] = useState<QualificationInterface>({})
-
-    const qualifications: Array<QualificationInterface> = useSelector((state: RootState) => state.qualification.qualifications)
+    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
 
     const createQualification = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(QualifycationActions.createQualification({ param, resolve, reject }));
+            dispatch(UserActions.createQualification({ param, resolve, reject }));
         });
     };
 
     const updateQualification = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(QualifycationActions.updateQualification({ param, resolve, reject }));
+            dispatch(UserActions.updateQualification({ param, resolve, reject }));
+        });
+    };
+
+    const deleteQualification = (param: any): Promise<ResponseFormatItem> => {
+        return new Promise((resolve, reject) => {
+            dispatch(UserActions.deleteQualification({ param, resolve, reject }));
         });
     };
 
@@ -74,6 +80,20 @@ const Qualifications = ({modify}: Qualifications) => {
         setformValues({...qual, start_year: dayjs(qual?.start_year)})
         setModifyStatus('edit')
    }
+
+   const handleDeleteQualification = (record: QualificationInterface) => {
+        setrecordSelected(record)
+        setIsOpenModalConfirm(true)
+   }
+
+   const onConfirm = () => {
+    dispatch(AppActions.openLoading(true))
+    deleteQualification({ id: recordSelected.id }).then((resDel) => {
+        if (resDel) {
+            setIsOpenModalConfirm(false)
+        }
+    })
+}
 
     const renderCardContent = () => {
         if (modifyStatus === 'add' || modifyStatus === 'edit') {
@@ -122,7 +142,7 @@ const Qualifications = ({modify}: Qualifications) => {
                 </div>
             )
         } else {
-            if (qualifications.length === 0) {
+            if (user_info?.qualifications!?.length === 0) {
                 return (
                     <div className="card-content no-data">
                         <span className="card-text">No qualifications have been added..</span>
@@ -131,7 +151,7 @@ const Qualifications = ({modify}: Qualifications) => {
             } else {
                 return (
                     <div className="list-item">
-                        {qualifications && qualifications.length > 0 && qualifications.map((qual:QualificationInterface, index) => {
+                        {user_info?.qualifications && user_info?.qualifications.length > 0 && user_info?.qualifications.map((qual:QualificationInterface, index) => {
                             const summary = (qual.summary!).replace(/\n/g, '<br>') || ''
                             return (
                                 <div className="qualification-item">
@@ -142,7 +162,7 @@ const Qualifications = ({modify}: Qualifications) => {
                                                 content={
                                                     <ul className="qualification-popover">
                                                         <li onClick={() => handleEditQualification(qual)}>Edit</li>
-                                                        <li>Delete</li>
+                                                        <li onClick={() => handleDeleteQualification(qual)}>Delete</li>
                                                     </ul>
                                                 }
                                                 trigger="hover" placement='bottom'>
@@ -167,12 +187,19 @@ const Qualifications = ({modify}: Qualifications) => {
     }
 
     return (
-        <Card size="small" title="Qualifications" className={`card-qualification ${(!modify && qualifications.length === 0) && 'none'}`} extra={<Button onClick={() => handleAddQualifications()}>Add Qualification</Button>}>
+        <>
+        <Card size="small" title="Qualifications" className={`card-qualification ${(!modify && user_info?.qualifications!.length === 0) && 'none'}`} extra={modify && <Button onClick={() => handleAddQualifications()}>Add Qualification</Button>}>
             {renderCardContent()}
-            {/* <div className="card-content no-data">
-                <span className="card-text">No portfolio items have been added yet.</span>
-            </div> */}
         </Card>
+        <ModalConfirm
+                title={'Confirm'}
+                icon={delete_icon}
+                content={'Are you sure to delete this item'}
+                visible={isOpenModalConfirm}
+                setVisible={setIsOpenModalConfirm}
+                onConfirm={onConfirm}
+            />
+        </>
     )
 }
 

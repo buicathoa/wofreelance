@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "isolatedModules": false,
+    "baseUrl": "src",
     // "downlevelIteration": true,
     "lib": [
       "dom",
@@ -15,7 +16,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "es6",
+    "module": "es2020",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,

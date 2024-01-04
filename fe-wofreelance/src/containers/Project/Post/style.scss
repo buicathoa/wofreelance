@@ -346,11 +346,12 @@
                     color: #ffffff;
                     font-weight: 500;
                     margin-right: calc(16 / $fdf) * $rem;
+                    font-size: calc(16 / $fdf) * $rem;
                 }
 
                 span {
                     &.enter {
-                        font-size: calc(14 / $fdf) * $rem;
+                        font-size: calc(16 / $fdf) * $rem;
                         color: $textcolor;
                         font-weight: 500;
                     }

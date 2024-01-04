@@ -17,14 +17,15 @@ canvas {
 .rating {
   margin-right: calc(24 / $fdf) * $rem;
   font-size: calc(20 / $fdf) * $rem;
+
   .ant-rate-star {
-      &.ant-rate-star-full {
-          color: #e60278
-      }
+    &.ant-rate-star-full {
+      color: #e60278
+    }
   }
 }
 
-.rated-number{
+.rated-number {
   font-size: calc(20 / $fdf) * $rem;
 }
 
@@ -146,7 +147,8 @@ canvas {
   &.text-area {
     height: calc(150 / $fdf) * $rem;
     padding: calc(8 / $fdf) * $rem calc(12 / $fdf) * $rem;
-    textarea{
+
+    textarea {
       font-size: calc(14 / $fdf) * $rem !important;
       padding: 0;
     }
@@ -166,11 +168,13 @@ canvas {
 }
 
 .form-select {
+
   // height: calc(40 / $fdf) * $rem;
-  &.multiple{
+  &.multiple {
     min-height: calc(40 / $fdf) * $rem;
     height: unset;
   }
+
   .ant-select-selector {
     height: 100% !important;
     padding: 0 calc(12 / $fdf) * $rem;
@@ -178,6 +182,7 @@ canvas {
     border-radius: calc(5 / $fdf) * $rem;
     background-color: #f1f4f6;
     align-items: center;
+
     .ant-select-selection-placeholder {
       font-family: $roboto;
       font-weight: 400;
@@ -193,6 +198,7 @@ canvas {
       color: #2c2c2c;
       // line-height: calc(40 / $fdf) * $rem;
     }
+
     // .ant-select-selection-search{
     //   input{
     //     height: unset !important;
@@ -290,7 +296,7 @@ canvas {
     padding-left: 0;
   }
 
-  .ant-checkbox{
+  .ant-checkbox {
     margin-right: calc(4 / $fdf) * $rem;
   }
 
@@ -482,22 +488,27 @@ canvas {
     }
   }
 
-  .ant-input-number-group-wrapper, .ant-input-number{
+  .ant-input-number-group-wrapper,
+  .ant-input-number {
     height: calc(40 / $fdf) * $rem;
-    input{
+
+    input {
       height: calc(40 / $fdf) * $rem;
     }
-    .ant-input-number-group-addon{
+
+    .ant-input-number-group-addon {
       font-size: calc(16 / $fdf) * $rem;
     }
-    &.form-input{
-        border: unset;
-        padding: 0;
-        .ant-input-number{
-            border: 1px solid #d9d9d9;
-        }
+
+    &.form-input {
+      border: unset;
+      padding: 0;
+
+      .ant-input-number {
+        border: 1px solid #d9d9d9;
+      }
     }
-}
+  }
 
   .form-input-mention {
     width: 100%;
@@ -972,6 +983,7 @@ html {
   padding: 0 calc(8 / $fdf) * $rem;
 
   button {
+
     // font-size: calc(16 / $fdf) * $rem;
     &.next {
       font-weight: 600;
@@ -1021,28 +1033,34 @@ html {
 
 .ant-card {
   box-shadow: 0 0 6px #0000001f, 0 4px 10px #00000029;
-  margin-top: calc(24 / $fdf) * $rem;
+  margin: calc(24 / $fdf) * $rem 0;
 
   .ant-card-head {
-    .ant-card-head-title {
+    .ant-card-head-title, span {
       font-size: calc(16 / $fdf) * $rem;
-      color: $textcolor;
+      // color: $textcolor;
       font-weight: 700;
       line-height: 1.5;
     }
 
     .ant-card-extra {
       padding: calc(12 / $fdf) * $rem 0;
+      span{
+        cursor: pointer;
+      }
 
       a,
       button {
+        font-size: calc(16 / $fdf) * $rem;
+        font-weight: 600;
+        height: calc(40 / $fdf) * $rem;
+        padding: 0 calc(32 / $fdf) * $rem !important;
+        display: block;
+        border-radius: calc(4 / $fdf) * $rem;
         background: #1772eb;
-        // line-height: 1.43;
-        padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
+        line-height: calc(40 / $fdf) * $rem;
         border-color: #1772eb;
         color: #f7f7f7;
-        font-size: calc(12 / $fdf) * $rem;
-        font-size: 600;
         cursor: pointer;
         // span {
         //   border-color: #1772eb;
@@ -1066,7 +1084,7 @@ html {
       font-size: calc(14 / $fdf) * $rem;
       line-height: 1.43;
       margin-bottom: calc(16 / $fdf) * $rem;
-      
+
       &.border {
         padding: calc(4 / $fdf) * $rem calc(12 / $fdf) * $rem;
         border-radius: 3px;
@@ -1114,9 +1132,12 @@ html {
     }
   }
 }
+
 .custom-datepicker-dropdown {
   font-size: calc(14 / $fdf) * $rem;
+
   &.show-time {
+
     .ant-picker-decade-panel,
     .ant-picker-year-panel,
     .ant-picker-quarter-panel,
@@ -1125,7 +1146,9 @@ html {
       width: calc(270 / $fdf) * $rem;
     }
   }
+
   &.frame-large {
+
     .ant-picker-decade-panel,
     .ant-picker-year-panel,
     .ant-picker-quarter-panel,
@@ -1134,35 +1157,43 @@ html {
       width: calc(350 / $fdf) * $rem;
     }
   }
+
   .ant-picker-decade-panel,
   .ant-picker-year-panel,
   .ant-picker-quarter-panel,
   .ant-picker-month-panel,
   .ant-picker-date-panel {
     width: calc(280 / $fdf) * $rem;
+
     .ant-picker-header {
       padding: 0 calc(8 / $fdf) * $rem;
+
       button,
-      > div {
+      >div {
         font-size: calc(14 / $fdf) * $rem;
         line-height: calc(40 / $fdf) * $rem;
       }
     }
+
     .ant-picker-body {
       padding: calc(8 / $fdf) * $rem calc(12 / $fdf) * $rem;
+
       .ant-picker-content {
         width: 100%;
         table-layout: auto;
+
         tr {
           td {
             min-width: calc(24 / $fdf) * $rem;
             padding: calc(3 / $fdf) * $rem 0;
-            > div {
+
+            >div {
               min-width: calc(24 / $fdf) * $rem;
               height: calc(24 / $fdf) * $rem;
               line-height: calc(24 / $fdf) * $rem;
               border-radius: calc(2 / $fdf) * $rem;
             }
+
             &::before {
               height: calc(24 / $fdf) * $rem;
             }
@@ -1171,10 +1202,12 @@ html {
       }
     }
   }
+
   .ant-picker-time-panel {
     .ant-picker-header {
       padding: 0 calc(5 / $fdf) * $rem;
-      > div {
+
+      >div {
         font-family: $roboto;
         font-weight: 500;
         font-size: calc(14 / $fdf) * $rem;
@@ -1182,12 +1215,15 @@ html {
         line-height: calc(40 / $fdf) * $rem;
       }
     }
+
     .ant-picker-content {
       height: calc(225 / $fdf) * $rem;
+
       ul {
         width: calc(50 / $fdf) * $rem;
+
         li {
-          > div {
+          >div {
             height: calc(28 / $fdf) * $rem;
             padding: 0 0 0 calc(14 / $fdf) * $rem;
             line-height: calc(28 / $fdf) * $rem;
@@ -1196,11 +1232,14 @@ html {
       }
     }
   }
+
   .ant-picker-footer {
     line-height: calc(35 / $fdf) * $rem;
+
     ul {
       .ant-picker-ok {
         margin-left: calc(8 / $fdf) * $rem;
+
         button {
           height: calc(24 / $fdf) * $rem;
           padding: 0 calc(7 / $fdf) * $rem;
@@ -1210,6 +1249,7 @@ html {
       }
     }
   }
+
   .ant-picker-decade-panel,
   .ant-picker-year-panel,
   .ant-picker-quarter-panel,

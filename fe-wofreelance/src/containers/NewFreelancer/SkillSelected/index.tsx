@@ -125,8 +125,8 @@ const SkillSelected = () => {
                     categorySelected={categorySelected}
                     setCategorySelected={setCategorySelected}
                     debouncedText={debouncedText}
-                    matchJobs={matchJobs}
-                    setMatchJobs={setMatchJobs}
+                    // matchJobs={matchJobs}
+                    // setMatchJobs={setMatchJobs}
                     setValueSearch={setValueSearch}
                 />
             </div>

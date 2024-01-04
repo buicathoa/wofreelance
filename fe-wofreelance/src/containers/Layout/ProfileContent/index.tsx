@@ -1,13 +1,12 @@
 import React, { useContext } from 'react'
-import {useSelector} from 'react-redux'
-import './style.scss'
+import {useSelector, useDispatch} from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { ResponseFormatItem, UserInterface } from '../../../interface'
-import { RootState } from '../../../reducers/rootReducer'
-import { UserActions } from '../../../reducers/listReducer/userReducer'
-import { useDispatch } from 'react-redux'
-import { SocketContext } from '../../../SocketProvider'
+import { ResponseFormatItem, UserInterface } from 'interface'
+import { RootState } from 'reducers/rootReducer'
+import { UserActions } from 'reducers/listReducer/userReducer'
+import { SocketContext } from 'SocketProvider'
 
+import './style.scss'
 const ProfileContent = ({user}:any) => {
     const socket: any = useContext(SocketContext)
     const dispatch = useDispatch()

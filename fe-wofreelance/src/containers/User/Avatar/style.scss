@@ -70,8 +70,8 @@
                     transform: translateX(-50%);
                     display: block;
                     img{
-                        max-height: calc(280 / $fdf) * $rem;;
-                        max-width: calc(280 / $fdf) * $rem;;
+                        max-height: calc(280 / $fdf) * $rem;
+                        max-width: calc(280 / $fdf) * $rem;
                     }
                 }
             }
@@ -79,6 +79,7 @@
         
     }
     .modify-avatar-button{
+        font-size: calc(16 / $fdf) * $rem;
         &.none{
             display: none;
         }

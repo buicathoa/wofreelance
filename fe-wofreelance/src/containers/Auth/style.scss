@@ -161,7 +161,7 @@
       border-radius: 5px;
       padding: calc(8 / $fdf) * $rem calc(22 / $fdf) * $rem;
       margin-bottom: calc(24 / $fdf) * $rem;
-
+      cursor: pointer;
       img {
         width: calc(36 / $fdf) * $rem;
         height: calc(36 / $fdf) * $rem;

@@ -1,32 +1,25 @@
-import React, { Component, useContext, useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button, Form, Input, Checkbox, Row, Col } from 'antd';
-import { freelancer_logo, facebook_icon_white } from './../../assets'
-import { AppActions } from '../../reducers/listReducer/appReducer';
-import './style.scss'
-import { useAppDispatch } from '../../reducers/hook';
 import { Link } from 'react-router-dom';
-import { ResponseFormatItem, UserInterface } from '../../interface';
-import { UserActions } from '../../reducers/listReducer/userReducer';
-import { openError } from '../../components/Notifications';
-import axios from 'axios';
-import { getCookie } from '../../utils/helper';
-import { LeftOutlined } from '@ant-design/icons'
-import { io } from "socket.io-client";
-import { SocketContext } from '../../SocketProvider';
-// import { SocketContext, socket } from '../../SocketContext';
 
+import { freelancer_logo, facebook_icon_white } from 'assets'
+
+import { AppActions } from 'reducers/listReducer/appReducer';
+import { useAppDispatch } from 'reducers/hook';
+import { UserActions } from 'reducers/listReducer/userReducer';
+
+import { ResponseFormatItem } from 'interface';
+import { openError } from 'components/Notifications';
+import { getCookie } from 'utils/helper';
+import './style.scss'
 
 const Auth = () => {
   let location = useLocation()
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
-  const socket: any = useContext(SocketContext)
-  const {id} = useParams()
   const [formValues, setformValues] = useState({})
-  const [loginType, setLoginType] = useState('')
-  const [userFbInfo, setUserFbInfo] = useState<UserInterface>({user_active: false})
   const validateMessages = {
     required: 'This field is required'
   }
@@ -53,9 +46,7 @@ const Auth = () => {
   useEffect(() => {
     const login_type: any = getCookie('login_type')
     if (login_type === 'facebook') {
-      setLoginType(login_type)
       const user_info: any = getCookie('user_info')
-      setUserFbInfo(JSON.parse(user_info))
       setformValues({ email: JSON.parse(user_info).email })
     }
   }, [])
@@ -82,13 +73,13 @@ const Auth = () => {
     <div className="auth-wrapper">
         <div className="auth-component">
           <div className="auth-logo">
-            <img src={freelancer_logo} />
+            <img src={freelancer_logo} alt=""/>
           </div>
           <div className="auth-description">
             Welcome back!
           </div>
           <div className="auth-login-social" onClick={handleLoginWithFacebook}>
-            <img src={facebook_icon_white} />
+            <img src={facebook_icon_white} alt=""/>
             <span>Login with Facebook</span>
           </div>
           <div className="content-divider">OR</div>

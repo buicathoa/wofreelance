@@ -19,6 +19,7 @@ export interface ResponseFormatList {
 
 export interface SkillsetInterface {
     id?: number,
+    category_id?: number,
     name?: string,
     job_matching_count?: number,
     createdAt?: Date,
@@ -96,10 +97,13 @@ export interface ModalConfirmInterface {
     onConfirm: any
 }
 
-export interface ModalPortfolioInterface {
+interface PortfolioCompInterface {
     visible: boolean,
-    setVisible: React.Dispatch<React.SetStateAction<boolean>>,
-    portfolioItem: PortfolioInterface
+    selected: PortfolioInterface | any
+}
+export interface ModalPortfolioInterface {
+    portfolioAction: PortfolioCompInterface,
+    setPortfolioAction: React.Dispatch<React.SetStateAction<PortfolioCompInterface>>
 }
 
 export interface LinkAccountsComponentInterface {
@@ -126,6 +130,7 @@ export interface UserInterface {
     linkedin?: boolean,
     avatar?: string,
     education?: string,
+    educations?: Array<EducationInterface>
     birthdate?: string,
     title?: string,
     description?: string,
@@ -148,7 +153,7 @@ export interface UserInterface {
     first_name?: string,
     last_name?: string,
     list_skills?: Array<SkillsetInterface>,
-    list_experiences?: Array<ExperiencesInterface>,
+    experiences?: Array<ExperiencesInterface>,
     hourly_rate?: number,
     avatar_cropped?: string,
     country?: {
@@ -160,7 +165,9 @@ export interface UserInterface {
     noti_count?: number,
     user_active?: boolean,
     noti_mess?: number,
-    status_info?: MessageStatus
+    status_info?: MessageStatus,
+    portfolios?: Array<PortfolioInterface>,
+    qualifications?: Array<QualificationInterface>
 }
 
 export interface BudgetInterface {
@@ -273,7 +280,11 @@ export interface EducationInterface {
     university_name?: string,
     country_id?: number,
     createdAt?: Date,
-    updatedAt?: Date
+    updatedAt?: Date,
+    degree?: string,
+    start_year?: Date,
+    end_year?: Date,
+    country?: string
 }
 
 export interface AvatarUserInterface {
@@ -297,7 +308,7 @@ export interface QualificationInterface {
 export interface UserEducationInterface {
     degree?: string,
     end_year?: Date,
-    id: number,
+    id?: number,
     start_year?: Date,
     university_name?: string,
     country_id?: number,
@@ -377,8 +388,6 @@ export interface SkillSelectionComponentInterface {
     categorySelected?: CategoryInterface,
     setCategorySelected: React.Dispatch<React.SetStateAction<any>>,
     debouncedText?: string,
-    matchJobs?: number,
-    setMatchJobs: React.Dispatch<React.SetStateAction<any>>,
     valueSearch?: string,
     setValueSearch: React.Dispatch<React.SetStateAction<any>>
 }
@@ -394,7 +403,8 @@ export interface userReducerInterface {
     languages: Array<LanguagesInterface>,
     address_generated: AddressGeneratedInterface,
     user_info: UserInterface,
-    isLoggedIn: boolean
+    isLoggedIn: boolean,
+    educations: Array<EducationInterface> | [],
 }
 
 export interface categoryReducerInterface {

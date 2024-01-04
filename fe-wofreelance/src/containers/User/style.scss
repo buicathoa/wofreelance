@@ -3,14 +3,16 @@
 .slick-arrow.slick-prev {
     background-color: red;
     color: red;
-  }
-  .slick-arrow.slick-next {
+}
+
+.slick-arrow.slick-next {
     background-color: red;
     color: red;
-  }
+}
+
 .user-profile-wrapper {
     background-color: #f7f7f7;
-    padding-bottom: calc(96 / $fdf) * $rem;
+    // padding-bottom: calc(16 / $fdf) * $rem;
     font-family: $roboto;
     min-height: calc(100vh - 28rem);
 
@@ -21,12 +23,12 @@
     .nav-user {
         // height: calc(64 / $fdf) * $rem;
         background-color: #ffffff;
-        padding: 0 calc(8 / $fdf) * $rem;
+        // padding: 0 calc(8 / $fdf) * $rem;
         box-shadow: $boxshadow;
 
         &.display {
             z-index: 1000;
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             right: 0;
@@ -125,7 +127,7 @@
         width: 100%;
 
         .card-image {
-            &.rating {
+            &.rating > img {
                 margin: 0 auto;
                 width: calc(470 / $fdf) * $rem;
                 height: calc(157 / $fdf) * $rem;
@@ -134,6 +136,7 @@
 
         .ant-row {
             &.portfolio-wrapper-user {
+
                 padding: calc(24 / $fdf) * $rem;
 
                 .ant-col-8 {
@@ -143,6 +146,7 @@
                     // width: calc(100% / 3);
                     padding: 0 calc(12 / $fdf) * $rem;
                     cursor: pointer;
+
                     .ant-carousel {
                         width: 100%;
                         height: 100%;
@@ -150,11 +154,14 @@
                         .slick-slider {
                             width: 100%;
                             height: 100%;
-                            .slick-next, .slick-prev{
+
+                            .slick-next,
+                            .slick-prev {
                                 background-color: #12151b99 !important;
                                 border: unset !important;
                                 color: #ffffff !important;
                             }
+
                             img {
                                 height: calc(200 / $fdf) * $rem;
                                 width: 100%;
@@ -430,23 +437,19 @@
                                     }
 
                                     .edit-profile-button {
-                                        // margin-bottom: calc(16 / $fdf) * $rem;
-                                        height: calc(30 / $fdf) * $rem;
-                                        line-height: calc(30 / $fdf) * $rem;
                                         cursor: pointer;
 
                                         &.none {
                                             display: none;
                                         }
-
-                                        span {
-                                            background: #1772eb;
-                                            padding: calc(6 / $fdf) * $rem calc(13 / $fdf) * $rem;
-                                            border-color: #1772eb;
-                                            color: #f7f7f7;
-                                            font-size: calc(14 / $fdf) * $rem;
-                                            font-size: 600;
-                                        }
+                                        border-radius: calc(4 / $fdf) * $rem;
+                                        background: #1772eb;
+                                        border-color: #1772eb;
+                                        color: #f7f7f7;
+                                        font-size: calc(16 / $fdf) * $rem;
+                                        font-weight: 600;
+                                        height: calc(40 / $fdf) * $rem;
+                                        padding: 0 calc(32 / $fdf) * $rem !important;
                                     }
                                 }
 
@@ -541,6 +544,10 @@
                                     }
 
                                     button {
+                                        height: calc(40 / $fdf) * $rem;
+                                        padding: 0 calc(32 / $fdf) * $rem !important;
+                                        font-size: calc(16 / $fdf) * $rem;
+
                                         &:nth-child(1) {
                                             margin-right: calc(8 / $fdf) * $rem;
                                         }

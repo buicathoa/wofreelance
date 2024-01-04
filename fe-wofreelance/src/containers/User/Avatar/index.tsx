@@ -1,21 +1,24 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import {
     LoadingOutlined
 } from '@ant-design/icons'
 import ReactCrop from 'react-image-crop'
-import { AvatarUserInterface, ResponseFormatItem, UserInterface } from '../../../interface'
-import { RootState } from '../../../reducers/rootReducer';
-import { openError, openSuccess } from '../../../components/Notifications';
-import { getBase64 } from '../../../utils/helper';
-import { UserActions } from '../../../reducers/listReducer/userReducer';
 import { Spin } from 'antd';
+
+import { getBase64 } from 'utils/helper';
+
+import { UserActions } from 'reducers/listReducer/userReducer';
+import { RootState } from 'reducers/rootReducer';
+import { AppActions } from 'reducers/listReducer/appReducer';
+
+import { AvatarUserInterface, ResponseFormatItem, UserInterface } from 'interface'
+import { openError, openSuccess } from 'components/Notifications';
 
 import 'react-image-crop/dist/ReactCrop.css'
 import './style.scss'
-import { AppActions } from '../../../reducers/listReducer/appReducer';
 
-export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setFileUploaded }: AvatarUserInterface) => {
+const Avatar = ({ setIsOpenModifyAvt, fileUploaded, setFileUploaded }: AvatarUserInterface) => {
     const dispatch = useDispatch()
 
     const [isLoading, setIsLoading] = useState(false)
@@ -24,8 +27,8 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
         unit: 'px',
         x: 10,
         y: 10,
-        width: 140,
-        height: 140,
+        width: 250,
+        height: 250,
         aspect: 1,
         maxWidth: 0,
         maxHeight: 0,
@@ -202,3 +205,5 @@ export const Avatar = ({ isOpenModifyAvt, setIsOpenModifyAvt, fileUploaded, setF
         </div>
     )
 }
+
+export default Avatar

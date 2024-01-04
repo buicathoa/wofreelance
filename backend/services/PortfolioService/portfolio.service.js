@@ -101,10 +101,10 @@ const PortfolioService = {
   deletePortfolios: async (req, res) => {
     try {
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        Portfolios
       );
       if (checkRole === 1) {
         await Portfolios.destroy({
@@ -127,7 +127,7 @@ const PortfolioService = {
     const transaction = await sequelize.transaction();
     try {
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.user_id,
         UserProfiles

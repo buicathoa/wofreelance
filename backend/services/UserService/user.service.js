@@ -21,7 +21,7 @@ const UserProfile = db.userprofile;
 const UserRole = db.userroles;
 const Skillset = db.jobskillset;
 const User_Skillset = db.user_skillset;
-const Post = db.posts;
+const Portfolios = db.portfolio;
 const Languages = db.languages;
 const User_Languages = db.user_languages;
 const Experience = db.experiences;
@@ -29,7 +29,11 @@ const Countries = db.countries;
 const UserLoggedIn = db.user_loggedin;
 const Notifications = db.notifications;
 const Sockets = db.sockets;
-
+const Universities = db.universities;
+const User_Education = db.user_educations;
+const JobSkillset = db.jobskillset;
+const Qualifications = db.qualifications;
+const _ = require('lodash')
 const CONSTANT = require("../../constants");
 const store = require("store");
 const dayjs = require("dayjs");
@@ -266,9 +270,11 @@ const userService = {
       }
 
       const userFound = await UserProfile.findOne({
-        where: {
+        where: _.isEmpty(searchCond) ? {
           id: req.body.user_id ?? decoded.id,
           ...searchCond,
+        } : {
+          ...searchCond
         },
         attributes: {
           exclude: ["referer_code"],
@@ -303,6 +309,78 @@ const userService = {
             as: "languages",
             through: {},
           },
+          {
+            model: Experience,
+            as: 'experiences',
+            through: {
+              attributes: [],
+            },
+            sort: ['updatedAt', 'DESC']
+          },
+          {
+            // attributes: [],
+            model: Universities,
+            as: "educations",
+            // attributes: [],
+            through: {
+              model: User_Education,
+              where: {
+                user_id: req.body.user_id ?? decoded.id,
+              },
+              attributes: [
+                "id",
+                "user_id",
+                "education_id",
+                "createdAt",
+                "updatedAt",
+                "degree",
+                "start_year",
+                "end_year",
+                "country_id",
+              ],
+              order: [["updatedAt", "DESC"]],
+              // order: [["updatedAt", "DESC"]],
+            },
+            include: [
+              {
+                model: Countries,
+                as: 'country',
+                attributes: ['country_official_name']
+              }
+            ]
+          },
+          {
+            model: Portfolios,
+            as: 'portfolios',
+            include: [
+              {
+                model: JobSkillset,
+                attributes: {
+                  exclude: ['category_id', 'createdAt', 'updatedAt']
+                },
+                through: {
+                  attributes: [],
+                },
+                as: "skills",
+              },
+            ],
+            sort: ['updatedAt', 'DESC']
+          },
+          {
+            model: Qualifications,
+            as: 'qualifications',
+            sort: ['updatedAt', 'DESC']
+          },
+          {
+            model: JobSkillset,
+            attributes: {
+              exclude: ['updatedAt', 'createdAt']
+            },
+            as: 'list_skills',
+            through: {
+              attributes: []
+            }
+          }
         ],
       });
       if (userFound !== null) {
@@ -312,6 +390,7 @@ const userService = {
           role_id,
           is_verified_account,
           token,
+          educations,
           ...others
         } = userFound.dataValues;
         let list_skills = [];
@@ -340,19 +419,22 @@ const userService = {
             new Date().getTimezoneOffset() * 60 * 1000;
           timeResponse = new Date(timeConvert).toLocaleString("en-US");
         }
-
+        const educationResponse = educations?.map((x) => {
+          const {user_id, ...restObj} = x.user_education.dataValues
+          return {...restObj, university_name: x.university_name, country: x?.country?.country_official_name }
+        })
         if (req.body.id) {
           if (decoded.role.id <= user.role.id) {
             return timeResponse
-              ? { ...user, current_time: timeResponse }
-              : { ...user };
+              ? { ...user, current_time: timeResponse, educations: educationResponse }
+              : { ...user, educations: educationResponse };
           } else {
             throw new ClientError("You're not allowed to do this action", 404);
           }
         } else {
           return timeResponse
-            ? { ...others, current_time: timeResponse }
-            : { ...others };
+            ? { ...others, educations: educationResponse, current_time: timeResponse }
+            : { ...others, educations: educationResponse, };
         }
       } else {
         return 1;
@@ -521,7 +603,7 @@ const userService = {
     const decoded = jwt_decode(req.headers.authorization);
     let transaction = await sequelize.transaction();
     try {
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.id,
         UserProfile
@@ -582,7 +664,7 @@ const userService = {
     try {
       let user = {};
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.id,
         UserProfile

@@ -1,16 +1,11 @@
 import { Card, Col, Input, Row, Tag } from 'antd'
 import { RightOutlined, PlusOutlined, CheckOutlined } from '@ant-design/icons'
+import { useMemo } from 'react'
+import { SkillSelectionComponentInterface, SkillsetInterface } from 'interface'
 
-import React, { useState, useEffect } from 'react'
-import { useDebounce } from '../../utils/useDebounce'
-import { CategoryInterface, ResponseFormatList, SkillSelectionComponentInterface, SkillsetInterface } from '../../interface'
-import { useDispatch } from 'react-redux'
-import { CategoryActions } from '../../reducers/listReducer/categoryReducer'
-
-const SkillSelection = ({
-    listCategory, skillsetSelected, setSkillsetSelected, listSkills, setListSkills, categorySelected, setCategorySelected, debouncedText,
-    matchJobs, setMatchJobs, setValueSearch }: SkillSelectionComponentInterface) => {
+const SkillSelection = ({ listCategory, skillsetSelected, setSkillsetSelected, listSkills, setListSkills, categorySelected, setCategorySelected, debouncedText, setValueSearch }: SkillSelectionComponentInterface) => {
     const handleClose = (skill: SkillsetInterface) => {
+        console.log('skill', skill)
         const skills = skillsetSelected ? [...skillsetSelected] : []
         const skillsFilter = skills.filter(x => x.id !== skill.id)
         setSkillsetSelected && setSkillsetSelected(skillsFilter)
@@ -27,10 +22,6 @@ const SkillSelection = ({
     const handleSelectSkillset = (skill: SkillsetInterface) => {
         if (skillsetSelected && skillsetSelected.length < 20 && skillsetSelected.findIndex((x) => x.id === skill.id) === -1) {
             const skills: SkillsetInterface[] = [...skillsetSelected, skill]
-            const sum: number = skills.reduce((accumulator, currentValue: SkillsetInterface) => {
-                return accumulator + currentValue.job_matching_count!
-            }, 0)
-            setMatchJobs(sum)
             setSkillsetSelected && setSkillsetSelected(skills)
         }
     }
@@ -38,6 +29,16 @@ const SkillSelection = ({
     const handleSearchSkills = (event: any) => {
         setValueSearch(event.target.value)
     }
+
+    const calcMatchesJob = useMemo(() => {
+        let totalJobs = 0;
+        if(skillsetSelected!.length > 0) {
+            for(let i of skillsetSelected!) {
+                totalJobs += i.job_matching_count!
+            }
+        }
+        return totalJobs
+    }, [skillsetSelected])
 
     return (
         <div className="new-freelancer-content">
@@ -79,7 +80,7 @@ const SkillSelection = ({
                             {skillsetSelected ? skillsetSelected.length : 0} out of 20 skills selected
                         </div>
                         <div className="skill-selected-body">
-                            <div className="lists-job-matching-quantity">{matchJobs} jobs matching your skills</div>
+                            <div className="lists-job-matching-quantity">{calcMatchesJob} jobs matching your skills</div>
                             <div className="list-job-matching">
                                 {skillsetSelected?.map((skill: SkillsetInterface, index) => {
                                     return (

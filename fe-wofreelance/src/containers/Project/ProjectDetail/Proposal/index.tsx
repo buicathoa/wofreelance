@@ -15,13 +15,15 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../../../reducers/rootReducer'
 import _ from 'lodash'
 import { Link } from 'react-router-dom'
-import { ModalConfirm } from '../../../../components/ModalConfirm'
 import { openSuccess } from '../../../../components/Notifications'
 import { PaginationDivide } from '../../../../components/Pagination'
 import { InteractionsActions } from '../../../../reducers/listReducer/interactionReducer'
 import { AssignProjectComponent } from '../../../../components/AssignProjectComponent'
 import DetailBidInsightsModal from '../../../BidInsights/DetailBidInsightsModal'
 import { toggleUserMessState } from '../../../../utils/helper'
+
+const ModalConfirm = React.lazy(() => import('components/ModalConfirm'));
+
 interface componentInterface {
     postItem?: PostInteface,
     setModifyBid: React.Dispatch<React.SetStateAction<string>>,

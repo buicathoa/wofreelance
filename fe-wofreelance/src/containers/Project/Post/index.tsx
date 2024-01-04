@@ -1,23 +1,23 @@
-import React, { useEffect, useState, useContext } from 'react'
-import { freelancer_logo } from '../../../assets'
-import './style.scss'
-import { Alert, AutoComplete, Button, Col, DatePicker, Form, Input, Row, Select } from 'antd'
-import { removeAccentsToLower, renderFileIcon, renderTypeOfContent } from '../../../utils/helper'
+import { useEffect, useState, useContext } from 'react'
+import { Button, Col, Form, Input, Row, Select } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
+import { GoldTwoTone, IdcardTwoTone, UploadOutlined, ClockCircleTwoTone, DollarTwoTone } from '@ant-design/icons'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { GoldTwoTone, IdcardTwoTone, UploadOutlined, ClockCircleTwoTone, DollarTwoTone, SmileTwoTone } from '@ant-design/icons'
-import { AlertBanner } from '../../../components/AlertBanner'
-import { useDispatch } from 'react-redux'
-import { AppActions } from '../../../reducers/listReducer/appReducer'
-import { BudgetInterface, CurrencyInterface, ResponseFormatItem, ResponseFormatList } from '../../../interface'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../../reducers/rootReducer'
-import { CategoryActions } from '../../../reducers/listReducer/categoryReducer'
-import { PostActions } from '../../../reducers/listReducer/postReducer'
-import { openError } from '../../../components/Notifications'
-import { SocketContext } from '../../../SocketProvider'
-import { useDebounce } from '../../../utils/useDebounce'
-// import { SocketContext } from '../../../SocketContext'
+import { BudgetInterface, CurrencyInterface, ResponseFormatItem, ResponseFormatList } from 'interface'
+
+import { SocketContext } from 'SocketProvider'
+import { AppActions } from 'reducers/listReducer/appReducer'
+import { RootState } from 'reducers/rootReducer'
+import { CategoryActions } from 'reducers/listReducer/categoryReducer'
+import { PostActions } from 'reducers/listReducer/postReducer'
+
+import { AlertBanner } from 'components/AlertBanner'
+import { openError } from 'components/Notifications'
+import { renderFileIcon, renderTypeOfContent } from 'utils/helper'
+import { useDebounce } from 'utils/useDebounce'
+import './style.scss'
+
 export const Post = () => {
     const socket: any = useContext(SocketContext)
 
@@ -239,7 +239,7 @@ export const Post = () => {
                         {1 <= step && (
                             <div className="step-item">
                                 <Form.Item name="title" className="custom-form-item" rules={validateSchema.title}>
-                                    <Input placeholder='Choose a name for a project' className='form-input project-name' />
+                                    <Input placeholder='Project name' className='form-input project-name' />
                                 </Form.Item>
                                 <div className="description-step-1">
                                     <div className="description-left">
@@ -260,7 +260,7 @@ export const Post = () => {
                                     </div>
                                 </div>
                                 <Form.Item name="project_detail" className="custom-form-item" rules={validateSchema.project_detail} label='Project detail'>
-                                    <Input.TextArea placeholder='Choose a name for a project' className='form-input textarea' rows={4} maxLength={1000} showCount={false} />
+                                    <Input.TextArea placeholder='Description of project' className='form-input textarea' rows={4} maxLength={1000} showCount={false} />
                                 </Form.Item>
                                 <div className="attached-file-wrapper">
                                     <div className="attached-file-left">
@@ -290,10 +290,10 @@ export const Post = () => {
                                         return (
                                             <div className="file-item" key={index}>
                                                 <div className="file-item-left">
-                                                    <img src={renderFileIcon(file.split('.').at(-1))} />
+                                                    <img src={renderFileIcon(file.split('.').at(-1))} alt=""/>
                                                     <span className="file-name">{file.split('/').at(-1)}</span>
                                                 </div>
-                                                <div className="file-item-right" onClick={() => handleRemoveFile(file)}>X</div>
+                                                <div className="file-item-right" onClick={() => handleRemoveFile(file)}>x</div>
                                             </div>
                                         )
                                     })}

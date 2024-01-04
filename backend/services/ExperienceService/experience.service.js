@@ -28,10 +28,10 @@ const ExperienceService = {
     let transaction = await sequelize.transaction();
     let newExperience;
     try {
-      const checkRole = await validateRole.create(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        User_Experiences
       );
       if (checkRole === 1) {
         newExperience = await Experience.create({ ...req.body });
@@ -60,10 +60,10 @@ const ExperienceService = {
     const decoded = jwt_decode(req.headers.authorization);
     let exp;
     try {
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        User_Experiences
       );
       if (checkRole === 1) {
         exp = await Experience.update(
@@ -91,10 +91,10 @@ const ExperienceService = {
     try {
       let exp = {};
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.id,
-        UserProfiles
+        User_Experiences
       );
       if (checkRole === 1) {
         exp = await Experience.destroy({

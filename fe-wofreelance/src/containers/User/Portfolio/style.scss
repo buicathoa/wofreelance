@@ -55,6 +55,7 @@
                     flex-wrap: wrap;
 
                     .ant-row {
+                        width: 100%;
                         .ant-col-6 {
                             padding: calc(16 / $fdf) * $rem;
                             padding-top: calc(24 / $fdf) * $rem;
@@ -141,7 +142,7 @@
                                     align-items: center;
                                     border-top: 1px solid #aaa;
                                     background-color: #ffffff;
-
+                                    font-size: calc(16 / $fdf) * $rem;
                                     span {
                                         font-weight: 600;
                                         color: #2c2c2c;
@@ -229,6 +230,7 @@
                 padding: calc(40 / $fdf) * $rem;
                 background-color: #ffffff;
                 border: 1px solid #DEDEDE;
+                border-radius: calc(4 / $fdf) * $rem;
 
                 .portfolio-modify-form-title {
                     font-size: calc(18 / $fdf) * $rem;
@@ -449,18 +451,18 @@
                                     display: flex;
                                     flex-wrap: wrap;
 
-                                    .ant-tag {
-                                        cursor: pointer;
-                                        background-color: #f50;
+                                    // .ant-tag {
+                                    //     cursor: pointer;
+                                    //     background-color: #f50;
 
-                                        &.skill-selected-item {
-                                            border-color: #f50;
-                                        }
+                                    //     &.skill-selected-item {
+                                    //         border-color: #f50;
+                                    //     }
 
-                                        &:hover {
-                                            background-color: rgb(218, 131, 88) !important;
-                                        }
-                                    }
+                                    //     &:hover {
+                                    //         background-color: rgb(218, 131, 88) !important;
+                                    //     }
+                                    // }
                                 }
                             }
                         }

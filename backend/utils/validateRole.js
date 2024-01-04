@@ -43,53 +43,30 @@ const validateRole = {
   get: async () => {
     return 1;
   },
-  update_delete: async (decoded = null, id = null, model = null) => {
-    if (model === UserProfile) {
-      const user = await model.findOne({
-        where: {
-          id: id,
-        },
-      });
-      if (user) {
-        if (decoded.role?.id < user.role_id) {
-          return 3;
-        } else if (decoded?.role?.id === user?.role_id) {
-          if (decoded?.id === user?.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        } else {
-          return 0;
-        }
-      } else {
-        return 1;
-      }
+  modify: async (decoded = null, id = null, model = null) => {
+    if(!id) {
+      return 1
     } else {
       const user = await model.findOne({
+        attributes: ['user_id'],
         where: {
-          id: id,
-        },
-        include: [
-          {
-            model: UserProfile,
-          },
-        ],
-      });
-      if (user) {
-        if (decoded.role?.id < user.UserProfile.role_id) {
-          return 1;
-        } else if (decoded?.role?.id === user.UserProfile.role_id) {
-          if (decoded?.id === user?.UserProfile.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        } else {
-          return 0;
+          id: id
         }
+      })
+      if(decoded.id === user?.user_id) {
+        return 1
       } else {
-        return 2;
+        const userFound = await UserProfile.findOne({
+          attributes: ['role_id'],
+          where: {
+            id: user?.user_id
+          },
+        })
+        if(userFound?.role_id < decoded.role_id) {
+          return 1
+        } else {
+          return 0
+        }
       }
     }
   },

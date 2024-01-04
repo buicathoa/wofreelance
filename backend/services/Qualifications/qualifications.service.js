@@ -49,10 +49,10 @@ const QualificationsService = {
     const decoded = jwt_decode(req.headers.authorization);
     let qualification;
     try {
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
-        req.body.user_id,
-        UserProfiles
+        req.body.id,
+        Qualifications
       );
       if (checkRole === 1) {
         qualification = await Qualifications.update(
@@ -80,10 +80,10 @@ const QualificationsService = {
     try {
       let exp = {};
       const decoded = jwt_decode(req.headers.authorization);
-      const checkRole = await validateRole.update_delete(
+      const checkRole = await validateRole.modify(
         decoded,
         req.body.id,
-        UserProfiles
+        Qualifications
       );
       if (checkRole === 1) {
         exp = await Qualifications.destroy({

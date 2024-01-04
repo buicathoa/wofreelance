@@ -52,7 +52,6 @@ const Post = createSlice({
             const bidsClone = []
             return {
                 ...state,
-                state.
             }
         },
 

@@ -1,5 +1,5 @@
 
-import { useContext, useState, useRef } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { BellFilled, UpOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons'
@@ -23,8 +23,7 @@ function ChatWindowFrame() {
   const dispatch = useAppDispatch()
   dayjs.extend(utc);
     dayjs.extend(timezone);
-  const textareaRef = useRef<any>(null)
-  const socket: any = useContext(SocketContext)
+
   const [viewMessage, setViewMessage] = useState(false)
 
   const interactions: any = useSelector((state: RootState) => state.interactions.interactions)

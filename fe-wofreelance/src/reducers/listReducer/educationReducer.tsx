@@ -36,7 +36,7 @@ const Education = createSlice({
                     return {...edu}
                 }
             })
-        }
+        },
     })
 })
 

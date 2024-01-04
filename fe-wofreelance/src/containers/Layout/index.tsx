@@ -1,32 +1,31 @@
 /* eslint-disable array-callback-return */
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { freelancer_logo } from '../../assets'
+import { useLocation, useNavigate } from "react-router-dom";
 import { BellOutlined, MessageOutlined, CodeSandboxOutlined, TeamOutlined } from '@ant-design/icons'
 import { Badge, Button, Popover } from "antd";
-import './style.scss'
-import { useEffect, useContext, useState } from "react";
-import { useDispatch } from "react-redux";
-import { InteractionReducer, NotificationInterface, ResponseFormatItem, UserInterface, latestMessageInterface } from "../../interface";
-import { UserActions } from "../../reducers/listReducer/userReducer";
-import { useSelector } from "react-redux";
-import { RootState } from "../../reducers/rootReducer";
-import BrowseContent from "./BrowseContent";
-import ManageContent from "./ManageContent";
-import GroupContent from "./GroupContent";
-import NotificationContent from "./NotificationContent";
-import MessagesContent from "./MessagesContent";
-import ProfileContent from "./ProfileContent";
-import { checkLocalStorage, deleteCookie, getCookie } from "../../utils/helper";
-import { modalNotifications } from "../../components/modalNotifications";
-import { SocketContext } from "../../SocketProvider";
-import { NotificationsActions } from "../../reducers/listReducer/notificationsReducer";
-import ChatWindowFrame from "../ChatWindowFrame";
-import { InteractionsActions } from "../../reducers/listReducer/interactionReducer";
-import { messageStorage } from "../../constants";
-import { PostActions } from "../../reducers/listReducer/postReducer";
-// import { socket } from "../../SocketContext";
-// import { SocketContext } from "../../SocketContext";
+import React, { useEffect, useContext, useState, Suspense } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import { freelancer_logo } from 'assets'
+import { InteractionReducer, NotificationInterface, ResponseFormatItem, UserInterface, latestMessageInterface } from "interface";
+import { checkLocalStorage, deleteCookie, getCookie } from "utils/helper";
+import { modalNotifications } from "components/modalNotifications";
+import { SocketContext } from "SocketProvider";
+import ChatWindowFrame from "containers/ChatWindowFrame";
+
+import { UserActions } from "reducers/listReducer/userReducer";
+import { RootState } from "reducers/rootReducer";
+import { NotificationsActions } from "reducers/listReducer/notificationsReducer";
+import { InteractionsActions } from "reducers/listReducer/interactionReducer";
+import { PostActions } from "reducers/listReducer/postReducer";
+
+import './style.scss'
+
+const BrowseContent = React.lazy(() => import('./BrowseContent'));
+const ManageContent = React.lazy(() => import('./ManageContent'));
+const GroupContent = React.lazy(() => import('./GroupContent'));
+const NotificationContent = React.lazy(() => import('./NotificationContent'));
+const MessagesContent = React.lazy(() => import('./MessagesContent'));
+const ProfileContent = React.lazy(() => import('./ProfileContent'));
 
 const Layout = () => {
   const initFilterData = {
@@ -39,7 +38,6 @@ const Layout = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [openNoti, setOpenNoti] = useState(false)
-  const [countMessagesNoti, setCountMessagesNoti] = useState(0)
   const [openNotiMess, setOpenNotiMess] = useState(false)
   const [filterLatestMessages, setFilterLatestMessages] = useState(initFilterData)
   // const socket = useContext(SocketContext)
@@ -89,7 +87,7 @@ const Layout = () => {
         getUserInfo({}).then((resUser) => {
           getAllLatestMessages(filterLatestMessages).then((res) => {
             getUnreadMessages({})
-            dispatch(InteractionsActions.getAllLatestMessagesSuccess({data: res?.data, currentUser: resUser?.data?.username}))
+            dispatch(InteractionsActions.getAllLatestMessagesSuccess({ data: res?.data, currentUser: resUser?.data?.username }))
           })
         })
       }
@@ -105,7 +103,7 @@ const Layout = () => {
 
   useEffect(() => {
     if (socket?.connected) {
-      
+
       socket.on("new_post_notify_response", (data: any) => {
         dispatch(UserActions.increaseNotifications(data))
         modalNotifications(
@@ -119,7 +117,7 @@ const Layout = () => {
 
       socket.on("project_bidding_response", (data: any) => {
         dispatch(UserActions.increaseNotifications(data))
-        dispatch(PostActions.biddingResponse(data))
+        // dispatch(PostActions.biddingResponse(data))
         return modalNotifications({ notiMess: 'New bidding', description: data.message, noti_url: data.url })
       })
 
@@ -152,7 +150,7 @@ const Layout = () => {
     if (openNoti) {
       setOpenNoti(false)
     } else {
-      getAllNotifications({page: 1, limit: 10}).then(() => {
+      getAllNotifications({ page: 1, limit: 10 }).then(() => {
         if (user.noti_count! > 0) {
           updateUser({ noti_count: 0 }).then(() => {
             dispatch(UserActions.updateNoticountSuccess({}))
@@ -182,19 +180,31 @@ const Layout = () => {
             </div>
             <div className="manage-left">
               <div className="manage-left-item">
-                <Popover content={<BrowseContent />} trigger="hover" placement="bottomLeft">
+                <Popover content={
+                  <Suspense fallback={<p>Loading...</p>}>
+                    <BrowseContent />
+                  </Suspense>
+                } trigger="hover" placement="bottomLeft">
                   <CodeSandboxOutlined />
                   <span>Browse</span>
                 </Popover>
               </div>
               <div className="manage-left-item">
-                <Popover content={<ManageContent />} trigger="hover" placement="bottomLeft">
+                <Popover content={
+                  <Suspense fallback={<p>Loading...</p>}>
+                    <ManageContent />
+                  </Suspense>
+                } trigger="hover" placement="bottomLeft">
                   <CodeSandboxOutlined />
                   <span>Manage</span>
                 </Popover>
               </div>
               <div className="manage-left-item">
-                <Popover content={<GroupContent />} trigger="hover" placement="bottomLeft">
+                <Popover content={
+                  <Suspense fallback={<p>Loading...</p>}>
+                    <GroupContent />
+                  </Suspense>
+                } trigger="hover" placement="bottomLeft">
                   <TeamOutlined />
                   <span>Groups</span>
                 </Popover>
@@ -203,12 +213,20 @@ const Layout = () => {
           </div>
           <div className="nav-menu-right">
             <div className="message-notify">
-              <Popover content={<NotificationContent notifications={notifications} />} onOpenChange={handleOpenNoti} open={openNoti} trigger="click" placement="bottom">
+              <Popover content={
+                <Suspense fallback={<p>Loading...</p>}>
+                  <NotificationContent notifications={notifications} />
+                </Suspense>
+              } onOpenChange={handleOpenNoti} open={openNoti} trigger="click" placement="bottom">
                 <Badge count={user.noti_count} size="small">
                   <BellOutlined />
                 </Badge>
               </Popover>
-              <Popover content={<MessagesContent visible={openNotiMess}/>} trigger="click" onOpenChange={handleOpenNotiMess} open={openNotiMess} placement="bottom">
+              <Popover content={
+                <Suspense fallback={<p>Loading...</p>}>
+                  <MessagesContent visible={openNotiMess} />
+                </Suspense>
+              } trigger="click" onOpenChange={handleOpenNotiMess} open={openNotiMess} placement="bottom">
                 <Badge count={unread_messages} size="small">
                   <MessageOutlined />
                 </Badge>
@@ -216,9 +234,13 @@ const Layout = () => {
             </div>
             <div className="post-profile">
               <Button onClick={handlePostProject}>Post a Project</Button>
-              <Popover content={<ProfileContent user={user} />} trigger="hover" placement="bottom">
+              <Popover content={
+                <Suspense fallback={<p>Loading...</p>}>
+                  <ProfileContent user={user} />
+                </Suspense>
+              } trigger="hover" placement="bottom">
                 <div className="user-profile">
-                  <img src={user?.avatar} alt="" />
+                  <img src={user?.avatar_cropped} alt="" />
                   <div className="name-balance">
                     <div className="name">@{user.username}</div>
                     <div className="balance">

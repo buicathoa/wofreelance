@@ -1,42 +1,37 @@
 import React, { useEffect, useState } from 'react'
-import './style.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { CountryInterface, EducationInterface, ResponseFormatItem, UserEducationInterface, UserInterface } from '../../../interface';
-import { UserActions } from '../../../reducers/listReducer/userReducer';
-import { RootState } from '../../../reducers/rootReducer';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import LayoutBottomProfile from '../../../components/LayoutBottom/LayoutBottomProfile';
-import { Button, Card, Col, Rate, Row, Form, Input, DatePicker, Checkbox, Popover, Select } from 'antd';
+import dayjs from 'dayjs';
+import { Button, Card, Col, Row, Form, Input, DatePicker, Popover, Select } from 'antd';
 import {
     EllipsisOutlined
 } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import { certifications } from '../../../assets';
-import { removeAccentsToLower } from '../../../utils/helper';
-import { EducationActions } from '../../../reducers/listReducer/educationReducer';
-import dayjs from 'dayjs';
-import { AppActions } from '../../../reducers/listReducer/appReducer';
-import { ModalConfirm } from '../../../components/ModalConfirm';
-import { LocationActions } from '../../../reducers/listReducer/locationReducer';
 
-interface Education {
+import { CountryInterface, EducationInterface, ResponseFormatItem, UserEducationInterface, UserInterface } from '../../../interface';
+import { UserActions } from 'reducers/listReducer/userReducer';
+import { RootState } from 'reducers/rootReducer';
+import { AppActions } from 'reducers/listReducer/appReducer';
+import { LocationActions } from 'reducers/listReducer/locationReducer';
+
+import { removeAccentsToLower } from 'utils/helper';
+
+import './style.scss'
+const ModalConfirm = React.lazy(() => import('components/ModalConfirm'));
+interface EducationInterfaceComponent {
     modify: boolean
 }
 
-const Education = ({ modify }: Education) => {
+const Education = ({ modify }: EducationInterfaceComponent) => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
     const [form] = Form.useForm()
 
     const [modifyStatus, setModifyStatus] = useState<string>('')
-    const [listExp, setListExp] = useState([])
     const [formValues, setformValues] = useState({})
     const [recordSelected, setrecordSelected] = useState<EducationInterface>({})
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false)
 
+    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
     const countries: Array<CountryInterface> = useSelector((state: RootState) => state.location.countries)
-    const educations: Array<CountryInterface> = useSelector((state: RootState) => state.education.educations)
-    const user_educations: Array<UserEducationInterface> = useSelector((state: RootState) => state.education.user_educations)
+    const educations: Array<EducationInterface> = useSelector((state: RootState) => state.user.educations)
 
     const validateMessages = {
         required: 'This field is required'
@@ -82,25 +77,25 @@ const Education = ({ modify }: Education) => {
 
     const getAllEducation = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(EducationActions.getAllEducation({ param, resolve, reject }));
+            dispatch(UserActions.getAllEducation({ param, resolve, reject }));
         });
     };
 
     const deleteEducation = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(EducationActions.deleteEducation({ param, resolve, reject }));
+            dispatch(UserActions.deleteEducation({ param, resolve, reject }));
         });
     };
 
     const createEducation = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(EducationActions.createEducation({ param, resolve, reject }));
+            dispatch(UserActions.createEducation({ param, resolve, reject }));
         });
     };
 
     const updateEducation = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(EducationActions.updateEducation({ param, resolve, reject }));
+            dispatch(UserActions.updateEducation({ param, resolve, reject }));
         });
     };
 
@@ -124,6 +119,10 @@ const Education = ({ modify }: Education) => {
     }
 
     const handleModifyEducation = (action: string) => {
+        if(action === 'add') {
+            setformValues({})
+            setrecordSelected({})
+        }
         setModifyStatus(action)
         getAllCountries({})
     }
@@ -131,7 +130,8 @@ const Education = ({ modify }: Education) => {
     const handleEditEducation = async (edu: UserEducationInterface) => {
         setModifyStatus('edit')
         setrecordSelected(edu)
-        getAllCountries({}).then((resCountry) => {
+        console.log('edu', edu)
+        getAllCountries({country_id: edu.country_id}).then((resCountry) => {
             if (resCountry) {
                 getAllEducation({ country_id: edu.country_id }).then((resEdu) => {
                     if (resEdu) {
@@ -159,11 +159,6 @@ const Education = ({ modify }: Education) => {
 
     const handleCloseForm = () => {
         setModifyStatus('')
-    }
-    
-    const handleAddEducation = () => {
-        setformValues({})
-        setModifyStatus('add')
     }
 
     const renderCardContent = () => {
@@ -224,7 +219,7 @@ const Education = ({ modify }: Education) => {
                                         getPopupContainer={(triggerNode) => triggerNode.parentNode}
                                         showSearch
                                     >
-                                        {educations?.length > 0 && educations.map((country: any, index) => {
+                                        {educations?.length > 0 && educations?.map((country: any, index) => {
                                             return (
                                                 <Select.Option key={index} value={country.id}>{country.university_name}</Select.Option>
                                             )
@@ -258,7 +253,7 @@ const Education = ({ modify }: Education) => {
                 </div>
             )
         } else {
-            if (user_educations.length === 0) {
+            if (!user_info?.educations || user_info?.educations!.length === 0) {
                 return (
                     <div className="card-content no-data">
                         <span className="card-text">No Education have been added..</span>
@@ -267,7 +262,7 @@ const Education = ({ modify }: Education) => {
             } else {
                 return (
                     <div className="list-item">
-                        {user_educations && user_educations?.length > 0 && user_educations.map((edu, index) => {
+                        {user_info?.educations && user_info?.educations!?.length > 0 && user_info?.educations!.map((edu, index) => {
                             return (
                                 <div className="education-item" key={index}>
                                     <div className="education-item-header">
@@ -286,7 +281,7 @@ const Education = ({ modify }: Education) => {
                                         </div>}
                                     </div>
                                     <div className="education-item-content">
-                                        <div className="company-name">{edu?.university_name}</div>
+                                        <div className="company-name">{edu?.university_name} - {edu?.country}</div>
                                         <div className="working-process-time">
                                             <div className="from">{dayjs(edu.start_year).format("MMMM YYYY")} - </div>
                                             <div className="to">&nbsp;{!edu.end_year ? 'Present' : dayjs(edu.end_year).format("MMMM YYYY")}</div>
@@ -302,7 +297,7 @@ const Education = ({ modify }: Education) => {
     }
 
     return (
-        <Card size="small" title="Education" className={`card-education ${(!modify && user_educations.length === 0) && 'none'}`} extra={<Button onClick={() => handleAddEducation()}>Add education</Button>}>
+        <Card size="small" title="Education" className={`card-education ${(!modify && (!user_info?.educations || user_info?.educations?.length === 0)) && 'none'}`} extra={<Button onClick={() => handleModifyEducation('add')}>Add education</Button>}>
             {renderCardContent()}
             <ModalConfirm
                 title={'Confirm'}

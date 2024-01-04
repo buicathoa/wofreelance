@@ -304,6 +304,40 @@ db.notifications.belongsTo(db.userprofile, {
   as: 'user'
 })
 
+
+
+db.userprofile.hasMany(db.portfolio, {
+  foreignKey: 'user_id',
+  as: 'portfolios'
+})
+
+db.portfolio.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'user'
+})
+
+
+db.userprofile.hasMany(db.qualifications, {
+  foreignKey: 'user_id',
+  as: 'qualifications'
+})
+
+db.qualifications.belongsTo(db.userprofile, {
+  foreignKey: 'user_id',
+  as: 'user'
+})
+
+
+
+db.countries.hasMany(db.user_educations, {
+  foreignKey: 'country_id',
+  // as: 'country'
+})
+
+db.user_educations.belongsTo(db.countries, {
+  foreignKey: 'country_id',
+  as: 'country'
+})
 // ========================================================================================== End ==========================================================================================//
 
 
@@ -358,7 +392,7 @@ db.userprofile.belongsToMany(db.experiences, {
   through: db.user_experiences,
   foreignKey: 'user_id',
   otherKey: 'experience_id',
-  as: 'list_experiences'
+  as: 'experiences'
 })
 db.experiences.belongsToMany(db.userprofile, {
   through: db.user_experiences,

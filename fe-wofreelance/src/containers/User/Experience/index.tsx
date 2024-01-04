@@ -1,30 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import './style.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { ExperiencesInterface, ResponseFormatItem, UserInterface } from '../../../interface';
-import { UserActions } from '../../../reducers/listReducer/userReducer';
-import { RootState } from '../../../reducers/rootReducer';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import LayoutBottomProfile from '../../../components/LayoutBottom/LayoutBottomProfile';
-import { Button, Card, Col, Rate, Row, Form, Input, DatePicker, Checkbox, Popover } from 'antd';
+import { ExperiencesInterface, ResponseFormatItem, UserInterface } from 'interface';
+import { Button, Card, Col, Row, Form, Input, DatePicker, Checkbox, Popover } from 'antd';
 import {
     EllipsisOutlined
 } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import { delete_icon } from '../../../assets';
 import dayjs from 'dayjs';
 
-import { ModalConfirm } from '../../../components/ModalConfirm';
-import { AppActions } from '../../../reducers/listReducer/appReducer';
-import { ExperienceActions } from '../../../reducers/listReducer/experienceReducer';
+import { delete_icon } from 'assets';
 
+import { UserActions } from 'reducers/listReducer/userReducer';
+import { RootState } from 'reducers/rootReducer';
+import { AppActions } from 'reducers/listReducer/appReducer';
+import { openSuccess } from 'components/Notifications';
+
+import './style.scss'
+const ModalConfirm = React.lazy(() => import('components/ModalConfirm'));
 interface componentInterface{
     modify: boolean
 }
 
 const Experience = ({modify}: componentInterface) => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
     const [form] = Form.useForm()
 
     const [modifyStatus, setModifyStatus] = useState<string>('')
@@ -66,31 +63,23 @@ const Experience = ({modify}: componentInterface) => {
         ]
     }
 
-    const experiences: Array<ExperiencesInterface> = useSelector((state: RootState) => state.experience.experiences)
-    const user: UserInterface = useSelector((state: RootState) => state.user.user)
-
+    const user_info: UserInterface = useSelector((state: RootState) => state.user.user_info)
 
     const createExperience = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(ExperienceActions.createExperience({ param, resolve, reject }));
+            dispatch(UserActions.createExperience({ param, resolve, reject }));
         });
     };
 
     const deleteExperience = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(ExperienceActions.deleteExperience({ param, resolve, reject }));
+            dispatch(UserActions.deleteExperience({ param, resolve, reject }));
         });
     };
 
     const updateExperience = (param: any): Promise<ResponseFormatItem> => {
         return new Promise((resolve, reject) => {
-            dispatch(ExperienceActions.updateExperience({ param, resolve, reject }));
-        });
-    };
-
-    const getUserInfo = (param: any): Promise<ResponseFormatItem> => {
-        return new Promise((resolve, reject) => {
-            dispatch(UserActions.getUserInfo({ param, resolve, reject }));
+            dispatch(UserActions.updateExperience({ param, resolve, reject }));
         });
     };
 
@@ -102,21 +91,22 @@ const Experience = ({modify}: componentInterface) => {
         setIsStillWorking(e.target.checked)
         if(e.target.checked) {
             setformValues({date_end: ''})
-            // form.setFieldsValue({date_end: ''})
         }
     }
 
     const onSubmitForm = (values: any) => {
-        const payload = { ...values, date_start: dayjs(values.date_start).format('YYYY-MM-DD'), date_end: !isStillWorking ? dayjs(values.date_end).format('YYYY-MM-DD') : null, user_id: user.id }
+        const payload = { ...values, date_start: dayjs(values.date_start).format('YYYY-MM-DD'), date_end: !isStillWorking ? dayjs(values.date_end).format('YYYY-MM-DD') : null, user_id: user_info.id }
         if (modifyStatus === 'add') {
             createExperience(payload).then((res) => {
                 if (res) {
+                    openSuccess({notiMess: 'Action success.'})
                     setModifyStatus('')
                 }
             })
         } else {
             updateExperience({ ...payload, id: itemSelected.id }).then((res) => {
                 if (res) {
+                    openSuccess({notiMess: 'Action success.'})
                     setModifyStatus('')
                 }
             })
@@ -147,6 +137,7 @@ const Experience = ({modify}: componentInterface) => {
         dispatch(AppActions.openLoading(true))
         deleteExperience({ id: itemSelected.id }).then((resDel) => {
             if (resDel) {
+                openSuccess({notiMess: 'Action success'})
                 setIsOpenModalConfirm(false)
             }
         })
@@ -238,7 +229,7 @@ const Experience = ({modify}: componentInterface) => {
                 </div>
             )
         } else {
-            if (experiences?.length === 0) {
+            if (user_info?.experiences!?.length === 0) {
                 return (
                     <div className="card-content no-data">
                         <span className="card-text">No portfolio items have been added yet.</span>
@@ -247,7 +238,7 @@ const Experience = ({modify}: componentInterface) => {
             } else {
                 return (
                     <div className="list-item">
-                        {experiences && experiences.length > 0 && experiences.map((exp, index) => {
+                        {user_info?.experiences! && user_info?.experiences!.length > 0 && user_info?.experiences!.map((exp, index) => {
                             const summary = (exp.summary!).replace(/\n/g, '<br>') || ''
                             return (
                                 <div className="experience-item" key={index}>
@@ -286,7 +277,7 @@ const Experience = ({modify}: componentInterface) => {
 
     return (
         <>
-            <Card size="small" title="Experience" className={`card-experience ${(!modify && experiences.length === 0) && 'none'}`} extra={modify && <Button onClick={() => handleAddExperience()}>Add Experience</Button>}>
+            <Card size="small" title="Experience" className={`card-experience ${(!modify && (!user_info?.experiences || user_info?.experiences!.length === 0)) && 'none'}`} extra={modify && <Button onClick={() => handleAddExperience()}>Add Experience</Button>}>
                 {renderCardContent()}
             </Card>
             <ModalConfirm

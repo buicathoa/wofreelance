@@ -175,7 +175,7 @@ const PostService = {
     const decoded = jwt_decode(req.headers.authorization);
     let updatedRecord;
     try {
-      const checkRole = await validateRole.update_delete(decoded, req.body.id, Post);
+      const checkRole = await validateRole.modify(decoded, req.body.id, Post);
       if(checkRole === 1) {
         await sequelize.transaction(async (t) => {
           const postUpdated = await Post.update(
@@ -220,7 +220,7 @@ const PostService = {
     const decoded = jwt_decode(req.headers.authorization);
     let updatedRecord;
     try {
-      const checkRole = await validateRole.update_delete(decoded, req.body.id, Post)
+      const checkRole = await validateRole.modify(decoded, req.body.id, Post)
       if(checkRole === 1) {
         await sequelize.transaction(async (t) => {
           const postUpdated = await Post.update(

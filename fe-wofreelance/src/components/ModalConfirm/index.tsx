@@ -4,7 +4,7 @@ import { Button, Modal } from 'antd'
 import './style.scss'
 import { delete_icon } from '../../assets'
 
-export const ModalConfirm = ({title, icon = delete_icon, content = "Are you sure to delete this item", description = null, visible, setVisible, onConfirm}: ModalConfirmInterface) => {
+const ModalConfirm = ({title, icon = delete_icon, content = "Are you sure to delete this item", description = null, visible, setVisible, onConfirm}: ModalConfirmInterface) => {
 
     const onConfirmOk = () => {
         onConfirm()
@@ -40,3 +40,5 @@ export const ModalConfirm = ({title, icon = delete_icon, content = "Are you sure
         </>
   )
 }
+
+export default ModalConfirm
